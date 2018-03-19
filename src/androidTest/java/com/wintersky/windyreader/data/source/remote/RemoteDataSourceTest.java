@@ -61,7 +61,7 @@ public class RemoteDataSourceTest {
 
     @Test
     public void searchBook() throws Exception {
-        //loadFile(searchUrl, "s.html");
+        loadTestFile(searchUrl, "s.html");
         List<Book> list = dataSource.searchBookFromRemote(searchUrl, "约会");
         assertNotNull("book list null", list);
         searchCheck(list);
@@ -69,6 +69,7 @@ public class RemoteDataSourceTest {
 
     @Test
     public void getBook() throws Exception {
+        loadTestFile(bookUrl, "b.html");
         Book book = dataSource.getBookFromRemote(bookUrl);
         assertNotNull("book null", book);
         bookCheck(book);
@@ -76,6 +77,7 @@ public class RemoteDataSourceTest {
 
     @Test
     public void getChapterList() throws Exception {
+        loadTestFile(chapterListUrl, "cl.html");
         List<Chapter> list = dataSource.getChapterListFromRemote(chapterListUrl);
         assertNotNull("chapter list null", list);
         chapterListCheck(list);
@@ -83,6 +85,7 @@ public class RemoteDataSourceTest {
 
     @Test
     public void getChapter() throws Exception {
+        loadTestFile(chapterUrl, "c.html");
         Chapter chapter = dataSource.getChapterFromRemote(chapterUrl);
         assertNotNull("chapter null", chapter);
         chapterCheck(chapter);
@@ -126,7 +129,7 @@ public class RemoteDataSourceTest {
         assertNotNull("title null", chapter.title);
     }
 
-    private void loadFile(String url, String file) throws Exception {
+    private void loadTestFile(String url, String file) throws Exception {
         Matcher m = Pattern.compile("(?<=\\.)[^.]+").matcher(url);
         String dir = "";
         if (m.find()) dir += m.group() + "/";
