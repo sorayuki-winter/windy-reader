@@ -1,7 +1,3 @@
----
---- Created by WinterSky.
---- DateTime: 2018/3/11 16:07
----
 function getBook()
     local doc = jsoup.get(bookUrl)
     local eTitles = doc:select("strong:matches((?<!T|t)全集下载)");
