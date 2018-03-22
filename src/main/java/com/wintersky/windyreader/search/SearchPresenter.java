@@ -5,5 +5,14 @@ package com.wintersky.windyreader.search;
  * Presenter
  */
 
-public class SearchPresenter {
+public class SearchPresenter implements SearchContract.Presenter {
+    @Override
+    public void takeView(SearchContract.View view) {
+
+    }
+
+    @Override
+    public void dropView() {
+
+    }
 }

@@ -1,6 +1,12 @@
 package com.wintersky.windyreader.di;
 
+import com.wintersky.windyreader.read.ReadActivity;
+import com.wintersky.windyreader.read.ReadModule;
+import com.wintersky.windyreader.search.SearchActivity;
+import com.wintersky.windyreader.search.SearchModule;
+
 import dagger.Module;
+import dagger.android.ContributesAndroidInjector;
 
 /**
  * We want Dagger.Android to create a Subcomponent which has a parent Component of whichever module ActivityBindingModule is on,
@@ -11,13 +17,13 @@ import dagger.Module;
  */
 @Module
 public abstract class ActivityBindingModule {
-    /*
-    @ActivityScoped
-    @ContributesAndroidInjector(modules = DetailModule.class)
-    abstract DetailActivity detailActivity();
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = ReadModule.class)
     abstract ReadActivity readActivity();
-    */
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = SearchModule.class)
+    abstract SearchActivity searchActivity();
+
 }

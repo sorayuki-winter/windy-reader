@@ -14,8 +14,7 @@ import dagger.android.support.DaggerFragment;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends DaggerFragment {
-
+public class SearchFragment extends DaggerFragment implements SearchContract.View {
 
     public SearchFragment() {
         // Required empty public constructor
