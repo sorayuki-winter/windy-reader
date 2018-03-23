@@ -1,5 +1,7 @@
 package com.wintersky.windyreader.read;
 
+import android.support.v4.app.FragmentManager;
+
 import com.wintersky.windyreader.di.ActivityScoped;
 import com.wintersky.windyreader.di.FragmentScoped;
 
@@ -17,6 +19,12 @@ public abstract class ReadModule {
     @Provides
     static String provideChapterUrl(ReadActivity activity) {
         return activity.getIntent().getStringExtra(EXTRA_CHAPTER_URL);
+    }
+
+    @ActivityScoped
+    @Provides
+    static FragmentManager provideFM(ReadActivity activity) {
+        return activity.getSupportFragmentManager();
     }
 
     @FragmentScoped

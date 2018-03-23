@@ -13,5 +13,7 @@ public class SearchActivity extends DaggerAppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search);
+
+        String s = "Abdsf";
     }
 }

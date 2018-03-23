@@ -13,15 +13,14 @@ public class ReadActivity extends DaggerAppCompatActivity {
 
     public static final String EXTRA_CHAPTER_URL = "CHAPTER_URL";
 
-    @Inject
-    ReadFragment readFragment;
+    @Inject FragmentManager fm;
+
+    @Inject ReadFragment readFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_read);
-
-        FragmentManager fm = getSupportFragmentManager();
 
         ReadFragment fragment = (ReadFragment) fm.findFragmentById(R.id.frame_read);
 
