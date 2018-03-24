@@ -53,8 +53,23 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getBook(String bookUrl, GetBookCallback callback) {
-        callback.onDataNotAvailable();
+    public void getBook(final String bookUrl, final GetBookCallback callback) {
+        mAppExecutors.networkIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final Book book = getBookFromRemote(bookUrl);
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(book == null) {
+                            callback.onDataNotAvailable();
+                        } else {
+                            callback.onBookLoaded(book);
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -66,11 +81,10 @@ public class RemoteDataSource implements DataSource {
                 mAppExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (list == null) {
+                        if (list == null)
                             callback.onDataNotAvailable();
-                        } else {
+                        else
                             callback.onChaptersLoaded(list);
-                        }
                     }
                 });
             }
@@ -78,8 +92,22 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getChapter(String chapterUrl, GetChapterCallback callback) {
-
+    public void getChapter(final String chapterUrl, final GetChapterCallback callback) {
+        mAppExecutors.networkIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final Chapter chapter = getChapterFromRemote(chapterUrl);
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (chapter == null)
+                            callback.onDataNotAvailable();
+                        else
+                            callback.onChapterLoaded(chapter);
+                    }
+                });
+            }
+        });
     }
 
     @VisibleForTesting
@@ -88,6 +116,7 @@ public class RemoteDataSource implements DataSource {
         Matcher m = Pattern.compile("(?<=https?://)([^/]*)").matcher(url);
         String fileName = ".lua";
         if (m.find()) fileName = m.group() + fileName;
+        mLuaState.setTop(0);
         try {
             luaSafeDoString(mLuaState, is2String(mContext.getAssets().open(fileName)));
             mLuaState.pushString(url);
@@ -102,6 +131,7 @@ public class RemoteDataSource implements DataSource {
             String msg = "search book fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
             Log.i(LT, msg);
+            return null;
         }
         return list;
     }
@@ -111,6 +141,7 @@ public class RemoteDataSource implements DataSource {
         Book book = new Book();
         book.url = url;
         String fileName = url.split("/")[2] + ".lua";
+        mLuaState.setTop(0);
         try {
             luaSafeDoString(mLuaState, is2String(mContext.getAssets().open(fileName)));
             mLuaState.pushString(url);
@@ -123,6 +154,7 @@ public class RemoteDataSource implements DataSource {
             String msg = "get book fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
             Log.i(LT, msg);
+            return null;
         }
         return book;
     }
@@ -132,6 +164,7 @@ public class RemoteDataSource implements DataSource {
     List<Chapter> getChapterListFromRemote(String url) {
         List<Chapter> list = new ArrayList<>();
         String fileName = url.split("/")[2] + ".lua";
+        mLuaState.setTop(0);
         try {
             luaSafeDoString(mLuaState, is2String(mContext.getAssets().open(fileName)));
             mLuaState.pushString(url);
@@ -144,6 +177,7 @@ public class RemoteDataSource implements DataSource {
             String msg = "get chapter list fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
             Log.i(LT, msg);
+            return null;
         }
         return list;
     }
@@ -166,6 +200,7 @@ public class RemoteDataSource implements DataSource {
             String msg = "get chapter fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
             Log.i(LT, msg);
+            return null;
         }
         return chapter;
     }

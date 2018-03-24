@@ -5,8 +5,12 @@
     android:orientation="vertical"
     tools:context="com.wintersky.windyreader.shelf.ShelfFragment">
 
-    <TextView
+    <GridView
+        android:id="@+id/shelf_gv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:numColumns="3">
+
+    </GridView>
 
 </LinearLayout>
