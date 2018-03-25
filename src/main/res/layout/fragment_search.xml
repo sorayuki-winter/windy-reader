@@ -15,9 +15,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:drawableEnd="@mipmap/search_edit_r"
-            android:drawableStart="@mipmap/search_edit_l"
-            android:background="@mipmap/search_edit_m"
             android:hint="@string/search" />
 
         <ImageButton
