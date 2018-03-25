@@ -1,4 +1,4 @@
-package com.wintersky.windyreader.shelf;
+package com.wintersky.windyreader.search;
 
 import android.support.test.rule.ActivityTestRule;
 
@@ -13,14 +13,13 @@ import static org.junit.Assert.*;
 
 /**
  * Created by tiandong on 18-3-24.
- * Shelf Test
+ * Search Test
  */
-public class ShelfActivityTest {
+public class SearchActivityTest {
     @Rule
-    public ActivityTestRule<ShelfActivity> testRule =
-            new ActivityTestRule<>(ShelfActivity.class);
+    public ActivityTestRule<SearchActivity> testRule = new ActivityTestRule<SearchActivity>(SearchActivity.class);
 
-    public CountDownLatch latch;
+    private CountDownLatch latch;
 
     @Before
     public void setUp() throws Exception {
@@ -32,7 +31,7 @@ public class ShelfActivityTest {
     }
 
     @Test
-    public void launchShelf() throws Exception {
+    public void launchSearch() throws Exception {
         latch.await();
     }
 }

@@ -1,8 +1,16 @@
 package com.wintersky.windyreader.search;
 
+import android.util.Log;
+
+import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
+import java.util.List;
+
 import javax.inject.Inject;
+
+import static com.wintersky.windyreader.util.Constants.LT;
 
 public class SearchPresenter implements SearchContract.Presenter {
 
@@ -23,5 +31,20 @@ public class SearchPresenter implements SearchContract.Presenter {
     @Override
     public void dropView() {
         mView = null;
+    }
+
+    @Override
+    public void search(String url, String keyword) {
+        mRepository.searchBook(url, keyword, new DataSource.SearchBookCallback() {
+            @Override
+            public void onBookSearched(List<Book> books) {
+                mView.setResult(books);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                Log.i(LT, "search fail");
+            }
+        });
     }
 }

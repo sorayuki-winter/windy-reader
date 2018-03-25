@@ -1,12 +1,21 @@
 package com.wintersky.windyreader.search;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
+import com.wintersky.windyreader.data.Book;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -19,6 +28,15 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
 
     @Inject
     SearchContract.Presenter mPresenter;
+
+    private EditText searchKey;
+
+    private ImageButton searchGo;
+
+    private ListView searchResult;
+
+    @Inject
+    ListAdapter adapter;
 
     @Inject
     public SearchFragment() {
@@ -43,6 +61,83 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
+        searchKey = view.findViewById(R.id.search_keyword);
+        searchGo = view.findViewById(R.id.search_go);
+        searchResult = view.findViewById(R.id.search_result);
+
+        searchGo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String key = searchKey.getText().toString();
+                mPresenter.search("http://www.8wenku.com/site/search", key);
+            }
+        });
+
+        searchResult.setAdapter(adapter);
+
         return view;
+    }
+
+    @Override
+    public void setResult(List<Book> list) {
+        adapter.setResult(list);
+    }
+
+    static class ListAdapter extends BaseAdapter {
+        private List<Book> mList;
+
+        private Context mContext;
+
+        @Inject
+        ListAdapter(Context mContext) {
+            this.mContext = mContext;
+        }
+
+        void setResult(List<Book> list) {
+            mList = list;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public int getCount() {
+            if(mList != null)
+                return mList.size();
+            return 0;
+        }
+
+        @Override
+        public Book getItem(int position) {
+            if (mList != null && mList.size() > position)
+                return mList.get(position);
+            return null;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+
+            if(convertView == null) {
+                holder = new ViewHolder();
+                convertView = LayoutInflater.from(mContext)
+                        .inflate(R.layout.item_search, parent, false);
+                holder.tv = convertView.findViewById(R.id.search_item_title);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            holder.tv.setText(getItem(position).title);
+
+            return convertView;
+        }
+
+        class ViewHolder {
+            TextView tv;
+        }
     }
 }

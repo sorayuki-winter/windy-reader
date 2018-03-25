@@ -69,31 +69,31 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
     static class GridAdapter extends BaseAdapter {
 
-        private List<Book> bookList;
+        private List<Book> mList;
 
-        private Context context;
+        private Context mContext;
 
         @Inject
         GridAdapter(Context context){
-            this.context = context;
+            mContext = context;
         }
 
-        public void setBookList(List<Book> list) {
-            this.bookList = list;
+        void setBookList(List<Book> list) {
+            this.mList = list;
             notifyDataSetChanged();
         }
 
         @Override
         public int getCount() {
-            if(bookList != null)
-                return bookList.size();
+            if(mList != null)
+                return mList.size();
             return 0;
         }
 
         @Override
         public Book getItem(int position) {
-            if (bookList != null)
-                return bookList.get(position);
+            if (mList != null && mList.size() > position)
+                return mList.get(position);
             return null;
         }
 
@@ -108,7 +108,8 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
             if (view == null) {
                 viewHolder = new ViewHolder();
-                view = LayoutInflater.from(this.context).inflate(R.layout.item_shelf, viewGroup, false);
+                view = LayoutInflater.from(mContext)
+                        .inflate(R.layout.item_shelf, viewGroup, false);
                 viewHolder.tv = view.findViewById(R.id.shelf_it_name_txt);
                 view.setTag(viewHolder);
             } else {

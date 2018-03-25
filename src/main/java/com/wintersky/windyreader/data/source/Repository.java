@@ -31,6 +31,16 @@ public class Repository implements DataSource {
     }
 
     @Override
+    public void getLibraries(LoadLibrariesCallback callback) {
+        mLocalDataSource.getLibraries(callback);
+    }
+
+    @Override
+    public void searchBook(String url, String key, SearchBookCallback callback) {
+        mRemoteDataSource.searchBook(url, key, callback);
+    }
+
+    @Override
     public void getBooks(@NonNull final LoadBooksCallback callback) {
         if (mCachedBooks != null && !mCacheIsDirty) {
             callback.onBooksLoaded(new ArrayList<>(mCachedBooks.values()));

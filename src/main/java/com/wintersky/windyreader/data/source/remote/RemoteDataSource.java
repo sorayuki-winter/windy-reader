@@ -42,6 +42,29 @@ public class RemoteDataSource implements DataSource {
         mLuaState = luaState;
     }
 
+    @Override
+    public void getLibraries(LoadLibrariesCallback callback) {
+        //none
+    }
+
+    @Override
+    public void searchBook(final String url, final String key, final SearchBookCallback callback) {
+        mAppExecutors.networkIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final List<Book> list = searchBookFromRemote(url, key);
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(list == null)
+                            callback.onDataNotAvailable();
+                        else callback.onBookSearched(list);
+                    }
+                });
+            }
+        });
+    }
+
     /**
      * Note: {@link LoadBooksCallback#onDataNotAvailable()} is never fired. In a real remote data
      * source implementation, this would be fired if the server can't be contacted or the server

@@ -19,11 +19,13 @@ package com.wintersky.windyreader.data.source.local;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.Library;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -55,6 +57,25 @@ public class LocalDataSource implements DataSource {
     @Inject
     LocalDataSource(@NonNull AppExecutors executors) {
         mAppExecutors = executors;
+    }
+
+    @Override
+    public void getLibraries(LoadLibrariesCallback callback) {
+        List<Library> list = new ArrayList<>();
+
+        Library library = new Library();
+        library.name = "八号文库";
+        library.baseUrl = "http://www.8wenku.com";
+        library.path = "";
+
+        list.add(library);
+
+        callback.onLibrariesLoaded(list);
+    }
+
+    @Override
+    public void searchBook(String url, String key, SearchBookCallback callback) {
+        //none
     }
 
     @Override
