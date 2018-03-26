@@ -1,4 +1,4 @@
-package com.wintersky.windyreader.detail;
+package com.wintersky.windyreader.read;
 
 import android.support.v4.app.FragmentManager;
 
@@ -10,28 +10,28 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 
-import static com.wintersky.windyreader.detail.DetailActivity.EXTRA_BOOK_URL;
+import static com.wintersky.windyreader.read.ReadActivity.EXTRA_CHAPTER_URL;
 
 @Module
-public abstract class DetailModule {
+public abstract class ReadModule {
 
     @ActivityScoped
     @Provides
-    static FragmentManager provideFM(DetailActivity activity) {
+    static FragmentManager provideFM(ReadActivity activity) {
         return activity.getSupportFragmentManager();
     }
 
     @FragmentScoped
     @ContributesAndroidInjector
-    abstract DetailFragment detailFragment();
+    abstract ReadFragment readFragment();
 
     @ActivityScoped
     @Binds
-    abstract DetailContract.Presenter detailPresenter(DetailPresenter presenter);
+    abstract ReadContract.Presenter readPresenter(ReadPresenter presenter);
 
     @ActivityScoped
     @Provides
-    static String provideBookUrl(DetailActivity activity) {
-        return activity.getIntent().getStringExtra(EXTRA_BOOK_URL);
+    static String provideChapterUrl(ReadActivity activity) {
+        return activity.getIntent().getStringExtra(EXTRA_CHAPTER_URL);
     }
 }

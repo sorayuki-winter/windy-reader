@@ -1,4 +1,4 @@
-package com.wintersky.windyreader.detail;
+package com.wintersky.windyreader.read;
 
 import android.util.Log;
 
@@ -6,28 +6,26 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import static com.wintersky.windyreader.util.Constants.LT;
 
-public class DetailPresenter implements DetailContract.Presenter {
+public class ReadPresenter implements ReadContract.Presenter {
 
-    private DetailContract.View mView;
+    private ReadContract.View mView;
 
     private Repository mRepository;
 
-    private String bookUrl;
+    private String chapterUrl;
 
     @Inject
-    DetailPresenter(Repository repository, String bookUrl) {
+    ReadPresenter(Repository repository, String chapterUrl) {
         this.mRepository = repository;
-        this.bookUrl = bookUrl;
+        this.chapterUrl = chapterUrl;
     }
 
     @Override
-    public void takeView(DetailContract.View view) {
+    public void takeView(ReadContract.View view) {
         mView = view;
         start();
     }
@@ -38,15 +36,15 @@ public class DetailPresenter implements DetailContract.Presenter {
     }
 
     private void start() {
-        mRepository.getChapters(bookUrl, new DataSource.LoadChaptersCallback() {
+        mRepository.getChapter(chapterUrl, new DataSource.GetChapterCallback() {
             @Override
-            public void onChaptersLoaded(List<Chapter> list) {
-                mView.setChapters(list);
+            public void onChapterLoaded(Chapter chapter) {
+                mView.setChapter(chapter);
             }
 
             @Override
             public void onDataNotAvailable() {
-                Log.i(LT, "load chapter list fail");
+                Log.i(LT, "get chapter fail");
             }
         });
     }

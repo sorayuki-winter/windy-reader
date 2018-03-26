@@ -1,16 +1,14 @@
-package com.wintersky.windyreader.detail;
+package com.wintersky.windyreader.read;
 
 import com.wintersky.windyreader.BasePresenter;
 import com.wintersky.windyreader.BaseView;
 import com.wintersky.windyreader.data.Chapter;
 
-import java.util.List;
-
-public interface DetailContract {
+public interface ReadContract {
 
     interface View extends BaseView<Presenter> {
 
-        void setChapters(List<Chapter> list);
+        void setChapter(Chapter chapter);
     }
 
     interface Presenter extends BasePresenter<View> {

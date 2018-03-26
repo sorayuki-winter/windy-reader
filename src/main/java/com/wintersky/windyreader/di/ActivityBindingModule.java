@@ -1,5 +1,9 @@
 package com.wintersky.windyreader.di;
 
+import com.wintersky.windyreader.detail.DetailActivity;
+import com.wintersky.windyreader.detail.DetailModule;
+import com.wintersky.windyreader.read.ReadActivity;
+import com.wintersky.windyreader.read.ReadModule;
 import com.wintersky.windyreader.search.SearchActivity;
 import com.wintersky.windyreader.search.SearchModule;
 import com.wintersky.windyreader.shelf.ShelfActivity;
@@ -26,4 +30,11 @@ public abstract class ActivityBindingModule {
     @ContributesAndroidInjector(modules = SearchModule.class)
     abstract SearchActivity searchActivity();
 
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = DetailModule.class)
+    abstract DetailActivity detailActivity();
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = ReadModule.class)
+    abstract ReadActivity readActivity();
 }

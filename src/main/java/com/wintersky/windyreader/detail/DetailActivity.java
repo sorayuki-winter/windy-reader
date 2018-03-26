@@ -11,6 +11,8 @@ import dagger.android.support.DaggerAppCompatActivity;
 
 public class DetailActivity extends DaggerAppCompatActivity {
 
+    public static final String EXTRA_BOOK_URL = "BOOK_URL";
+
     @Inject
     FragmentManager fm;
 
