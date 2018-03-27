@@ -31,8 +31,6 @@ function getBook()
     else
         book:setAuthor(" ")
     end
-    book:setStatus(" ")
-    book:setClassify(" ")
     local desc = doc:select("p.desc"):get(0)
     book:setDetail(desc:ownText())
 end

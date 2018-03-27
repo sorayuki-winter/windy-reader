@@ -16,12 +16,12 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     private Repository mRepository;
 
-    private String chapterUrl;
+    private String[] urls;
 
     @Inject
-    ReadPresenter(Repository repository, String chapterUrl) {
+    ReadPresenter(Repository repository, String[] urls) {
         this.mRepository = repository;
-        this.chapterUrl = chapterUrl;
+        this.urls = urls;
     }
 
     @Override
@@ -36,7 +36,7 @@ public class ReadPresenter implements ReadContract.Presenter {
     }
 
     private void start() {
-        mRepository.getChapter(chapterUrl, new DataSource.GetChapterCallback() {
+        mRepository.getChapter(urls[0], new DataSource.GetChapterCallback() {
             @Override
             public void onChapterLoaded(Chapter chapter) {
                 mView.setChapter(chapter);

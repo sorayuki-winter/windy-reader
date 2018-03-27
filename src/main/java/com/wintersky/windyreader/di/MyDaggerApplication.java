@@ -1,7 +1,11 @@
 package com.wintersky.windyreader.di;
 
+import com.wintersky.windyreader.data.source.local.MyMigration;
+
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 public class MyDaggerApplication extends DaggerApplication {
 
@@ -17,5 +21,11 @@ public class MyDaggerApplication extends DaggerApplication {
                 .application(this)
                 .build();
         ComponentHolder.setAppComponent(appComponent);
+
+        Realm.init(this);
+        RealmConfiguration config = new RealmConfiguration.Builder()
+                .deleteRealmIfMigrationNeeded()
+                .build();
+        Realm.setDefaultConfiguration(config);
     }
 }

@@ -1,24 +1,31 @@
 package com.wintersky.windyreader.detail;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
+import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
+import com.wintersky.windyreader.read.ReadActivity;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+
+import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
+import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +34,9 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
 
     @Inject
     DetailContract.Presenter mPresenter;
+
+    @Inject
+    String bookUrl;
 
     private Button btCollect;
 
@@ -59,18 +69,33 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         btCollect = view.findViewById(R.id.detail_collect);
-        lvChapters = view.findViewById(R.id.detail_chapters);
-
-        lvChapters.setAdapter(mAdapter);
-
         btCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mPresenter.saveBook(bookUrl);
+                btCollect.setText("已收藏");
+            }
+        });
 
+        lvChapters = view.findViewById(R.id.detail_chapters);
+        lvChapters.setAdapter(mAdapter);
+        lvChapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent();
+                intent.setClass(getContext(), ReadActivity.class);
+                intent.putExtra(BOOK_URL, bookUrl);
+                intent.putExtra(CHAPTER_URL, mAdapter.getItem(position).getUrl());
+                startActivity(intent);
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void setBook(Book book) {
+        btCollect.setEnabled(true);
     }
 
     @Override

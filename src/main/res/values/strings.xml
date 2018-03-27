@@ -3,4 +3,5 @@
     <string name="search">搜索</string>
     <string name="description">contentDescription</string>
     <string name="collect">收藏</string>
+    <string name="catalog">目录</string>
 </resources>

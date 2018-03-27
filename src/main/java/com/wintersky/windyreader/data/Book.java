@@ -1,27 +1,23 @@
 package com.wintersky.windyreader.data;
 
-public final class Book {
+import java.util.Date;
 
+import io.realm.RealmList;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Book extends RealmObject {
+    @PrimaryKey
     public String url;
-
     public String title;
-
-    public String imgUrl;
-
-    public String chapterListUrl;
-
-    public String imgFile;
-
     public String author;
-
-    public String status;
-
-    public String classify;
-
     public String detail;
-
-    public Book() {
-    }
+    public String imgUrl;
+    public String chapterListUrl;
+    public byte[] img;
+    public Date lastTime;
+    public int lastRead;
+    RealmList<Chapter> chapterList;
 
     public String getUrl() {
         return url;
@@ -37,6 +33,22 @@ public final class Book {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
+    }
+
+    public String getDetail() {
+        return detail;
+    }
+
+    public void setDetail(String detail) {
+        this.detail = detail;
     }
 
     public String getImgUrl() {
@@ -55,43 +67,35 @@ public final class Book {
         this.chapterListUrl = chapterListUrl;
     }
 
-    public String getImgFile() {
-        return imgFile;
+    public byte[] getImg() {
+        return img;
     }
 
-    public void setImgFile(String imgFile) {
-        this.imgFile = imgFile;
+    public void setImg(byte[] img) {
+        this.img = img;
     }
 
-    public String getAuthor() {
-        return author;
+    public Date getLastTime() {
+        return lastTime;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setLastTime(Date lastTime) {
+        this.lastTime = lastTime;
     }
 
-    public String getStatus() {
-        return status;
+    public long getLastRead() {
+        return lastRead;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setLastRead(int lastRead) {
+        this.lastRead = lastRead;
     }
 
-    public String getClassify() {
-        return classify;
+    public RealmList<Chapter> getChapterList() {
+        return chapterList;
     }
 
-    public void setClassify(String classify) {
-        this.classify = classify;
-    }
-
-    public String getDetail() {
-        return detail;
-    }
-
-    public void setDetail(String detail) {
-        this.detail = detail;
+    public void setChapterList(RealmList<Chapter> chapterList) {
+        this.chapterList = chapterList;
     }
 }

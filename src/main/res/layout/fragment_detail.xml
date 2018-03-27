@@ -8,6 +8,7 @@
     <Button
         android:id="@+id/detail_collect"
         android:text="@string/collect"
+        android:enabled="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

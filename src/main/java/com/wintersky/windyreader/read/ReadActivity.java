@@ -11,7 +11,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 
 public class ReadActivity extends DaggerAppCompatActivity {
 
-    public static final String EXTRA_CHAPTER_URL = "CHAPTER_URL";
+    public static final String CHAPTER_URL = "CHAPTER_URL";
 
     @Inject
     FragmentManager fm;

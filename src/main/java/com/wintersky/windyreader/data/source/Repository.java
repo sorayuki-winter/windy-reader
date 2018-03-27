@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.Chapter;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -20,9 +21,9 @@ public class Repository implements DataSource {
 
     private final DataSource mRemoteDataSource;
 
-    Map<String, Book> mCachedBooks;
+    private Map<String, Book> mCachedBooks;
 
-    boolean mCacheIsDirty = false;
+    private boolean mCacheIsDirty = false;
 
     @Inject
     Repository(@Remote DataSource remoteDataSource, @Local DataSource localDataSource) {
@@ -51,7 +52,7 @@ public class Repository implements DataSource {
 
     @Override
     public void getBook(String bookUrl, final GetBookCallback callback) {
-        Book cachedBook = getBookWithId(bookUrl);
+        Book cachedBook = mCachedBooks.get(bookUrl);
 
         // Respond immediately with cache if available
         if (cachedBook != null) {
@@ -59,14 +60,14 @@ public class Repository implements DataSource {
             return;
         }
 
-        mLocalDataSource.getBook(bookUrl, new GetBookCallback() {
+        mRemoteDataSource.getBook(bookUrl, new GetBookCallback() {
             @Override
             public void onBookLoaded(Book book) {
                 // Do in memory cache update to keep the app UI up to date
                 if (mCachedBooks == null) {
                     mCachedBooks = new LinkedHashMap<>();
                 }
-                mCachedBooks.put(book.title, book);
+                mCachedBooks.put(book.url, book);
                 callback.onBookLoaded(book);
             }
 
@@ -78,13 +79,42 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getChapters(String bookUrl, LoadChaptersCallback callback) {
-        mRemoteDataSource.getChapters(bookUrl, callback);
+    public void getChapters(final String bookUrl, final LoadChaptersCallback callback) {
+        mRemoteDataSource.getChapters(bookUrl, new LoadChaptersCallback() {
+            @Override
+            public void onChaptersLoaded(List<Chapter> list) {
+                callback.onChaptersLoaded(list);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                callback.onDataNotAvailable();
+            }
+        });
     }
 
     @Override
-    public void getChapter(String chapterUrl, GetChapterCallback callback) {
-        mRemoteDataSource.getChapter(chapterUrl, callback);
+    public void getChapter(final String chapterUrl, final GetChapterCallback callback) {
+        mLocalDataSource.getChapter(chapterUrl, new GetChapterCallback() {
+            @Override
+            public void onChapterLoaded(Chapter chapter) {
+                if(chapter.content != null)
+                    callback.onChapterLoaded(chapter);
+                else
+                    mRemoteDataSource.getChapter(chapterUrl, callback);
+            }
+
+            @Override
+            public void onDataNotAvailable() {
+                mRemoteDataSource.getChapter(chapterUrl, callback);
+            }
+        });
+    }
+
+    @Override
+    public void saveBook(Book book) {
+        mCachedBooks.put(book.url, book);
+        mLocalDataSource.saveBook(book);
     }
 
     private void getBooksFromLocalDataSource(@NonNull final LoadBooksCallback callback) {
@@ -108,18 +138,8 @@ public class Repository implements DataSource {
         }
         mCachedBooks.clear();
         for (Book book : books) {
-            mCachedBooks.put(book.title, book);
+            mCachedBooks.put(book.url, book);
         }
         mCacheIsDirty = false;
-    }
-
-    @Nullable
-    private Book getBookWithId(@NonNull String id) {
-        //checkNotNull(id);
-        if (mCachedBooks == null || mCachedBooks.isEmpty()) {
-            return null;
-        } else {
-            return mCachedBooks.get(id);
-        }
     }
 }

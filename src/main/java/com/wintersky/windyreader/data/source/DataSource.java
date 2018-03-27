@@ -20,6 +20,8 @@ public interface DataSource {
 
     void getChapter(String chapterUrl, GetChapterCallback callback);
 
+    void saveBook(Book book);
+
     interface LoadLibrariesCallback {
 
         void onLibrariesLoaded(List<Library> list);

@@ -6,8 +6,9 @@
     tools:context="com.wintersky.windyreader.read.ReadFragment">
 
     <ScrollView
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp">
 
         <TextView
             android:id="@+id/read_content"
@@ -15,5 +16,11 @@
             android:layout_height="wrap_content" />
 
     </ScrollView>
+
+    <Button
+        android:id="@+id/read_show_list"
+        android:text="@string/catalog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
 </LinearLayout>

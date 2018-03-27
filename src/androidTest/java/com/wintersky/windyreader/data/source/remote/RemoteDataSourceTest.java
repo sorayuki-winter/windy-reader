@@ -103,15 +103,11 @@ public class RemoteDataSourceTest {
         Log.i(LT, "IU:" + book.imgUrl);
         Log.i(LT, "CL:" + book.chapterListUrl);
         Log.i(LT, "AT:" + book.author);
-        Log.i(LT, "ST:" + book.status);
-        Log.i(LT, "CS:" + book.classify);
         Log.i(LT, "DT:" + book.detail);
         assertNotNull("title null", book.title);
         assertNotNull("imgUrl null", book.imgUrl);
         assertNotNull("chapterListUrl null", book.chapterListUrl);
         assertNotNull("author null", book.author);
-        assertNotNull("status null", book.status);
-        assertNotNull("classify null", book.classify);
         assertNotNull("detail null", book.detail);
     }
 

@@ -1,24 +1,31 @@
 package com.wintersky.windyreader.shelf;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.read.ReadActivity;
+import com.wintersky.windyreader.search.SearchActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+
+import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
+import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,6 +34,8 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
     @Inject
     ShelfContract.Presenter mPresenter;
+
+    private Button toSearch;
 
     private GridView gridView;
 
@@ -51,13 +60,35 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_shelf, container, false);
 
+        toSearch = view.findViewById(R.id.shelf_to_search);
+        toSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent();
+                intent.setClass(getContext(), SearchActivity.class);
+                startActivity(intent);
+            }
+        });
+
         gridView = view.findViewById(R.id.shelf_gv);
         gridView.setAdapter(adapter);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent();
+                intent.setClass(getContext(), ReadActivity.class);
+                Book bk = adapter.getItem(position);
+                intent.putExtra(BOOK_URL, bk.url);
+                intent.putExtra(CHAPTER_URL,
+                        bk.getChapterList().get(bk.lastRead).getUrl());
+                startActivity(intent);
+            }
+        });
 
         return view;
     }

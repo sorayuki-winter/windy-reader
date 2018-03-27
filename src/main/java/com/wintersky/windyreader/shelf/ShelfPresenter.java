@@ -26,7 +26,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
     @Override
     public void takeView(ShelfContract.View view) {
         mView = view;
-        loadShelf();
+        start();
     }
 
     @Override
@@ -34,7 +34,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
         mView = null;
     }
 
-    private void loadShelf() {
+    private void start() {
         mRepository.getBooks(new DataSource.LoadBooksCallback() {
             @Override
             public void onBooksLoaded(List<Book> books) {

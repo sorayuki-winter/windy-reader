@@ -1,30 +1,45 @@
 package com.wintersky.windyreader.data;
 
-public class Chapter {
+import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
+public class Chapter extends RealmObject {
+    @PrimaryKey
+    public long id;
     public String title;
     public String url;
     public String content;
 
-    public Chapter() {
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public String getUrl() {
+        return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
     }
 
-    @Override
-    public String toString() {
-        String re = "";
-        re += url == null ? "url" : url + " ";
-        re += title == null ? "title" : title + " ";
-        return re;
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

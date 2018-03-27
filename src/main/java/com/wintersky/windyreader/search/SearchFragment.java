@@ -1,11 +1,13 @@
 package com.wintersky.windyreader.search;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -14,12 +16,15 @@ import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.detail.DetailActivity;
 
 import java.util.List;
 
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+
+import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -62,9 +67,8 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
         searchKey = view.findViewById(R.id.search_keyword);
-        searchGo = view.findViewById(R.id.search_go);
-        searchResult = view.findViewById(R.id.search_result);
 
+        searchGo = view.findViewById(R.id.search_go);
         searchGo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,7 +77,17 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
             }
         });
 
+        searchResult = view.findViewById(R.id.search_result);
         searchResult.setAdapter(adapter);
+        searchResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent();
+                intent.setClass(getContext(), DetailActivity.class);
+                intent.putExtra(BOOK_URL, adapter.getItem(position).getUrl());
+                startActivity(intent);
+            }
+        });
 
         return view;
     }

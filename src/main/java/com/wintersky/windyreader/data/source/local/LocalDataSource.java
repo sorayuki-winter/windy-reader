@@ -19,17 +19,20 @@ package com.wintersky.windyreader.data.source.local;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.Library;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
+import io.realm.Sort;
 
 /**
  * Concrete implementation of a data source as a db.
@@ -37,26 +40,19 @@ import javax.inject.Singleton;
 @Singleton
 public class LocalDataSource implements DataSource {
 
-    private final static Map<String, Book> BOOKS_LOCAL_DATA = new LinkedHashMap<>(10);
-
-    static {
-        Book book = new Book();
-        book.url = "http://www.8wenku.com/book/1498";
-        book.title = "OVERLORD不死者之王";
-        book.chapterListUrl = "http://www.8wenku.com/book/1498";
-        book.imgUrl = "http://xs.dmzj.com/img/webpic/28/151117overlordl.jpg";
-        book.author = "";
-        book.status = "";
-        book.classify = "";
-        book.detail = "一款席卷游戏界的网路游戏「YGGDRASIL」，有一天突然毫无预警地停止一切服务——原本应该是如此。但是不知为何它却成了一款即使过了结束时间，玩家角色依然不会登出的游戏。NPC开始拥有自己的思想。 现实世界当中一名喜欢电玩的普通青年，似乎和整个公会一起穿越到异世界，变成拥有骷髅外表的最强魔法师「飞鼠」。他率领的公会「安兹．乌尔．恭」将展开前所未有的奇幻传说！";
-        BOOKS_LOCAL_DATA.put(book.url, book);
-    }
+    private Realm mRealm;
 
     private final AppExecutors mAppExecutors;
 
     @Inject
     LocalDataSource(@NonNull AppExecutors executors) {
         mAppExecutors = executors;
+        mAppExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mRealm = Realm.getDefaultInstance();
+            }
+        });
     }
 
     @Override
@@ -79,28 +75,62 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getBooks(@NonNull LoadBooksCallback callback) {
-        callback.onBooksLoaded(new ArrayList<Book>(BOOKS_LOCAL_DATA.values()));
+    public void getBooks(@NonNull final LoadBooksCallback callback) {
+        mAppExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                RealmResults<Book> results = mRealm.where(Book.class).findAll();
+                results.sort("lastTime", Sort.DESCENDING);
+                final List<Book> books = mRealm.copyFromRealm(results);
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onBooksLoaded(books);
+                    }
+                });
+            }
+        });
     }
 
     @Override
-    public void getBook(String bookUrl, GetBookCallback callback) {
-        Book book = BOOKS_LOCAL_DATA.get(bookUrl);
-
-        if (book == null) {
-            callback.onDataNotAvailable();
-        } else {
-            callback.onBookLoaded(book);
-        }
+    public void getBook(final String bookUrl, final GetBookCallback callback) {
+        mAppExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                final Book bk = mRealm.where(Book.class)
+                        .equalTo("url", bookUrl).findFirst();
+                mAppExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (bk == null)
+                            callback.onDataNotAvailable();
+                        else
+                            callback.onBookLoaded(bk);
+                    }
+                });
+            }
+        });
     }
 
     @Override
-    public void getChapters(String bookUrl, LoadChaptersCallback callback) {
-        callback.onDataNotAvailable();
+    public void getChapters(final String bookUrl, final LoadChaptersCallback callback) {
+
     }
 
     @Override
     public void getChapter(String chapterUrl, GetChapterCallback callback) {
-        callback.onDataNotAvailable();
+
+    }
+
+    @Override
+    public void saveBook(final Book book) {
+        mAppExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                mRealm.beginTransaction();
+                mRealm.copyToRealmOrUpdate(book);
+                mRealm.commitTransaction();
+            }
+        });
     }
 }

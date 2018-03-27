@@ -10,7 +10,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 
-import static com.wintersky.windyreader.detail.DetailActivity.EXTRA_BOOK_URL;
+import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
 
 @Module
 public abstract class DetailModule {
@@ -32,6 +32,6 @@ public abstract class DetailModule {
     @ActivityScoped
     @Provides
     static String provideBookUrl(DetailActivity activity) {
-        return activity.getIntent().getStringExtra(EXTRA_BOOK_URL);
+        return activity.getIntent().getStringExtra(BOOK_URL);
     }
 }

@@ -133,6 +133,11 @@ public class RemoteDataSource implements DataSource {
         });
     }
 
+    @Override
+    public void saveBook(Book book) {
+        //none
+    }
+
     @VisibleForTesting
     List<Book> searchBookFromRemote(String url, String key) {
         List<Book> list = new ArrayList<>();

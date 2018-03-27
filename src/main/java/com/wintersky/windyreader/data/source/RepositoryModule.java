@@ -24,6 +24,8 @@ import javax.inject.Singleton;
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 
 import static com.wintersky.windyreader.util.Constants.LT;
 import static com.wintersky.windyreader.util.Constants.is2String;
