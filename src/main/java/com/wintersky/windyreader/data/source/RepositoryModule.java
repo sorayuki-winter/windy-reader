@@ -92,6 +92,10 @@ abstract public class RepositoryModule {
             luaState.setField(-2, "path");            // package
             luaState.pop(1);
 
+            luaState.setTop(0);
+            luaState.getGlobal("debug");
+            luaState.getField(-1, "traceback");
+
             luaSafeDoString(luaState, "require(\"windyreader_tools\")");
         } catch (LuaException e) {
             String msg = "LuaState init fail\n" + e + "\n";

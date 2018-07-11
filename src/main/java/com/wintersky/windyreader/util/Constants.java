@@ -82,23 +82,15 @@ public class Constants {
     public static void luaSafeDoString(LuaState luaState, String src) throws LuaException {
         int ok = luaState.LloadString(src);
         if (ok == 0) {
-            luaState.getGlobal("debug");
-            luaState.getField(-1, "traceback");
-            luaState.remove(-2);
-            luaState.insert(-2);
-            ok = luaState.pcall(0, 0, -2);
+            ok = luaState.pcall(0, 0, 0);
         }
         if (ok != 0) {
             throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
         }
     }
 
-    public static void luaSafeRun(LuaState luaState) throws LuaException {
-        luaState.getGlobal("debug");
-        luaState.getField(-1, "traceback");
-        luaState.remove(-2);
-        luaState.insert(-2);
-        int ok = luaState.pcall(0, 0, -2);
+    public static void luaSafeRun(LuaState luaState, int in, int out) throws LuaException {
+        int ok = luaState.pcall(in, out, 0);
         if (ok != 0) {
             throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
         }

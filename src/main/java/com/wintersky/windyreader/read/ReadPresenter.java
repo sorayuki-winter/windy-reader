@@ -15,14 +15,14 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     private ReadContract.View mView;
     private Repository mRepository;
-    private String[] urls;
+    private String[] mUrls;
     private Book mBook;
     private Chapter mChapter;
 
     @Inject
     ReadPresenter(Repository repository, String[] urls) {
         this.mRepository = repository;
-        this.urls = urls;
+        this.mUrls = urls;
     }
 
     @Override
@@ -43,9 +43,9 @@ public class ReadPresenter implements ReadContract.Presenter {
             return;
         }
 
-        loadChapter(urls[0]);
+        getChapter(mUrls[0]);
 
-        mRepository.getBook(urls[1], new DataSource.GetBookCallback() {
+        mRepository.getBook(mUrls[1], new DataSource.GetBookCallback() {
             @Override
             public void onBookLoaded(Book book) {
                 mBook = book;
@@ -59,20 +59,27 @@ public class ReadPresenter implements ReadContract.Presenter {
     }
 
     @Override
-    public void lastChapter() {
+    public void loadChapter(String url) {
+        mBook.setCurrentCUrl(url);
+        mRepository.saveBook(mBook);
+        getChapter(url);
+    }
+
+    @Override
+    public void prevChapter() {
         mBook.setCurrentCUrl(mChapter.last);
         mRepository.saveBook(mBook);
-        loadChapter(mChapter.last);
+        getChapter(mChapter.last);
     }
 
     @Override
     public void nextChapter() {
         mBook.setCurrentCUrl(mChapter.next);
         mRepository.saveBook(mBook);
-        loadChapter(mChapter.next);
+        getChapter(mChapter.next);
     }
 
-    private void loadChapter(String url) {
+    private void getChapter(String url) {
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
             public void onChapterLoaded(Chapter chapter) {

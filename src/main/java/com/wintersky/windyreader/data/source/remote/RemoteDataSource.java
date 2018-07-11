@@ -143,17 +143,14 @@ public class RemoteDataSource implements DataSource {
         Matcher m = Pattern.compile("(?<=https?://)([^/]*)").matcher(url);
         String fileName = ".lua";
         if (m.find()) fileName = m.group() + fileName;
-        mLua.setTop(0);
+        mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.pushString(url);
-            mLua.setGlobal("searchUrl");
-            mLua.pushString(key);
-            mLua.setGlobal("keyWord");
-            mLua.pushJavaObject(list);
-            mLua.setGlobal("list");
             mLua.getField(LuaState.LUA_GLOBALSINDEX, "search");
-            luaSafeRun(mLua);
+            mLua.pushString(url);
+            mLua.pushString(key);
+            mLua.pushJavaObject(list);
+            luaSafeRun(mLua, 3, 0);
         } catch (Exception e) {
             String msg = "search book fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
@@ -168,15 +165,13 @@ public class RemoteDataSource implements DataSource {
         Book book = new Book();
         book.url = url;
         String fileName = url.split("/")[2] + ".lua";
-        mLua.setTop(0);
+        mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.pushString(url);
-            mLua.setGlobal("bookUrl");
-            mLua.pushJavaObject(book);
-            mLua.setGlobal("book");
             mLua.getField(LuaState.LUA_GLOBALSINDEX, "getBook");
-            luaSafeRun(mLua);
+            mLua.pushString(url);
+            mLua.pushJavaObject(book);
+            luaSafeRun(mLua, 2, 0);
         } catch (Exception e) {
             String msg = "get book fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
@@ -191,15 +186,13 @@ public class RemoteDataSource implements DataSource {
     List<Chapter> getChapterListFromRemote(String url) {
         List<Chapter> list = new ArrayList<>();
         String fileName = url.split("/")[2] + ".lua";
-        mLua.setTop(0);
+        mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.pushString(url);
-            mLua.setGlobal("chapterListUrl");
-            mLua.pushJavaObject(list);
-            mLua.setGlobal("list");
             mLua.getField(LuaState.LUA_GLOBALSINDEX, "getChapterList");
-            luaSafeRun(mLua);
+            mLua.pushString(url);
+            mLua.pushJavaObject(list);
+            luaSafeRun(mLua, 2, 0);
         } catch (Exception e) {
             String msg = "get chapter list fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();
@@ -214,15 +207,13 @@ public class RemoteDataSource implements DataSource {
         Chapter chapter = new Chapter();
         chapter.url = url;
         String fileName = url.split("/")[2] + ".lua";
-        mLua.setTop(0);
+        mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.pushString(url);
-            mLua.setGlobal("chapterUrl");
-            mLua.pushJavaObject(chapter);
-            mLua.setGlobal("chapter");
             mLua.getField(LuaState.LUA_GLOBALSINDEX, "getChapter");
-            luaSafeRun(mLua);
+            mLua.pushString(url);
+            mLua.pushJavaObject(chapter);
+            luaSafeRun(mLua, 2, 0);
         } catch (Exception e) {
             String msg = "get chapter fail\n" + e + "\n";
             msg += e.getStackTrace()[0].toString();

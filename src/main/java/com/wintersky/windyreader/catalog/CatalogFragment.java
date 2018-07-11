@@ -1,12 +1,15 @@
 package com.wintersky.windyreader.catalog;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +23,10 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
+import static android.app.Activity.RESULT_OK;
+import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
+import static com.wintersky.windyreader.util.Constants.WS;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -29,6 +36,8 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     CatalogContract.Presenter mPresenter;
     @Inject
     CatalogAdapter mAdapter;
+    @Inject
+    String mUrl;
 
     private ListView mListView;
 
@@ -57,6 +66,20 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
 
         mListView = view.findViewById(R.id.list);
         mListView.setAdapter(mAdapter);
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Activity activity = getActivity();
+                if (activity != null) {
+                    Intent intent = new Intent();
+                    intent.putExtra(CHAPTER_URL, mAdapter.getItem(position).getUrl());
+                    activity.setResult(RESULT_OK, intent);
+                    activity.finish();
+                } else {
+                    WS("CatalogFragment.mListView.onItemClick", "activity null");
+                }
+            }
+        });
 
         return view;
     }

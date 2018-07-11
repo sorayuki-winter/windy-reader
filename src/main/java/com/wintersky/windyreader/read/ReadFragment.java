@@ -22,7 +22,9 @@ import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
 
+import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
+import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 import static com.wintersky.windyreader.util.Constants.WS;
 
 /**
@@ -30,12 +32,16 @@ import static com.wintersky.windyreader.util.Constants.WS;
  */
 public class ReadFragment extends DaggerFragment implements ReadContract.View {
 
+    private static final int REQUEST_CATALOG = 1;
+
     private static final int UI_ANIMATION_DELAY = 300;
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
+
     @Inject
     ReadContract.Presenter mPresenter;
     @Inject
-    String[] urls;
+    String[] mUrls;
+
     private View mTBar, mBBar;
     private TextView tvTitle;
     private ScrollView mScroll;
@@ -122,23 +128,21 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
                 if (activity != null) {
                     Intent intent = new Intent();
                     intent.setClass(activity, CatalogActivity.class);
-                    intent.putExtra(BOOK_URL, urls[1]);
-                    startActivity(intent);
+                    intent.putExtra(BOOK_URL, mUrls[1]);
+                    startActivityForResult(intent, REQUEST_CATALOG);
                 } else {
                     WS("showCatalog onClick", "Activity null");
                 }
             }
         });
 
-        Button lastC = view.findViewById(R.id.prev);
-        Button nextC = view.findViewById(R.id.next);
-        lastC.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.prev).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.lastChapter();
+                mPresenter.prevChapter();
             }
         });
-        nextC.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.next).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mPresenter.nextChapter();
@@ -148,6 +152,14 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
         hide();
 
         return view;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CATALOG && resultCode == RESULT_OK) {
+            String url = data.getStringExtra(CHAPTER_URL);
+            mPresenter.loadChapter(url);
+        }
     }
 
     @Override

@@ -1,8 +1,8 @@
-function getBook()
+function getBook(url, key, list)
 end
 
-function getChapterList()
-    local doc = docGet(chapterListUrl)
+function getChapterList(url, list)
+    local doc = docGet(url)
     local divCList = doc:select("div.chapters"):get(0);
     local aCList = divCList:select("a");
     for i = 0, aCList:size() - 1 do
@@ -15,8 +15,8 @@ function getChapterList()
     end
 end
 
-function getChapter()
-    local doc = docGet(chapterUrl)
+function getChapter(url, chapter)
+    local doc = docGet(url)
     local CT = doc:select("div.text.t_c"):get(0):child(0):ownText();
     local CC = doc:select("div#content"):get(0):html();
     --CC = CC:substring(CC:indexOf("</div>")+8, CC:indexOf("<input"));

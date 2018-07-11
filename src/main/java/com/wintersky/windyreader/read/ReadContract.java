@@ -13,7 +13,9 @@ public interface ReadContract {
 
     interface Presenter extends BasePresenter<View> {
 
-        void lastChapter();
+        void loadChapter(String url);
+
+        void prevChapter();
 
         void nextChapter();
     }
