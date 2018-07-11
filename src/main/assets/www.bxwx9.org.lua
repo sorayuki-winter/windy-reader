@@ -1,5 +1,5 @@
-function getBook()
-    local doc = jsoup.get(bookUrl)
+function getBook(url, book)
+    local doc = docGet(url)
     local eTitles = doc:select("strong:matches((?<!T|t)全集下载)");
     if (eTitles:isEmpty()) then
         Log:i(LT, "title not find");
@@ -38,23 +38,23 @@ function getBook()
     end
 end
 
-function getChapterList()
-    local doc = jsoup.get(chaptersUrl)
+function getChapterList(url, list)
+    local doc = docGet(url)
     local chaptersDiv = doc:select("#TabCss"):get(0)
     local chaptersAs = chaptersDiv:select("a")
     for i = 0, chaptersAs:size() - 1 do
         local chapter = luajava.newInstance("com.wintersky.windyreader.data.Chapter")
         local e = chaptersAs:get(i)
         chapter:setTitle(e:ownText())
-        local base = chaptersUrl
+        local base = url
         base = string.match(base, "https?://.+/")
         chapter:setUrl(base .. e:attr("href"))
         list:add(chapter)
     end
 end
 
-function getChapter()
-    local doc = jsoup.get(chapterUrl)
+function getChapter(url, chapter)
+    local doc = docGet(url)
     chapter:setTitle(doc:select("#title"):get(0):ownText())
     local content = doc:select("#content"):get(0)
     content:select("br"):after("\\n")

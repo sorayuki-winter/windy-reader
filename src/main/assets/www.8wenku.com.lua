@@ -1,5 +1,5 @@
-function search()
-    local doc = jsoup:connect(searchUrl):data("keyword", keyWord):post()
+function search(url, key, list)
+    local doc = jsoup:connect(url):data("keyword", key):post()
     local lis = doc:select("li.inline")
     for i = 0, lis:size() - 1 do
         local li = lis:get(i)
@@ -14,15 +14,15 @@ function search()
     end
 end
 
-function getBook()
-    local doc = jsoup:connect(bookUrl):post()
+function getBook(url, book)
+    local doc = docGet(url)
     local tH2 = doc:select("h2.tit"):get(0)
     local sT = tH2:text()
     local _, _, sT1 = string.find(sT, "《(.+)》")
     book:setTitle(sT1)
     local img = doc:select("img[width][height][alt][src~=.*\\.jpg]"):get(0)
     book:setImgUrl(img:attr("src"))
-    book:setChapterListUrl(bookUrl)
+    book:setChapterListUrl(url)
     local atr = doc:select("span.author"):get(0)
     local sAtr = atr:text()
     _, _, sAtr = string.find(sAtr, "作者：(.*)")
@@ -35,8 +35,8 @@ function getBook()
     book:setDetail(desc:ownText())
 end
 
-function getChapterList()
-    local doc = jsoup:connect(chapterListUrl):post()
+function getChapterList(url, list)
+    local doc = docGet(url)
     local jrs = doc:select("div.hd.clearfix")
     for i = 0, jrs:size() - 1 do
         local jr = jrs:get(i)
@@ -47,15 +47,15 @@ function getChapterList()
             local aC = aCl:get(j)
             local jc = Chapter()
             jc:setTitle(st1 .. " " .. aC:ownText())
-            local burl = string.match(chapterListUrl, "https?://[^/]+")
+            local burl = string.match(url, "https?://[^/]+")
             jc:setUrl(burl .. aC:attr("href"))
             list:add(jc)
         end
     end
 end
 
-function getChapter()
-    local doc = jsoup:connect(chapterUrl):post()
+function getChapter(url, chapter)
+    local doc = docGet(url)
     local t1 = doc:select(".article-title"):get(0)
     local t2 = t1:select("h1"):get(0)
     chapter:setTitle(t2:ownText())
