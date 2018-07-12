@@ -1,28 +1,26 @@
 package com.wintersky.windyreader.catalog;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Chapter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+import io.realm.RealmBaseAdapter;
+import io.realm.RealmList;
 
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
@@ -36,11 +34,10 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     @Inject
     CatalogContract.Presenter mPresenter;
     @Inject
-    CatalogAdapter mAdapter;
-    @Inject
     String mUrl;
 
     private ListView mListView;
+    private CatalogAdapter mAdapter;
 
     @Inject
     public CatalogFragment() {
@@ -65,19 +62,26 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
+        view.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
         mListView = view.findViewById(R.id.list);
-        mListView.setAdapter(mAdapter);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Activity activity = getActivity();
-                if (activity != null) {
+                Chapter chapter = mAdapter.getItem(position);
+                if (activity != null && chapter != null) {
                     Intent intent = new Intent();
-                    intent.putExtra(CHAPTER_URL, mAdapter.getItem(position).getUrl());
+                    intent.putExtra(CHAPTER_URL, chapter.getUrl());
                     activity.setResult(RESULT_OK, intent);
                     activity.finish();
                 } else {
-                    WS("CatalogFragment.mListView.onItemClick", "activity null");
+                    WS("CatalogFragment.mListView.onItemClick", "activity or chapter null");
                 }
             }
         });
@@ -86,60 +90,15 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     }
 
     @Override
-    public void addChapter(Chapter chapter) {
-        mAdapter.add(chapter);
+    public void setCList(RealmList<Chapter> list) {
+        mAdapter = new CatalogAdapter(list);
+        mListView.setAdapter(mAdapter);
     }
 
-    @Override
-    public void cListLoaded() {
-        mAdapter.setLoaded();
-        mListView.setSelection(85);
-    }
+    class CatalogAdapter extends RealmBaseAdapter<Chapter> {
 
-    static class CatalogAdapter extends BaseAdapter {
-
-        private List<Chapter> mList = new ArrayList<>();
-
-        private boolean isLoading;
-
-        private Context mContext;
-
-        @Inject
-        CatalogAdapter(Context context) {
-            mContext = context;
-            isLoading = false;
-        }
-
-        void add(Chapter chapter) {
-            if (!isLoading) {
-                isLoading = true;
-                mList.clear();
-            }
-            mList.add(chapter);
-            notifyDataSetChanged();
-        }
-
-        void setLoaded() {
-            isLoading = false;
-        }
-
-        @Override
-        public int getCount() {
-            if (mList == null)
-                return 0;
-            return mList.size();
-        }
-
-        @Override
-        public Chapter getItem(int position) {
-            if (mList.size() > position)
-                return mList.get(position);
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
+        CatalogAdapter(@Nullable RealmList<Chapter> data) {
+            super(data);
         }
 
         @Override
@@ -149,7 +108,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
 
             if (convertView == null) {
                 holder = new ViewHolder();
-                convertView = LayoutInflater.from(mContext)
+                convertView = LayoutInflater.from(parent.getContext())
                         .inflate(R.layout.item_catalog, parent, false);
 
                 holder.title = convertView.findViewById(R.id.title);
@@ -159,6 +118,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
                 holder = (ViewHolder) convertView.getTag();
             }
 
+            assert chapter != null;
             holder.title.setText(chapter.getTitle());
 
             return convertView;

@@ -7,6 +7,8 @@ import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
 
+import io.realm.RealmList;
+
 import static com.wintersky.windyreader.util.Constants.WS;
 
 public class DetailPresenter implements DetailContract.Presenter {
@@ -48,14 +50,10 @@ public class DetailPresenter implements DetailContract.Presenter {
         });
 
         mRepository.getCList(bookUrl, new DataSource.LoadCListCallback() {
-            @Override
-            public void onLoading(Chapter chapter) {
-
-            }
 
             @Override
-            public void onLoaded() {
-                mView.setChapters(null);
+            public void onLoaded(RealmList<Chapter> list) {
+                mView.setChapters(list);
             }
 
             @Override

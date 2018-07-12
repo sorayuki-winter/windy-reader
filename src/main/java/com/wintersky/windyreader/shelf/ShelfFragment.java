@@ -8,13 +8,13 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
@@ -25,11 +25,12 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.read.ReadActivity;
 import com.wintersky.windyreader.search.SearchActivity;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
+import io.realm.OrderedRealmCollection;
+import io.realm.RealmBaseAdapter;
+import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
@@ -42,8 +43,8 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
     @Inject
     ShelfContract.Presenter mPresenter;
-    @Inject
-    GridAdapter adapter;
+
+    private GridView mGridView;
 
     @Inject
     public ShelfFragment() {
@@ -63,8 +64,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     }
 
     @Override
-    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_shelf, container, false);
 
@@ -83,61 +83,48 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             }
         });
 
-        GridView gridView = view.findViewById(R.id.shelf_gv);
-        gridView.setAdapter(adapter);
-        adapter.bind(getActivity());
+        mGridView = view.findViewById(R.id.shelf_gv);
 
         return view;
     }
 
     @Override
-    public void setBooks(List<Book> list) {
-        adapter.setBookList(list);
+    public void setBooks(RealmResults<Book> list) {
+        GridAdapter adapter = new GridAdapter(list);
+        adapter.bind(getActivity());
+        mGridView.setAdapter(adapter);
     }
 
-    static class GridAdapter extends BaseAdapter {
-
-        private List<Book> mList;
-
-        private Context mContext;
+    class GridAdapter extends RealmBaseAdapter<Book> {
 
         private Activity mActivity;
 
-        @Inject
-        GridAdapter(Context context) {
-            mContext = context;
+        GridAdapter(@Nullable OrderedRealmCollection<Book> data) {
+            super(data);
         }
 
         void bind(Activity activity) {
             mActivity = activity;
         }
 
-        void setBookList(List<Book> list) {
-            this.mList = list;
-            for (int i = 0; i < list.size() % 3; i++) {
-                Book book = new Book();
-                list.add(book);
-            }
-            notifyDataSetChanged();
-        }
-
         @Override
         public int getCount() {
-            if (mList == null)
+            if (adapterData == null) {
                 return 0;
-            return mList.size();
+            } else if (adapterData.size() % 3 == 0) {
+                return adapterData.size();
+            } else {
+                return adapterData.size() / 3 * 3 + 3;
+            }
         }
 
+        @Nullable
         @Override
         public Book getItem(int position) {
-            if (mList != null && mList.size() > position)
-                return mList.get(position);
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
+            if (adapterData == null || position >= adapterData.size()) {
+                return null;
+            }
+            return adapterData.get(position);
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -148,23 +135,20 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
             if (view == null) {
                 holder = new ViewHolder();
-                view = LayoutInflater.from(mContext)
-                        .inflate(R.layout.item_shelf, viewGroup, false);
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_shelf, viewGroup, false);
                 holder.img = view.findViewById(R.id.cover);
                 holder.tv = view.findViewById(R.id.shelf_it_name_txt);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
             }
-            if (bk.getUrl() == null) {
-                holder.img.setImageDrawable(null);
-            } else {
+            if (adapterData != null && i < adapterData.size() && bk != null) {
                 holder.img.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             Drawable drawable = ((ImageView) v).getDrawable();
-                            int color = ContextCompat.getColor(mContext, R.color.shelfCoverPress);
+                            int color = ContextCompat.getColor(mActivity, R.color.shelfCoverPress);
                             drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
                         } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
                             Drawable drawable = ((ImageView) v).getDrawable();
@@ -177,13 +161,15 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent();
-                        intent.setClass(mContext, ReadActivity.class);
+                        intent.setClass(mActivity, ReadActivity.class);
                         intent.putExtra(BOOK_URL, bk.getUrl());
-                        intent.putExtra(CHAPTER_URL, bk.getCurrentCUrl());
+                        intent.putExtra(CHAPTER_URL, bk.getCurrentUrl());
                         mActivity.startActivity(intent);
                     }
                 });
                 holder.tv.setText(bk.getTitle());
+            } else {
+                holder.img.setImageDrawable(null);
             }
 
             return view;

@@ -12,19 +12,14 @@ import org.junit.Test;
 import org.keplerproject.luajava.LuaState;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.wintersky.windyreader.util.Constants.WS;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 public class RemoteDataSourceTest {
 
     private RemoteDataSource mSource;
-
-    private String searchUrl;
-    private String bookUrl;
     private String chapterListUrl;
     private String chapterUrl;
 
@@ -36,8 +31,6 @@ public class RemoteDataSourceTest {
         LuaState lua = ComponentHolder.getAppComponent().getLuaState();
         mSource = new RemoteDataSource(context, new SingleExecutors(), lua);
 
-        searchUrl = "";
-        bookUrl = "http://zxzw.com/164588/";
         chapterListUrl = "http://zxzw.com/164588/";
         chapterUrl = "http://zxzw.com/164588/14192209/";
     }
@@ -53,15 +46,9 @@ public class RemoteDataSourceTest {
     }
 
     @Test
-    public void getChapterList() {
-        final List<Chapter> list = new ArrayList<>();
-        boolean ok = mSource.getChapterListFromRemote(chapterListUrl, new RemoteDataSource.LuaCListCallback() {
-            @Override
-            public void onLoading(Chapter chapter) {
-                list.add(chapter);
-            }
-        });
-        assertTrue("chapter list null", ok);
+    public void getCList() {
+        final List<Chapter> list = mSource.getCListFromRemote(chapterListUrl);
+        assertNotNull("chapter list null", list);
         chapterListCheck(list);
     }
 
@@ -75,7 +62,7 @@ public class RemoteDataSourceTest {
     private void chapterListCheck(List<Chapter> list) {
         StringBuilder sb = new StringBuilder();
         for (Chapter c : list) {
-            sb.append(c.getId()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
+            sb.append(c.getNum()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
         }
         WS(sb.toString());
     }

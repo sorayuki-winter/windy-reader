@@ -7,6 +7,8 @@ import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
+
 import static com.wintersky.windyreader.util.Constants.WS;
 
 public class ReadPresenter implements ReadContract.Presenter {
@@ -15,14 +17,16 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     private ReadContract.View mView;
     private Repository mRepository;
+    private Realm mRealm;
     private String[] mUrls;
     private Book mBook;
     private Chapter mChapter;
 
     @Inject
-    ReadPresenter(Repository repository, String[] urls) {
-        this.mRepository = repository;
-        this.mUrls = urls;
+    ReadPresenter(Repository repository, Realm realm, String[] urls) {
+        mRepository = repository;
+        mRealm = realm;
+        mUrls = urls;
     }
 
     @Override
@@ -60,22 +64,25 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void loadChapter(String url) {
-        mBook.setCurrentCUrl(url);
-        mRepository.saveBook(mBook);
+        mRealm.beginTransaction();
+        mBook.setCurrentUrl(url);
+        mRealm.commitTransaction();
         getChapter(url);
     }
 
     @Override
     public void prevChapter() {
-        mBook.setCurrentCUrl(mChapter.getPrev());
-        mRepository.saveBook(mBook);
+        mRealm.beginTransaction();
+        mBook.setCurrentUrl(mChapter.getPrev());
+        mRealm.commitTransaction();
         getChapter(mChapter.getPrev());
     }
 
     @Override
     public void nextChapter() {
-        mBook.setCurrentCUrl(mChapter.getNext());
-        mRepository.saveBook(mBook);
+        mRealm.beginTransaction();
+        mBook.setCurrentUrl(mChapter.getNext());
+        mRealm.commitTransaction();
         getChapter(mChapter.getNext());
     }
 

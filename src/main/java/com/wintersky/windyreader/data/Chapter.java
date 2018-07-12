@@ -6,18 +6,19 @@ import io.realm.annotations.PrimaryKey;
 public class Chapter extends RealmObject {
     @PrimaryKey
     private String url;
-    private long id;
+    private long num;
     private String title;
     private String content;
     private String prev;
     private String next;
+    private boolean readed;
 
-    public long getId() {
-        return id;
+    public long getNum() {
+        return num;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setNum(long num) {
+        this.num = num;
     }
 
     public String getTitle() {

@@ -1,5 +1,6 @@
 package com.wintersky.windyreader.data;
 
+import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
@@ -10,8 +11,9 @@ public class Book extends RealmObject {
     private String author;
     private String detail;
     private String imgUrl;
-    private String chapterListUrl;
-    private String currentCUrl;
+    private String listUrl;
+    private String currentUrl;
+    private RealmList<Chapter> list;
 
     public String getUrl() {
         return url;
@@ -53,19 +55,27 @@ public class Book extends RealmObject {
         this.imgUrl = imgUrl;
     }
 
-    public String getChapterListUrl() {
-        return chapterListUrl;
+    public String getListUrl() {
+        return listUrl;
     }
 
-    public void setChapterListUrl(String chapterListUrl) {
-        this.chapterListUrl = chapterListUrl;
+    public void setListUrl(String listUrl) {
+        this.listUrl = listUrl;
     }
 
-    public String getCurrentCUrl() {
-        return currentCUrl;
+    public String getCurrentUrl() {
+        return currentUrl;
     }
 
-    public void setCurrentCUrl(String currentCUrl) {
-        this.currentCUrl = currentCUrl;
+    public void setCurrentUrl(String currentUrl) {
+        this.currentUrl = currentUrl;
+    }
+
+    public RealmList<Chapter> getList() {
+        return list;
+    }
+
+    public void setList(RealmList<Chapter> list) {
+        this.list = list;
     }
 }

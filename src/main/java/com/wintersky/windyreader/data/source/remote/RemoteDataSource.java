@@ -19,6 +19,8 @@ import java.util.regex.Pattern;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import io.realm.RealmList;
+
 import static com.wintersky.windyreader.util.Constants.WS;
 import static com.wintersky.windyreader.util.Constants.is2String;
 import static com.wintersky.windyreader.util.Constants.luaSafeDoString;
@@ -98,22 +100,12 @@ public class RemoteDataSource implements DataSource {
         mExecutors.networkIO().execute(new Runnable() {
             @Override
             public void run() {
-                final boolean ok = getChapterListFromRemote(url, new LuaCListCallback() {
-                    @Override
-                    public void onLoading(final Chapter chapter) {
-                        mExecutors.mainThread().execute(new Runnable() {
-                            @Override
-                            public void run() {
-                                callback.onLoading(chapter);
-                            }
-                        });
-                    }
-                });
+                final RealmList<Chapter> list = getCListFromRemote(url);
                 mExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (ok)
-                            callback.onLoaded();
+                        if (list != null)
+                            callback.onLoaded(list);
                         else
                             callback.onDataNotAvailable();
                     }
@@ -170,7 +162,7 @@ public class RemoteDataSource implements DataSource {
     }
 
     @VisibleForTesting
-    public Book getBookFromRemote(String url) {
+    Book getBookFromRemote(String url) {
         Book book = new Book();
         book.setUrl(url);
         String fileName = url.split("/")[2] + ".lua";
@@ -191,22 +183,23 @@ public class RemoteDataSource implements DataSource {
     }
 
     @VisibleForTesting
-    boolean getChapterListFromRemote(String url, LuaCListCallback callback) {
+    RealmList<Chapter> getCListFromRemote(String url) {
+        RealmList<Chapter> list = new RealmList<>();
         String fileName = url.split("/")[2] + ".lua";
         mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.getField(LuaState.LUA_GLOBALSINDEX, "getChapterList");
+            mLua.getField(LuaState.LUA_GLOBALSINDEX, "getCList");
             mLua.pushString(url);
-            mLua.pushJavaObject(callback);
+            mLua.pushJavaObject(list);
             luaSafeRun(mLua, 2, 0);
         } catch (Exception e) {
-            String msg = "get chapter list fail\n" + e + "\n";
-            msg += e.getStackTrace()[0].toString();
+            String msg = e + "\n";
+            msg += e.getStackTrace()[1].toString();
             WS(msg);
-            return false;
+            return null;
         }
-        return true;
+        return list;
     }
 
     @VisibleForTesting
@@ -222,15 +215,11 @@ public class RemoteDataSource implements DataSource {
             mLua.pushJavaObject(chapter);
             luaSafeRun(mLua, 2, 0);
         } catch (Exception e) {
-            String msg = "get chapter fail\n" + e + "\n";
-            msg += e.getStackTrace()[0].toString();
+            String msg = e + "\n";
+            msg += e.getStackTrace()[1].toString();
             WS(msg);
             return null;
         }
         return chapter;
-    }
-
-    interface LuaCListCallback {
-        void onLoading(Chapter chapter);
     }
 }

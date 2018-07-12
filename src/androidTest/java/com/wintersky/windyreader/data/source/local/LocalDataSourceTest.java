@@ -1,6 +1,7 @@
 package com.wintersky.windyreader.data.source.local;
 
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.SingleExecutors;
 
@@ -8,6 +9,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+
+import io.realm.Realm;
 
 import static com.wintersky.windyreader.util.Constants.WS;
 
@@ -21,11 +24,19 @@ public class LocalDataSourceTest {
     }
 
     @Test
+    public void clearCList() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.delete(Chapter.class);
+        realm.commitTransaction();
+    }
+
+    @Test
     public void saveBook() {
         Book book = new Book();
         book.setUrl("http://zxzw.com/164588/");
         book.setTitle("合体双修");
-        book.setCurrentCUrl("http://zxzw.com/164588/14192209/");
+        book.setCurrentUrl("http://zxzw.com/164588/14192209/");
         mSource.saveBook(book);
     }
 

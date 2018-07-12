@@ -46,4 +46,5 @@ dependencies {
     implementation 'com.android.support:design:27.1.1'
 
     implementation files('libs/androLua.jar')
+    implementation 'io.realm:android-adapters:2.0.0'
 }

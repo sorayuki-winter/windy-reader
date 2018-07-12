@@ -61,9 +61,9 @@ public class LocalDataSource implements DataSource {
     @Override
     public void getBook(final String url, final GetBookCallback callback) {
         Realm realm = Realm.getDefaultInstance();
-        RealmResults<Book> books = realm.where(Book.class).equalTo("url", url).findAll();
-        if (books.size() > 0) {
-            callback.onLoaded(books.first());
+        Book book = realm.where(Book.class).equalTo("url", url).findFirst();
+        if (book != null) {
+            callback.onLoaded(book);
         } else {
             callback.onDataNotAvailable();
         }

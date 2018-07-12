@@ -4,13 +4,13 @@ import com.wintersky.windyreader.BasePresenter;
 import com.wintersky.windyreader.BaseView;
 import com.wintersky.windyreader.data.Chapter;
 
+import io.realm.RealmList;
+
 public interface CatalogContract {
 
     interface View extends BaseView<Presenter> {
 
-        void addChapter(Chapter chapter);
-
-        void cListLoaded();
+        void setCList(RealmList<Chapter> list);
     }
 
     interface Presenter extends BasePresenter<View> {

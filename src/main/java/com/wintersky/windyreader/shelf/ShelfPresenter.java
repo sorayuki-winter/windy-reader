@@ -4,9 +4,9 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
-import java.util.List;
-
 import javax.inject.Inject;
+
+import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.Constants.WS;
 
@@ -42,7 +42,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
 
         mRepository.getBList(new DataSource.LoadBListCallback() {
             @Override
-            public void onLoaded(List<Book> list) {
+            public void onLoaded(RealmResults<Book> list) {
                 mView.setBooks(list);
             }
 

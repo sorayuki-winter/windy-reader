@@ -4,7 +4,8 @@ import io.realm.RealmObject;
 
 public class Library extends RealmObject {
     private String name;
-    private String baseUrl;
+    private String url;
+    private String searchUrl;
     private String path;
 
     public String getName() {
@@ -15,12 +16,20 @@ public class Library extends RealmObject {
         this.name = name;
     }
 
-    public String getBaseUrl() {
-        return baseUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getSearchUrl() {
+        return searchUrl;
+    }
+
+    public void setSearchUrl(String searchUrl) {
+        this.searchUrl = searchUrl;
     }
 
     public String getPath() {
