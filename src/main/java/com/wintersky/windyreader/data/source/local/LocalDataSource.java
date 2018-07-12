@@ -16,19 +16,17 @@
 
 package com.wintersky.windyreader.data.source.local;
 
-import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
-import com.wintersky.windyreader.data.Library;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import io.realm.Realm;
+import io.realm.RealmResults;
 
 /**
  * Concrete implementation of a data source as a db.
@@ -38,26 +36,14 @@ public class LocalDataSource implements DataSource {
 
     private final AppExecutors mExecutors;
 
-    private final SharedPreferences mSP;
-
     @Inject
-    LocalDataSource(@NonNull AppExecutors executors, SharedPreferences sp) {
+    LocalDataSource(@NonNull AppExecutors executors) {
         mExecutors = executors;
-        mSP = sp;
     }
 
     @Override
-    public void getLibraries(LoadLibrariesCallback callback) {
-        List<Library> list = new ArrayList<>();
-
-        Library library = new Library();
-        library.name = "八号文库";
-        library.baseUrl = "http://www.8wenku.com";
-        library.path = "";
-
-        list.add(library);
-
-        callback.onLibrariesLoaded(list);
+    public void getLList(LoadLListCallback callback) {
+        callback.onDataNotAvailable();
     }
 
     @Override
@@ -66,43 +52,43 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getBooks(@NonNull final LoadBooksCallback callback) {
-        Book book = new Book();
-        book.setUrl("http://zxzw.com/164588/");
-        book.setTitle("合体双修");
-        book.setCurrentCUrl(mSP.getString("currentCUrl", ""));
-        if (!book.getCurrentCUrl().startsWith("http://")) {
-            book.setCurrentCUrl("http://zxzw.com/164588/14192209/");
-        }
-        List<Book> bks = new ArrayList<>();
-        bks.add(book);
-        callback.onBooksLoaded(bks);
+    public void getBList(@NonNull final LoadBListCallback callback) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Book> books = realm.where(Book.class).findAll();
+        callback.onLoaded(books);
     }
 
     @Override
-    public void getBook(final String bookUrl, final GetBookCallback callback) {
-        Book book = new Book();
-        book.setUrl("http://zxzw.com/164588/");
-        book.setTitle("合体双修");
-        book.setCurrentCUrl(mSP.getString("currentCUrl", ""));
-        if (!book.getCurrentCUrl().startsWith("http://")) {
-            book.setCurrentCUrl("http://zxzw.com/164588/14192209/");
+    public void getBook(final String url, final GetBookCallback callback) {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Book> books = realm.where(Book.class).equalTo("url", url).findAll();
+        if (books.size() > 0) {
+            callback.onLoaded(books.first());
+        } else {
+            callback.onDataNotAvailable();
         }
-        callback.onBookLoaded(book);
     }
 
     @Override
-    public void getChapters(final String bookUrl, final LoadChaptersCallback callback) {
+    public void getCList(final String url, final LoadCListCallback callback) {
         callback.onDataNotAvailable();
     }
 
     @Override
-    public void getChapter(String chapterUrl, GetChapterCallback callback) {
+    public void getChapter(String url, GetChapterCallback callback) {
         callback.onDataNotAvailable();
     }
 
     @Override
     public void saveBook(final Book book) {
-        mSP.edit().putString("currentCUrl", book.getCurrentCUrl()).apply();
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                realm.copyToRealmOrUpdate(book);
+                realm.commitTransaction();
+            }
+        });
     }
 }

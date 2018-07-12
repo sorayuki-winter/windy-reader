@@ -31,8 +31,8 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getLibraries(LoadLibrariesCallback callback) {
-        mLocalDataSource.getLibraries(callback);
+    public void getLList(LoadLListCallback callback) {
+        mLocalDataSource.getLList(callback);
     }
 
     @Override
@@ -41,36 +41,36 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getBooks(@NonNull final LoadBooksCallback callback) {
+    public void getBList(@NonNull final LoadBListCallback callback) {
         if (mCachedBooks != null && !mCacheIsDirty) {
-            callback.onBooksLoaded(new ArrayList<>(mCachedBooks.values()));
+            callback.onLoaded(new ArrayList<>(mCachedBooks.values()));
             return;
         }
         getBooksFromLocalDataSource(callback);
     }
 
     @Override
-    public void getBook(String bookUrl, final GetBookCallback callback) {
+    public void getBook(String url, final GetBookCallback callback) {
         if (mCachedBooks == null) {
             mCachedBooks = new LinkedHashMap<>();
         }
-        Book cachedBook = mCachedBooks.get(bookUrl);
+        Book cachedBook = mCachedBooks.get(url);
 
         // Respond immediately with cache if available
         if (cachedBook != null) {
-            callback.onBookLoaded(cachedBook);
+            callback.onLoaded(cachedBook);
             return;
         }
 
-        mLocalDataSource.getBook(bookUrl, new GetBookCallback() {
+        mLocalDataSource.getBook(url, new GetBookCallback() {
             @Override
-            public void onBookLoaded(Book book) {
+            public void onLoaded(Book book) {
                 // Do in memory cache update to keep the app UI up to date
                 if (mCachedBooks == null) {
                     mCachedBooks = new LinkedHashMap<>();
                 }
-                mCachedBooks.put(book.url, book);
-                callback.onBookLoaded(book);
+                mCachedBooks.put(book.getUrl(), book);
+                callback.onLoaded(book);
             }
 
             @Override
@@ -81,50 +81,40 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getChapters(final String bookUrl, final LoadChaptersCallback callback) {
-        mRemoteDataSource.getChapters(bookUrl, new LoadChaptersCallback() {
-            @Override
-            public void onChaptersLoaded(List<Chapter> list) {
-                callback.onChaptersLoaded(list);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                callback.onDataNotAvailable();
-            }
-        });
+    public void getCList(final String url, final LoadCListCallback callback) {
+        mRemoteDataSource.getCList(url, callback);
     }
 
     @Override
-    public void getChapter(final String chapterUrl, final GetChapterCallback callback) {
-        mLocalDataSource.getChapter(chapterUrl, new GetChapterCallback() {
+    public void getChapter(final String url, final GetChapterCallback callback) {
+        mLocalDataSource.getChapter(url, new GetChapterCallback() {
             @Override
-            public void onChapterLoaded(Chapter chapter) {
-                if (chapter.content != null)
-                    callback.onChapterLoaded(chapter);
+            public void onLoaded(Chapter chapter) {
+                if (chapter.getContent() != null)
+                    callback.onLoaded(chapter);
                 else
-                    mRemoteDataSource.getChapter(chapterUrl, callback);
+                    mRemoteDataSource.getChapter(url, callback);
             }
 
             @Override
             public void onDataNotAvailable() {
-                mRemoteDataSource.getChapter(chapterUrl, callback);
+                mRemoteDataSource.getChapter(url, callback);
             }
         });
     }
 
     @Override
     public void saveBook(Book book) {
-        mCachedBooks.put(book.url, book);
+        mCachedBooks.put(book.getUrl(), book);
         mLocalDataSource.saveBook(book);
     }
 
-    private void getBooksFromLocalDataSource(@NonNull final LoadBooksCallback callback) {
-        mLocalDataSource.getBooks(new LoadBooksCallback() {
+    private void getBooksFromLocalDataSource(@NonNull final LoadBListCallback callback) {
+        mLocalDataSource.getBList(new LoadBListCallback() {
             @Override
-            public void onBooksLoaded(List<Book> books) {
-                refreshCache(books);
-                callback.onBooksLoaded(new ArrayList<>(mCachedBooks.values()));
+            public void onLoaded(List<Book> list) {
+                refreshCache(list);
+                callback.onLoaded(new ArrayList<>(mCachedBooks.values()));
             }
 
             @Override
@@ -140,7 +130,7 @@ public class Repository implements DataSource {
         }
         mCachedBooks.clear();
         for (Book book : books) {
-            mCachedBooks.put(book.url, book);
+            mCachedBooks.put(book.getUrl(), book);
         }
         mCacheIsDirty = false;
     }

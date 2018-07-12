@@ -4,8 +4,6 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import static com.wintersky.windyreader.util.Constants.WS;
@@ -42,10 +40,15 @@ public class CatalogPresenter implements CatalogContract.Presenter {
             return;
         }
 
-        mRepository.getChapters(mUrl, new DataSource.LoadChaptersCallback() {
+        mRepository.getCList(mUrl, new DataSource.LoadCListCallback() {
             @Override
-            public void onChaptersLoaded(List<Chapter> list) {
-                mView.setChapterList(list);
+            public void onLoading(Chapter chapter) {
+                mView.addChapter(chapter);
+            }
+
+            @Override
+            public void onLoaded() {
+                mView.cListLoaded();
             }
 
             @Override

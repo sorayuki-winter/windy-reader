@@ -5,8 +5,6 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import static com.wintersky.windyreader.util.Constants.WS;
@@ -39,7 +37,7 @@ public class DetailPresenter implements DetailContract.Presenter {
     private void start() {
         mRepository.getBook(bookUrl, new DataSource.GetBookCallback() {
             @Override
-            public void onBookLoaded(Book book) {
+            public void onLoaded(Book book) {
                 mView.setBook(book);
             }
 
@@ -49,10 +47,15 @@ public class DetailPresenter implements DetailContract.Presenter {
             }
         });
 
-        mRepository.getChapters(bookUrl, new DataSource.LoadChaptersCallback() {
+        mRepository.getCList(bookUrl, new DataSource.LoadCListCallback() {
             @Override
-            public void onChaptersLoaded(List<Chapter> list) {
-                mView.setChapters(list);
+            public void onLoading(Chapter chapter) {
+
+            }
+
+            @Override
+            public void onLoaded() {
+                mView.setChapters(null);
             }
 
             @Override
@@ -66,7 +69,7 @@ public class DetailPresenter implements DetailContract.Presenter {
     public void saveBook(String url) {
         mRepository.getBook(url, new DataSource.GetBookCallback() {
             @Override
-            public void onBookLoaded(Book book) {
+            public void onLoaded(Book book) {
                 mRepository.saveBook(book);
             }
 

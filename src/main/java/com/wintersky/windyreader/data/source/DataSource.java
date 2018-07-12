@@ -8,58 +8,60 @@ import java.util.List;
 
 public interface DataSource {
 
-    void getLibraries(LoadLibrariesCallback callback);
+    void getLList(LoadLListCallback callback);
 
     void searchBook(String url, String key, SearchBookCallback callback);
 
-    void getBooks(LoadBooksCallback callback);
+    void getBList(LoadBListCallback callback);
 
-    void getBook(String bookUrl, GetBookCallback callback);
+    void getBook(String url, GetBookCallback callback);
 
-    void getChapters(String bookUrl, LoadChaptersCallback callback);
+    void getCList(String url, LoadCListCallback callback);
 
-    void getChapter(String chapterUrl, GetChapterCallback callback);
+    void getChapter(String url, GetChapterCallback callback);
 
     void saveBook(Book book);
 
-    interface LoadLibrariesCallback {
+    interface LoadLListCallback {
 
-        void onLibrariesLoaded(List<Library> list);
+        void onLoaded(List<Library> list);
 
         void onDataNotAvailable();
     }
 
     interface SearchBookCallback {
 
-        void onBookSearched(List<Book> books);
+        void onSearched(List<Book> list);
 
         void onDataNotAvailable();
     }
 
-    interface LoadBooksCallback {
+    interface LoadBListCallback {
 
-        void onBooksLoaded(List<Book> books);
+        void onLoaded(List<Book> list);
 
         void onDataNotAvailable();
     }
 
     interface GetBookCallback {
 
-        void onBookLoaded(Book book);
+        void onLoaded(Book book);
 
         void onDataNotAvailable();
     }
 
-    interface LoadChaptersCallback {
+    interface LoadCListCallback {
 
-        void onChaptersLoaded(List<Chapter> list);
+        void onLoading(Chapter chapter);
+
+        void onLoaded();
 
         void onDataNotAvailable();
     }
 
     interface GetChapterCallback {
 
-        void onChapterLoaded(Chapter chapter);
+        void onLoaded(Chapter chapter);
 
         void onDataNotAvailable();
     }

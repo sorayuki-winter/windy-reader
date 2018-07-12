@@ -155,7 +155,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.tv.setText(getItem(position).title);
+            holder.tv.setText(getItem(position).getTitle());
 
             return convertView;
         }

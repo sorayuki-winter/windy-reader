@@ -3,7 +3,6 @@ package com.wintersky.windyreader.data.source.remote;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
-import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.di.ComponentHolder;
 import com.wintersky.windyreader.util.SingleExecutors;
@@ -13,14 +12,16 @@ import org.junit.Test;
 import org.keplerproject.luajava.LuaState;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.wintersky.windyreader.util.Constants.WS;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RemoteDataSourceTest {
 
-    private RemoteDataSource dataSource;
+    private RemoteDataSource mSource;
 
     private String searchUrl;
     private String bookUrl;
@@ -33,7 +34,7 @@ public class RemoteDataSourceTest {
 
         Context context = InstrumentationRegistry.getTargetContext();
         LuaState lua = ComponentHolder.getAppComponent().getLuaState();
-        dataSource = new RemoteDataSource(context, new SingleExecutors(), lua);
+        mSource = new RemoteDataSource(context, new SingleExecutors(), lua);
 
         searchUrl = "";
         bookUrl = "http://zxzw.com/164588/";
@@ -43,58 +44,45 @@ public class RemoteDataSourceTest {
 
     @Test
     public void searchBook() {
-        List<Book> list = dataSource.searchBookFromRemote(searchUrl, "约会");
-        assertNotNull("book list null", list);
-        searchCheck(list);
+
     }
 
     @Test
     public void getBook() {
-        Book book = dataSource.getBookFromRemote(bookUrl);
-        assertNotNull("book null", book);
-        bookCheck(book);
+
     }
 
     @Test
     public void getChapterList() {
-        List<Chapter> list = dataSource.getChapterListFromRemote(chapterListUrl);
-        assertNotNull("chapter list null", list);
+        final List<Chapter> list = new ArrayList<>();
+        boolean ok = mSource.getChapterListFromRemote(chapterListUrl, new RemoteDataSource.LuaCListCallback() {
+            @Override
+            public void onLoading(Chapter chapter) {
+                list.add(chapter);
+            }
+        });
+        assertTrue("chapter list null", ok);
         chapterListCheck(list);
     }
 
     @Test
     public void getChapter() {
-        Chapter chapter = dataSource.getChapterFromRemote(chapterUrl);
+        Chapter chapter = mSource.getChapterFromRemote(chapterUrl);
         assertNotNull("chapter null", chapter);
         chapterCheck(chapter);
-    }
-
-    private void searchCheck(List<Book> list) {
-        for (Book bk : list) {
-            WS(bk.title + " " + bk.url);
-        }
-    }
-
-    private void bookCheck(Book book) {
-        WS("BU:" + book.url + "TT:" + book.title + "IU:" + book.imgUrl + "CL:" + book.chapterListUrl + "AT:" + book.author + "DT:" + book.detail);
-        assertNotNull("title null", book.title);
-        assertNotNull("imgUrl null", book.imgUrl);
-        assertNotNull("chapterListUrl null", book.chapterListUrl);
-        assertNotNull("author null", book.author);
-        assertNotNull("detail null", book.detail);
     }
 
     private void chapterListCheck(List<Chapter> list) {
         StringBuilder sb = new StringBuilder();
         for (Chapter c : list) {
-            sb.append(c.getId()).append(" ").append(c.title).append(" ").append(c.url).append("\n");
+            sb.append(c.getId()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
         }
         WS(sb.toString());
     }
 
     private void chapterCheck(Chapter chapter) {
-        WS("CU:" + chapter.url + "\nCT:" + chapter.title + "\nCC:\n" + chapter.content + "\nEND CC");
-        assertNotNull("content null", chapter.content);
-        assertNotNull("title null", chapter.title);
+        WS("CU:" + chapter.getUrl() + "\nCT:" + chapter.getTitle() + "\nCC:\n" + chapter.getContent() + "\nEND CC");
+        assertNotNull("content null", chapter.getContent());
+        assertNotNull("title null", chapter.getTitle());
     }
 }

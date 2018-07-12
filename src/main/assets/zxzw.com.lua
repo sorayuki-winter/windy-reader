@@ -1,7 +1,7 @@
 function getBook(url, key, list)
 end
 
-function getChapterList(url, list)
+function getChapterList(url, callback)
     local doc = docGet(url)
     local divCList = doc:select("div.chapters"):get(0);
     local aCList = divCList:select("a");
@@ -11,7 +11,7 @@ function getChapterList(url, list)
         chapter:setId(i + 1);
         chapter:setTitle(aC:attr("title"));
         chapter:setUrl(aC:absUrl("href"));
-        list:add(chapter);
+        callback:onLoading(chapter);
     end
 end
 
@@ -28,7 +28,7 @@ function getChapter(url, chapter)
 
     chapter:setTitle(CT)
     chapter:setContent(CC)
-    chapter:setLast(CL)
+    chapter:setPrev(CL)
     chapter:setNext(CN)
 end
 

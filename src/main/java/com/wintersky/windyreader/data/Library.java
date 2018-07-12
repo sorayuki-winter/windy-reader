@@ -1,15 +1,33 @@
 package com.wintersky.windyreader.data;
 
-/**
- * Created by tiandong on 18-3-24.
- */
+import io.realm.RealmObject;
 
-public class Library {
+public class Library extends RealmObject {
+    private String name;
+    private String baseUrl;
+    private String path;
 
-    public String name;
+    public String getName() {
+        return name;
+    }
 
-    public String baseUrl;
+    public void setName(String name) {
+        this.name = name;
+    }
 
-    public String path;
+    public String getBaseUrl() {
+        return baseUrl;
+    }
 
+    public void setBaseUrl(String baseUrl) {
+        this.baseUrl = baseUrl;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
+    }
 }

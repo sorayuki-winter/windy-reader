@@ -4,14 +4,16 @@ import com.wintersky.windyreader.BasePresenter;
 import com.wintersky.windyreader.BaseView;
 import com.wintersky.windyreader.data.Chapter;
 
-import java.util.List;
-
 public interface CatalogContract {
 
     interface View extends BaseView<Presenter> {
-        void setChapterList(List<Chapter> list);
+
+        void addChapter(Chapter chapter);
+
+        void cListLoaded();
     }
 
     interface Presenter extends BasePresenter<View> {
+
     }
 }

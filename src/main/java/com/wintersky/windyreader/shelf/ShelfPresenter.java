@@ -40,10 +40,10 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             return;
         }
 
-        mRepository.getBooks(new DataSource.LoadBooksCallback() {
+        mRepository.getBList(new DataSource.LoadBListCallback() {
             @Override
-            public void onBooksLoaded(List<Book> books) {
-                mView.setBooks(books);
+            public void onLoaded(List<Book> list) {
+                mView.setBooks(list);
             }
 
             @Override

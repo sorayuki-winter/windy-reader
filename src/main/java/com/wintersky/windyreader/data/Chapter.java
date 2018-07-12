@@ -1,12 +1,16 @@
 package com.wintersky.windyreader.data;
 
-public class Chapter {
-    public long id;
-    public String title;
-    public String url;
-    public String content;
-    public String last;
-    public String next;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+public class Chapter extends RealmObject {
+    @PrimaryKey
+    private String url;
+    private long id;
+    private String title;
+    private String content;
+    private String prev;
+    private String next;
 
     public long getId() {
         return id;
@@ -40,12 +44,12 @@ public class Chapter {
         this.content = content;
     }
 
-    public String getLast() {
-        return last;
+    public String getPrev() {
+        return prev;
     }
 
-    public void setLast(String last) {
-        this.last = last;
+    public void setPrev(String prev) {
+        this.prev = prev;
     }
 
     public String getNext() {

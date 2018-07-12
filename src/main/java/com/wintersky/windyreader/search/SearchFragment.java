@@ -149,7 +149,7 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            holder.tv.setText(getItem(position).title);
+            holder.tv.setText(getItem(position).getTitle());
 
             return convertView;
         }

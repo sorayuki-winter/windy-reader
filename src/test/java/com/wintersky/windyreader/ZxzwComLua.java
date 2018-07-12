@@ -23,15 +23,15 @@ public class ZxzwComLua {
         for (int i = 0; i < aCList.size(); i++) {
             Chapter chapter = new Chapter();
             Element aC = aCList.get(i);
-            chapter.setId(i + 1);
-            chapter.setTitle(aC.attr("title"));
-            chapter.setUrl(aC.absUrl("href"));
+            chapter.id = i + 1;
+            chapter.title = (aC.attr("title"));
+            chapter.url = (aC.absUrl("href"));
             list.add(chapter);
         }
 
         StringBuilder sb = new StringBuilder();
         for (Chapter c : list) {
-            sb.append(c.getId()).append(" ")
+            sb.append(c.id).append(" ")
                     .append(c.title).append(" ")
                     .append(c.url).append("\n");
         }

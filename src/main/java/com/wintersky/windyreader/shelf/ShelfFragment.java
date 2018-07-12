@@ -9,6 +9,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -155,7 +156,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             } else {
                 holder = (ViewHolder) view.getTag();
             }
-            if (bk.url == null) {
+            if (bk.getUrl() == null) {
                 holder.img.setImageDrawable(null);
             } else {
                 holder.img.setOnTouchListener(new View.OnTouchListener() {
@@ -163,7 +164,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
                             Drawable drawable = ((ImageView) v).getDrawable();
-                            int color = mContext.getResources().getColor(R.color.shelfCoverPress);
+                            int color = ContextCompat.getColor(mContext, R.color.shelfCoverPress);
                             drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
                         } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
                             Drawable drawable = ((ImageView) v).getDrawable();
@@ -177,12 +178,12 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     public void onClick(View v) {
                         Intent intent = new Intent();
                         intent.setClass(mContext, ReadActivity.class);
-                        intent.putExtra(BOOK_URL, bk.url);
+                        intent.putExtra(BOOK_URL, bk.getUrl());
                         intent.putExtra(CHAPTER_URL, bk.getCurrentCUrl());
                         mActivity.startActivity(intent);
                     }
                 });
-                holder.tv.setText(bk.title);
+                holder.tv.setText(bk.getTitle());
             }
 
             return view;

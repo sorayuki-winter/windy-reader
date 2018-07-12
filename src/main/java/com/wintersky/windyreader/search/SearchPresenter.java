@@ -35,8 +35,8 @@ public class SearchPresenter implements SearchContract.Presenter {
     public void search(String url, String keyword) {
         mRepository.searchBook(url, keyword, new DataSource.SearchBookCallback() {
             @Override
-            public void onBookSearched(List<Book> books) {
-                mView.setResult(books);
+            public void onSearched(List<Book> list) {
+                mView.setResult(list);
             }
 
             @Override

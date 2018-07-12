@@ -17,6 +17,7 @@ import android.widget.TextView;
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Chapter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -85,25 +86,41 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     }
 
     @Override
-    public void setChapterList(List<Chapter> list) {
-        mAdapter.setList(list);
+    public void addChapter(Chapter chapter) {
+        mAdapter.add(chapter);
+    }
+
+    @Override
+    public void cListLoaded() {
+        mAdapter.setLoaded();
         mListView.setSelection(85);
     }
 
     static class CatalogAdapter extends BaseAdapter {
 
-        private List<Chapter> mList;
+        private List<Chapter> mList = new ArrayList<>();
+
+        private boolean isLoading;
 
         private Context mContext;
 
         @Inject
         CatalogAdapter(Context context) {
             mContext = context;
+            isLoading = false;
         }
 
-        public void setList(List<Chapter> list) {
-            mList = list;
+        void add(Chapter chapter) {
+            if (!isLoading) {
+                isLoading = true;
+                mList.clear();
+            }
+            mList.add(chapter);
             notifyDataSetChanged();
+        }
+
+        void setLoaded() {
+            isLoading = false;
         }
 
         @Override

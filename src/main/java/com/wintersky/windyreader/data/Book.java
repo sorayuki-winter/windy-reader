@@ -1,20 +1,17 @@
 package com.wintersky.windyreader.data;
 
-import java.util.Date;
-import java.util.List;
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
-public class Book {
-    public String url;
-    public String title;
-    public String author;
-    public String detail;
-    public String imgUrl;
-    public String chapterListUrl;
-    public byte[] img;
-    public Date lastTime;
-    public int currentCId;
-    public String currentCUrl;
-    public List<Chapter> chapterList;
+public class Book extends RealmObject {
+    @PrimaryKey
+    private String url;
+    private String title;
+    private String author;
+    private String detail;
+    private String imgUrl;
+    private String chapterListUrl;
+    private String currentCUrl;
 
     public String getUrl() {
         return url;
@@ -64,43 +61,11 @@ public class Book {
         this.chapterListUrl = chapterListUrl;
     }
 
-    public byte[] getImg() {
-        return img;
-    }
-
-    public void setImg(byte[] img) {
-        this.img = img;
-    }
-
-    public Date getLastTime() {
-        return lastTime;
-    }
-
-    public void setLastTime(Date lastTime) {
-        this.lastTime = lastTime;
-    }
-
-    public long getCurrentCId() {
-        return currentCId;
-    }
-
-    public void setCurrentCId(int currentCId) {
-        this.currentCId = currentCId;
-    }
-
     public String getCurrentCUrl() {
         return currentCUrl;
     }
 
     public void setCurrentCUrl(String currentCUrl) {
         this.currentCUrl = currentCUrl;
-    }
-
-    public List<Chapter> getChapterList() {
-        return chapterList;
-    }
-
-    public void setChapterList(List<Chapter> chapterList) {
-        this.chapterList = chapterList;
     }
 }

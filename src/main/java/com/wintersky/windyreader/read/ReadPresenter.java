@@ -47,7 +47,7 @@ public class ReadPresenter implements ReadContract.Presenter {
 
         mRepository.getBook(mUrls[1], new DataSource.GetBookCallback() {
             @Override
-            public void onBookLoaded(Book book) {
+            public void onLoaded(Book book) {
                 mBook = book;
             }
 
@@ -67,22 +67,22 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void prevChapter() {
-        mBook.setCurrentCUrl(mChapter.last);
+        mBook.setCurrentCUrl(mChapter.getPrev());
         mRepository.saveBook(mBook);
-        getChapter(mChapter.last);
+        getChapter(mChapter.getPrev());
     }
 
     @Override
     public void nextChapter() {
-        mBook.setCurrentCUrl(mChapter.next);
+        mBook.setCurrentCUrl(mChapter.getNext());
         mRepository.saveBook(mBook);
-        getChapter(mChapter.next);
+        getChapter(mChapter.getNext());
     }
 
     private void getChapter(String url) {
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
-            public void onChapterLoaded(Chapter chapter) {
+            public void onLoaded(Chapter chapter) {
                 mChapter = chapter;
                 mView.setChapter(chapter);
             }
