@@ -2,15 +2,13 @@ package com.wintersky.windyreader.catalog;
 
 import com.wintersky.windyreader.BasePresenter;
 import com.wintersky.windyreader.BaseView;
-import com.wintersky.windyreader.data.Chapter;
-
-import io.realm.RealmList;
+import com.wintersky.windyreader.data.Book;
 
 public interface CatalogContract {
 
     interface View extends BaseView<Presenter> {
 
-        void setCList(RealmList<Chapter> list);
+        void setBook(Book book);
     }
 
     interface Presenter extends BasePresenter<View> {
