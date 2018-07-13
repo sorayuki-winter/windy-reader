@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,6 +9,39 @@
     <ListView
         android:id="@+id/list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="0dp"
+        android:background="@color/readBg"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar" />
 
-</FrameLayout>
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="22dp"
+            android:background="@color/readBg" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/readBg"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/top_divider"
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:background="@drawable/divider_top"
+        app:layout_constraintTop_toBottomOf="@id/top_bar" />
+
+</android.support.constraint.ConstraintLayout>
