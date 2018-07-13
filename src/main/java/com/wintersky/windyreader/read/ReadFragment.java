@@ -40,7 +40,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     @Inject
     ReadContract.Presenter mPresenter;
     @Inject
-    String[] mUrls;
+    String mUrl;
 
     private View mTBar, mBBar;
     private TextView tvTitle;
@@ -128,7 +128,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
                 if (activity != null) {
                     Intent intent = new Intent();
                     intent.setClass(activity, CatalogActivity.class);
-                    intent.putExtra(BOOK_URL, mUrls[1]);
+                    intent.putExtra(BOOK_URL, mUrl);
                     startActivityForResult(intent, REQUEST_CATALOG);
                 } else {
                     WS("showCatalog onClick", "Activity null");

@@ -17,16 +17,14 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     private ReadContract.View mView;
     private Repository mRepository;
-    private Realm mRealm;
-    private String[] mUrls;
+    private String mUrl;
     private Book mBook;
     private Chapter mChapter;
 
     @Inject
-    ReadPresenter(Repository repository, Realm realm, String[] urls) {
+    ReadPresenter(Repository repository, String url) {
         mRepository = repository;
-        mRealm = realm;
-        mUrls = urls;
+        mUrl = url;
     }
 
     @Override
@@ -47,12 +45,11 @@ public class ReadPresenter implements ReadContract.Presenter {
             return;
         }
 
-        getChapter(mUrls[0]);
-
-        mRepository.getBook(mUrls[1], new DataSource.GetBookCallback() {
+        mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(Book book) {
                 mBook = book;
+                loadChapter(book.getChapter().getUrl());
             }
 
             @Override
@@ -63,35 +60,17 @@ public class ReadPresenter implements ReadContract.Presenter {
     }
 
     @Override
-    public void loadChapter(String url) {
-        mRealm.beginTransaction();
-        mBook.setCurrentUrl(url);
-        mRealm.commitTransaction();
-        getChapter(url);
-    }
-
-    @Override
-    public void prevChapter() {
-        mRealm.beginTransaction();
-        mBook.setCurrentUrl(mChapter.getPrev());
-        mRealm.commitTransaction();
-        getChapter(mChapter.getPrev());
-    }
-
-    @Override
-    public void nextChapter() {
-        mRealm.beginTransaction();
-        mBook.setCurrentUrl(mChapter.getNext());
-        mRealm.commitTransaction();
-        getChapter(mChapter.getNext());
-    }
-
-    private void getChapter(String url) {
+    public void loadChapter(final String url) {
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
             public void onLoaded(Chapter chapter) {
                 mChapter = chapter;
                 mView.setChapter(chapter);
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                mBook.setChapter(chapter);
+                realm.commitTransaction();
+                realm.close();
             }
 
             @Override
@@ -99,5 +78,15 @@ public class ReadPresenter implements ReadContract.Presenter {
                 WS("Read", "get chapter fail");
             }
         });
+    }
+
+    @Override
+    public void prevChapter() {
+        loadChapter(mChapter.getPrev());
+    }
+
+    @Override
+    public void nextChapter() {
+        loadChapter(mChapter.getNext());
     }
 }
