@@ -38,16 +38,6 @@ public class Constants {
         WS(" ", msg);
     }
 
-    public static Integer getInteger(final String s) {
-        if (s == null) return null;
-        String[] ss = s.split("[^0-9]+");
-        if (ss.length < 1) return null;
-        for (String s1 : ss) {
-            if (!s1.equals("")) return Integer.valueOf(s1);
-        }
-        return null;
-    }
-
     public static String is2String(InputStream is) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -83,10 +73,11 @@ public class Constants {
         int ok = luaState.LloadString(src);
         if (ok == 0) {
             ok = luaState.pcall(0, 0, 0);
+            if (ok == 0) {
+                return;
+            }
         }
-        if (ok != 0) {
-            throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
-        }
+        throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
     }
 
     public static void luaSafeRun(LuaState luaState, int in, int out) throws LuaException {

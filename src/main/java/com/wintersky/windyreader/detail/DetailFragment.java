@@ -67,7 +67,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        btCollect = view.findViewById(R.id.detail_collect);
+        btCollect = view.findViewById(R.id.collect);
         btCollect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -76,7 +76,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
             }
         });
 
-        ListView lvChapters = view.findViewById(R.id.detail_chapters);
+        ListView lvChapters = view.findViewById(R.id.chapter_list);
         lvChapters.setAdapter(mAdapter);
         lvChapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -149,7 +149,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
                 holder = new ViewHolder();
                 convertView = LayoutInflater.from(mContext)
                         .inflate(R.layout.item_chapter, parent, false);
-                holder.tv = convertView.findViewById(R.id.detail_item_title);
+                holder.tv = convertView.findViewById(R.id.title);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

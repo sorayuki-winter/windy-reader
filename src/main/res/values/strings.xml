@@ -7,4 +7,5 @@
     <string name="last_chapter">上一章</string>
     <string name="next_chapter">下一章</string>
     <string name="content_dcp">contentDescription</string>
+    <string name="shelf">书架</string>
 </resources>

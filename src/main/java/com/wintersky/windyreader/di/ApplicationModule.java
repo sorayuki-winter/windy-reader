@@ -3,12 +3,8 @@ package com.wintersky.windyreader.di;
 import android.app.Application;
 import android.content.Context;
 
-import javax.inject.Singleton;
-
 import dagger.Binds;
 import dagger.Module;
-import dagger.Provides;
-import io.realm.Realm;
 
 /**
  * This is a Dagger module. We use this to bind our Application class as a Context in the AppComponent
@@ -24,11 +20,5 @@ abstract class ApplicationModule {
     //expose Application as an injectable context
     @Binds
     abstract Context bindContext(Application application);
-
-    @Singleton
-    @Provides
-    static Realm provideRealm() {
-        return Realm.getDefaultInstance();
-    }
 }
 

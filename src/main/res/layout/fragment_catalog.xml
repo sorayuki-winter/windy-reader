@@ -22,7 +22,7 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="22dp"
+            android:layout_height="24dp"
             android:background="@color/readBg" />
 
         <TextView

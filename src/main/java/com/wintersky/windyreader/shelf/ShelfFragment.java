@@ -2,7 +2,6 @@ package com.wintersky.windyreader.shelf;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
@@ -15,7 +14,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -23,7 +21,6 @@ import android.widget.TextView;
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.read.ReadActivity;
-import com.wintersky.windyreader.search.SearchActivity;
 
 import javax.inject.Inject;
 
@@ -33,8 +30,6 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
-import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
-import static com.wintersky.windyreader.util.Constants.WS;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -68,22 +63,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_shelf, container, false);
 
-        Button toSearch = view.findViewById(R.id.shelf_to_search);
-        toSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Context context = getContext();
-                if (context != null) {
-                    Intent intent = new Intent();
-                    intent.setClass(getContext(), SearchActivity.class);
-                    startActivity(intent);
-                } else {
-                    WS("Search onClick", "Context null");
-                }
-            }
-        });
-
-        mGridView = view.findViewById(R.id.shelf_gv);
+        mGridView = view.findViewById(R.id.book_grid);
 
         return view;
     }
@@ -137,7 +117,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                 holder = new ViewHolder();
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_shelf, viewGroup, false);
                 holder.img = view.findViewById(R.id.cover);
-                holder.tv = view.findViewById(R.id.shelf_it_name_txt);
+                holder.tv = view.findViewById(R.id.title);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
@@ -163,7 +143,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                         Intent intent = new Intent();
                         intent.setClass(mActivity, ReadActivity.class);
                         intent.putExtra(BOOK_URL, bk.getUrl());
-                        intent.putExtra(CHAPTER_URL, bk.getCurrentUrl());
                         mActivity.startActivity(intent);
                     }
                 });

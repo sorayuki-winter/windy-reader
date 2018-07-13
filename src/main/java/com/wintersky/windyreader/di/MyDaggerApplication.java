@@ -26,13 +26,4 @@ public class MyDaggerApplication extends DaggerApplication {
                 .build();
         Realm.setDefaultConfiguration(config);
     }
-
-    @Override
-    public void onTerminate() {
-        super.onTerminate();
-        Realm realm = Realm.getDefaultInstance();
-        if (!realm.isClosed()) {
-            realm.close();
-        }
-    }
 }

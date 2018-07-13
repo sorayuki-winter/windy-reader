@@ -37,10 +37,9 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
     @Inject
     SearchContract.Presenter mPresenter;
     @Inject
-    ListAdapter adapter;
-    private EditText searchKey;
-    private ImageButton searchGo;
-    private ListView searchResult;
+    ListAdapter mAdapter;
+
+    private EditText mKey;
 
     @Inject
     public SearchFragment() {
@@ -65,27 +64,27 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-        searchKey = view.findViewById(R.id.search_keyword);
+        mKey = view.findViewById(R.id.keyword);
 
-        searchGo = view.findViewById(R.id.search_go);
-        searchGo.setOnClickListener(new View.OnClickListener() {
+        ImageButton search = view.findViewById(R.id.search);
+        search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String key = searchKey.getText().toString();
+                String key = mKey.getText().toString();
                 mPresenter.search("http://www.8wenku.com/site/search", key);
             }
         });
 
-        searchResult = view.findViewById(R.id.search_result);
-        searchResult.setAdapter(adapter);
-        searchResult.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        ListView result = view.findViewById(R.id.result);
+        result.setAdapter(mAdapter);
+        result.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Activity activity = getActivity();
                 if (activity != null) {
                     Intent intent = new Intent();
                     intent.setClass(activity, DetailActivity.class);
-                    intent.putExtra(BOOK_URL, adapter.getItem(position).getUrl());
+                    intent.putExtra(BOOK_URL, mAdapter.getItem(position).getUrl());
                     startActivity(intent);
                 } else {
                     WS("SearchFragment.searchResult.onItemClick", "activity null");
@@ -98,7 +97,7 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
 
     @Override
     public void setResult(List<Book> list) {
-        adapter.setResult(list);
+        mAdapter.setResult(list);
     }
 
     static class ListAdapter extends BaseAdapter {
@@ -143,7 +142,7 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
                 holder = new ViewHolder();
                 convertView = LayoutInflater.from(mContext)
                         .inflate(R.layout.item_search, parent, false);
-                holder.tv = convertView.findViewById(R.id.search_item_title);
+                holder.tv = convertView.findViewById(R.id.title);
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();

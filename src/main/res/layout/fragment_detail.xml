@@ -6,14 +6,14 @@
     tools:context="com.wintersky.windyreader.detail.DetailFragment">
 
     <Button
-        android:id="@+id/detail_collect"
+        android:id="@+id/collect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:enabled="false"
         android:text="@string/collect" />
 
     <ListView
-        android:id="@+id/detail_chapters"
+        android:id="@+id/chapter_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

@@ -1,13 +1,10 @@
 package com.wintersky.windyreader.detail;
 
 import com.wintersky.windyreader.data.Book;
-import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
-
-import io.realm.RealmList;
 
 import static com.wintersky.windyreader.util.Constants.WS;
 
@@ -46,19 +43,6 @@ public class DetailPresenter implements DetailContract.Presenter {
             @Override
             public void onDataNotAvailable() {
                 WS("get book fail");
-            }
-        });
-
-        mRepository.getCList(bookUrl, new DataSource.LoadCListCallback() {
-
-            @Override
-            public void onLoaded(RealmList<Chapter> list) {
-                mView.setChapters(list);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                WS("load chapter list fail");
             }
         });
     }
