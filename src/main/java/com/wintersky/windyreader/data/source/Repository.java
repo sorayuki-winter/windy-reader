@@ -9,9 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.realm.Realm;
-import io.realm.RealmList;
-
-import static com.wintersky.windyreader.util.Constants.WS;
 
 @Singleton
 public class Repository implements DataSource {
@@ -57,49 +54,34 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getCList(final String url, final LoadCListCallback callback) {
-        getBook(url, new GetBookCallback() {
+    public void getChapter(final String url, final GetChapterCallback callback) {
+        mLocalDataSource.getChapter(url, new GetChapterCallback() {
             @Override
-            public void onLoaded(final Book book) {
-                callback.onLoaded(book.getList());
-                mRemoteDataSource.getCList(url, new LoadCListCallback() {
+            public void onLoaded(final Chapter chapter) {
+                mRemoteDataSource.getChapter(url, new GetChapterCallback() {
                     @Override
-                    public void onLoaded(RealmList<Chapter> list) {
+                    public void onLoaded(Chapter c) {
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
-                        book.getList().clear();
-                        book.getList().addAll(list);
+                        c.setNum(chapter.getNum());
+                        realm.copyToRealmOrUpdate(c);
+                        chapter.setContent(c.getContent());
                         realm.commitTransaction();
+                        realm.close();
+                        callback.onLoaded(chapter);
                     }
 
                     @Override
                     public void onDataNotAvailable() {
-                        WS("Repository.getCList()", "get chapter list from remote fail");
+                        callback.onDataNotAvailable();
                     }
                 });
+
             }
 
             @Override
             public void onDataNotAvailable() {
-                WS("Repository.getCList()", "get book fail");
-            }
-        });
-    }
-
-    @Override
-    public void getChapter(final String url, final GetChapterCallback callback) {
-        mLocalDataSource.getChapter(url, new GetChapterCallback() {
-            @Override
-            public void onLoaded(Chapter chapter) {
-                if (chapter.getContent() != null)
-                    callback.onLoaded(chapter);
-                else
-                    mRemoteDataSource.getChapter(url, callback);
-            }
-
-            @Override
-            public void onDataNotAvailable() {
-                mRemoteDataSource.getChapter(url, callback);
+                callback.onDataNotAvailable();
             }
         });
     }
@@ -107,5 +89,10 @@ public class Repository implements DataSource {
     @Override
     public void saveBook(Book book) {
         mLocalDataSource.saveBook(book);
+    }
+
+    @Override
+    public void updateCheck(String url, UpdateCheckCallback callback) {
+
     }
 }

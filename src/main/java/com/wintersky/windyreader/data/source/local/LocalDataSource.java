@@ -19,6 +19,7 @@ package com.wintersky.windyreader.data.source.local;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
+import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
@@ -70,25 +71,28 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getCList(final String url, final LoadCListCallback callback) {
-        callback.onDataNotAvailable();
-    }
-
-    @Override
     public void getChapter(String url, GetChapterCallback callback) {
-        callback.onDataNotAvailable();
+        Realm realm = Realm.getDefaultInstance();
+        Chapter chapter = realm.where(Chapter.class).equalTo("url", url).findFirst();
+        if (chapter != null) {
+            callback.onLoaded(chapter);
+        } else {
+            callback.onDataNotAvailable();
+        }
+        realm.close();
     }
 
     @Override
     public void saveBook(final Book book) {
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                realm.copyToRealmOrUpdate(book);
-                realm.commitTransaction();
-            }
-        });
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.copyToRealmOrUpdate(book);
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    @Override
+    public void updateCheck(String url, UpdateCheckCallback callback) {
+
     }
 }

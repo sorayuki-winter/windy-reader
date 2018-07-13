@@ -96,25 +96,6 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getCList(final String url, final LoadCListCallback callback) {
-        mExecutors.networkIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                final RealmList<Chapter> list = getCListFromRemote(url);
-                mExecutors.mainThread().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (list != null)
-                            callback.onLoaded(list);
-                        else
-                            callback.onDataNotAvailable();
-                    }
-                });
-            }
-        });
-    }
-
-    @Override
     public void getChapter(final String url, final GetChapterCallback callback) {
         mExecutors.networkIO().execute(new Runnable() {
             @Override
@@ -123,10 +104,11 @@ public class RemoteDataSource implements DataSource {
                 mExecutors.mainThread().execute(new Runnable() {
                     @Override
                     public void run() {
-                        if (chapter == null)
+                        if (chapter == null) {
                             callback.onDataNotAvailable();
-                        else
+                        } else {
                             callback.onLoaded(chapter);
+                        }
                     }
                 });
             }
@@ -136,6 +118,11 @@ public class RemoteDataSource implements DataSource {
     @Override
     public void saveBook(Book book) {
         // none
+    }
+
+    @Override
+    public void updateCheck(String url, UpdateCheckCallback callback) {
+
     }
 
     @VisibleForTesting

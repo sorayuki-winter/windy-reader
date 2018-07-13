@@ -12,7 +12,7 @@ public class Book extends RealmObject {
     private String detail;
     private String imgUrl;
     private String listUrl;
-    private String currentUrl;
+    private Chapter chapter;
     private RealmList<Chapter> list;
 
     public String getUrl() {
@@ -63,12 +63,12 @@ public class Book extends RealmObject {
         this.listUrl = listUrl;
     }
 
-    public String getCurrentUrl() {
-        return currentUrl;
+    public Chapter getChapter() {
+        return chapter;
     }
 
-    public void setCurrentUrl(String currentUrl) {
-        this.currentUrl = currentUrl;
+    public void setChapter(Chapter chapter) {
+        this.chapter = chapter;
     }
 
     public RealmList<Chapter> getList() {

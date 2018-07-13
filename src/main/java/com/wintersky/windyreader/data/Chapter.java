@@ -1,23 +1,25 @@
 package com.wintersky.windyreader.data;
 
 import io.realm.RealmObject;
+import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 public class Chapter extends RealmObject {
     @PrimaryKey
     private String url;
-    private long num;
+    private int num;
     private String title;
+    @Ignore
     private String content;
     private String prev;
     private String next;
     private boolean readed;
 
-    public long getNum() {
+    public int getNum() {
         return num;
     }
 
-    public void setNum(long num) {
+    public void setNum(int num) {
         this.num = num;
     }
 

@@ -6,7 +6,6 @@ import com.wintersky.windyreader.data.Library;
 
 import java.util.List;
 
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public interface DataSource {
@@ -19,11 +18,11 @@ public interface DataSource {
 
     void getBook(String url, GetBookCallback callback);
 
-    void getCList(String url, LoadCListCallback callback);
-
     void getChapter(String url, GetChapterCallback callback);
 
     void saveBook(Book book);
+
+    void updateCheck(String url, UpdateCheckCallback callback);
 
     interface LoadLListCallback {
 
@@ -53,9 +52,9 @@ public interface DataSource {
         void onDataNotAvailable();
     }
 
-    interface LoadCListCallback {
+    interface UpdateCheckCallback {
 
-        void onLoaded(RealmList<Chapter> list);
+        void onChecked();
 
         void onDataNotAvailable();
     }
