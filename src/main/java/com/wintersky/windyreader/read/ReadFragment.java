@@ -1,6 +1,5 @@
 package com.wintersky.windyreader.read;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -43,59 +41,64 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     String mUrl;
 
     private View mTBar, mBBar;
-    private TextView tvTitle;
+    private TextView mTitle;
     private ScrollView mScroll;
-    private TextView tvContent;
+    private TextView mContent;
     private boolean mVisible = true;
     private Handler mHandler = new Handler();
-    private Runnable runShow2 = new Runnable() {
-        @Override
-        public void run() {
-            mTBar.setVisibility(View.VISIBLE);
-            mBBar.setVisibility(View.VISIBLE);
-        }
-    };
-    private Runnable runHide2 = new Runnable() {
-        @Override
-        public void run() {
-            // Delayed removal of status and navigation bar
-
-            // Note that some of these constants are new as of API 16 (Jelly Bean)
-            // and API 19 (KitKat). It is safe to use them, as they are inlined
-            // at compile-time and do nothing on earlier devices.
-            tvContent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
-                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-                    | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        }
-    };
-    private Runnable runHide = new Runnable() {
-        @Override
-        public void run() {
-            hide();
-        }
-    };
 
     @Inject
     public ReadFragment() {
         // Required empty public constructor
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!mVisible) {
-            hide();
+    private Runnable showSystem = new Runnable() {
+        @Override
+        public void run() {
+            // Delayed removal of system UI
+            mContent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            mVisible = true;
         }
-        mPresenter.takeView(this);
-    }
+    };
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         mPresenter.dropView();
+    }
+
+    private Runnable hideControl = new Runnable() {
+        @Override
+        public void run() {
+            // Delayed removal of control bar
+            mTBar.setVisibility(View.GONE);
+            mBBar.setVisibility(View.GONE);
+        }
+    };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CATALOG && resultCode == RESULT_OK) {
+            String url = data.getStringExtra(CHAPTER_URL);
+            mPresenter.loadChapter(url);
+        }
+    }
+
+    private Runnable hideAll = new Runnable() {
+        @Override
+        public void run() {
+            hide();
+        }
+    };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.takeView(this);
+        if (!mVisible) {
+            hide();
+        }
     }
 
     @Override
@@ -106,22 +109,18 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
 
         mTBar = view.findViewById(R.id.top_bar);
         mBBar = view.findViewById(R.id.bottom_bar);
-        tvTitle = view.findViewById(R.id.title);
+        mTitle = view.findViewById(R.id.title);
         mScroll = view.findViewById(R.id.scroll);
-        tvContent = view.findViewById(R.id.content);
+        mContent = view.findViewById(R.id.content);
 
-        //mTBar.bringToFront();
-        //mBBar.bringToFront();
-
-        tvContent.setOnClickListener(new View.OnClickListener() {
+        mContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 toggle();
             }
         });
 
-        Button showCatalog = view.findViewById(R.id.catalog);
-        showCatalog.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.catalog).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Activity activity = getActivity();
@@ -155,19 +154,46 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CATALOG && resultCode == RESULT_OK) {
-            String url = data.getStringExtra(CHAPTER_URL);
-            mPresenter.loadChapter(url);
-        }
-    }
-
-    @Override
     public void setChapter(Chapter chapter) {
-        tvTitle.setText(chapter.getTitle());
-        tvContent.setText(chapter.getContent());
+        mTitle.setText(chapter.getTitle());
+        mContent.setText(chapter.getContent());
         mScroll.scrollTo(0, 0);
         hide();
+    }
+
+    private void hide() {
+        // Hide the system UI first
+        mContent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        mVisible = false;
+
+        // Schedule a runnable to remove the control bar after a delay
+        mHandler.removeCallbacks(showSystem);
+        mHandler.postDelayed(hideControl, UI_ANIMATION_DELAY);
+    }
+
+    private void show() {
+        // Show the control bar first
+        mTBar.setVisibility(View.VISIBLE);
+        mBBar.setVisibility(View.VISIBLE);
+        mVisible = true;
+
+        // Schedule a runnable to display the system UI after a delay
+        mHandler.removeCallbacks(hideControl);
+        mHandler.post(showSystem);
+    }
+
+    /**
+     * Schedules a call to hide() in delay milliseconds, canceling any
+     * previously scheduled calls.
+     */
+    private void delayedHide(int delayMillis) {
+        mHandler.removeCallbacks(hideAll);
+        mHandler.postDelayed(hideAll, delayMillis);
     }
 
     private void toggle() {
@@ -178,37 +204,4 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             delayedHide(AUTO_HIDE_DELAY_MILLIS);
         }
     }
-
-    private void hide() {
-        // Hide UI first
-        mTBar.setVisibility(View.GONE);
-        mBBar.setVisibility(View.GONE);
-        mVisible = false;
-
-        // Schedule a runnable to remove the status and navigation bar after a delay
-        mHandler.removeCallbacks(runShow2);
-        mHandler.postDelayed(runHide2, UI_ANIMATION_DELAY);
-    }
-
-    @SuppressLint("InlinedApi")
-    private void show() {
-        // Show the system bar
-        tvContent.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        mVisible = true;
-
-        // Schedule a runnable to display UI elements after a delay
-        mHandler.removeCallbacks(runHide2);
-        mHandler.post(runShow2);
-    }
-
-    /**
-     * Schedules a call to hide() in delay milliseconds, canceling any
-     * previously scheduled calls.
-     */
-    private void delayedHide(int delayMillis) {
-        mHandler.removeCallbacks(runHide);
-        mHandler.postDelayed(runHide, delayMillis);
-    }
-
 }
