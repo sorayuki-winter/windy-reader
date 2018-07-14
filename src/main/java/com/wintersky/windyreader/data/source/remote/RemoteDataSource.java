@@ -9,10 +9,13 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.keplerproject.luajava.LuaState;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,9 +33,7 @@ import static com.wintersky.windyreader.util.Constants.luaSafeRun;
 public class RemoteDataSource implements DataSource {
 
     private final AppExecutors mExecutors;
-
     private final Context mContext;
-
     private final LuaState mLua;
 
     @Inject
@@ -42,10 +43,7 @@ public class RemoteDataSource implements DataSource {
         mLua = lua;
     }
 
-    @Override
-    public void getLList(LoadLListCallback callback) {
-        // none
-    }
+    private Future taskCatalog;
 
     @Override
     public void searchBook(final String url, final String key, final SearchBookCallback callback) {
@@ -65,15 +63,7 @@ public class RemoteDataSource implements DataSource {
         });
     }
 
-    /**
-     * Note: {@link LoadBListCallback#onDataNotAvailable()} is never fired. In a real remote data
-     * source implementation, this would be fired if the server can't be contacted or the server
-     * returns an error.
-     */
-    @Override
-    public void getBList(final @NonNull LoadBListCallback callback) {
-        // none
-    }
+    private Future taskChapter;
 
     @Override
     public void getBook(final String url, final GetBookCallback callback) {
@@ -96,8 +86,50 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
+    public void getLList(GetLListCallback callback) {
+        // none
+    }
+
+    /**
+     * Note: {@link GetShelfCallback#onDataNotAvailable()} is never fired. In a real remote data
+     * source implementation, this would be fired if the server can't be contacted or the server
+     * returns an error.
+     */
+    @Override
+    public void getShelf(final @NonNull GetShelfCallback callback) {
+        // none
+    }
+
+    @Override
+    public void getCatalog(final String url, final GetCatalogCallback callback) {
+        if (taskCatalog != null) {
+            taskCatalog.cancel(true);
+        }
+        taskCatalog = mExecutors.networkIO().submit(new Runnable() {
+            @Override
+            public void run() {
+                final List<Chapter> list = getCatalogFromRemote(url);
+                mExecutors.mainThread().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (list != null && !list.isEmpty()) {
+                            callback.onLoaded(list);
+                        } else {
+                            callback.onDataNotAvailable();
+                        }
+                        taskCatalog = null;
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
     public void getChapter(final String url, final GetChapterCallback callback) {
-        mExecutors.networkIO().execute(new Runnable() {
+        if (taskChapter != null) {
+            taskChapter.cancel(true);
+        }
+        taskChapter = mExecutors.networkIO().submit(new Runnable() {
             @Override
             public void run() {
                 final Chapter chapter = getChapterFromRemote(url);
@@ -109,6 +141,7 @@ public class RemoteDataSource implements DataSource {
                         } else {
                             callback.onLoaded(chapter);
                         }
+                        taskChapter = null;
                     }
                 });
             }
@@ -122,7 +155,7 @@ public class RemoteDataSource implements DataSource {
 
     @Override
     public void updateCheck(String url, UpdateCheckCallback callback) {
-
+        // none
     }
 
     @VisibleForTesting
@@ -170,43 +203,48 @@ public class RemoteDataSource implements DataSource {
     }
 
     @VisibleForTesting
-    RealmList<Chapter> getCListFromRemote(String url) {
-        RealmList<Chapter> list = new RealmList<>();
+    RealmList<Chapter> getCatalogFromRemote(String url) {
         String fileName = url.split("/")[2] + ".lua";
         mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
-            mLua.getField(LuaState.LUA_GLOBALSINDEX, "getCList");
+            mLua.getField(LuaState.LUA_GLOBALSINDEX, "getCatalog");
             mLua.pushString(url);
-            mLua.pushJavaObject(list);
-            luaSafeRun(mLua, 2, 0);
+            luaSafeRun(mLua, 1, 1);
+            Elements list = (Elements) mLua.toJavaObject(-1);
+            RealmList<Chapter> catalog = new RealmList<>();
+            for (int i = 0; i < list.size(); i++) {
+                Chapter chapter = new Chapter();
+                Element aC = list.get(i);
+                chapter.setIndex(i);
+                chapter.setTitle(aC.attr("title"));
+                chapter.setUrl(aC.absUrl("href"));
+                catalog.add(chapter);
+            }
+            return catalog;
         } catch (Exception e) {
             String msg = e + "\n";
             msg += e.getStackTrace()[1].toString();
             WS(msg);
             return null;
         }
-        return list;
     }
 
     @VisibleForTesting
     Chapter getChapterFromRemote(String url) {
-        Chapter chapter = new Chapter();
-        chapter.setUrl(url);
         String fileName = url.split("/")[2] + ".lua";
         mLua.setTop(1);
         try {
             luaSafeDoString(mLua, is2String(mContext.getAssets().open(fileName)));
             mLua.getField(LuaState.LUA_GLOBALSINDEX, "getChapter");
             mLua.pushString(url);
-            mLua.pushJavaObject(chapter);
-            luaSafeRun(mLua, 2, 0);
+            luaSafeRun(mLua, 1, 1);
+            return (Chapter) mLua.toJavaObject(-1);
         } catch (Exception e) {
             String msg = e + "\n";
             msg += e.getStackTrace()[1].toString();
             WS(msg);
             return null;
         }
-        return chapter;
     }
 }

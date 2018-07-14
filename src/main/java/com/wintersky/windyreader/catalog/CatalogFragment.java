@@ -17,8 +17,6 @@ import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import dagger.android.support.DaggerFragment;
@@ -67,7 +65,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         View view = inflater.inflate(R.layout.fragment_catalog, container, false);
 
         mTitle = view.findViewById(R.id.title);
-        mListView = view.findViewById(R.id.list);
+        mListView = view.findViewById(R.id.catalog);
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -90,14 +88,10 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     @Override
     public void setBook(Book book) {
         mTitle.setText(book.getTitle());
-        mAdapter = new CatalogAdapter(book.getList());
+        mAdapter = new CatalogAdapter(book.getCatalog());
         mListView.setAdapter(mAdapter);
 
-        List<Chapter> list = book.getList();
-        int index = list.indexOf(book.getChapter());
-        if (index > 10) {
-            mListView.setSelection(index - 10);
-        }
+        mListView.setSelection(book.getIndex() - 10);
     }
 
     class CatalogAdapter extends RealmBaseAdapter<Chapter> {

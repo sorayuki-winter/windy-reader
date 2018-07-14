@@ -36,14 +36,16 @@ import io.realm.RealmResults;
 public class LocalDataSource implements DataSource {
 
     private final AppExecutors mExecutors;
+    private final Realm mRealm;
 
     @Inject
-    LocalDataSource(@NonNull AppExecutors executors) {
+    LocalDataSource(@NonNull AppExecutors executors, Realm realm) {
         mExecutors = executors;
+        mRealm = realm;
     }
 
     @Override
-    public void getLList(LoadLListCallback callback) {
+    public void getLList(GetLListCallback callback) {
         callback.onDataNotAvailable();
     }
 
@@ -53,16 +55,14 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getBList(@NonNull final LoadBListCallback callback) {
-        Realm realm = Realm.getDefaultInstance();
-        RealmResults<Book> books = realm.where(Book.class).findAll();
+    public void getShelf(@NonNull final GetShelfCallback callback) {
+        RealmResults<Book> books = mRealm.where(Book.class).findAll();
         callback.onLoaded(books);
     }
 
     @Override
     public void getBook(final String url, final GetBookCallback callback) {
-        Realm realm = Realm.getDefaultInstance();
-        Book book = realm.where(Book.class).equalTo("url", url).findFirst();
+        Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
         if (book != null) {
             callback.onLoaded(book);
         } else {
@@ -71,28 +71,29 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getChapter(String url, GetChapterCallback callback) {
-        Realm realm = Realm.getDefaultInstance();
-        Chapter chapter = realm.where(Chapter.class).equalTo("url", url).findFirst();
+    public void getCatalog(String url, GetCatalogCallback callback) {
+        // none
+    }
+
+    @Override
+    public void getChapter(String url, final GetChapterCallback callback) {
+        Chapter chapter = mRealm.where(Chapter.class).equalTo("url", url).findFirst();
         if (chapter != null) {
             callback.onLoaded(chapter);
         } else {
             callback.onDataNotAvailable();
         }
-        realm.close();
     }
 
     @Override
     public void saveBook(final Book book) {
-        Realm realm = Realm.getDefaultInstance();
-        realm.beginTransaction();
-        realm.copyToRealmOrUpdate(book);
-        realm.commitTransaction();
-        realm.close();
+        mRealm.beginTransaction();
+        mRealm.copyToRealmOrUpdate(book);
+        mRealm.commitTransaction();
     }
 
     @Override
     public void updateCheck(String url, UpdateCheckCallback callback) {
-
+        // none
     }
 }

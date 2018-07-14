@@ -46,10 +46,10 @@ public class RemoteDataSourceTest {
     }
 
     @Test
-    public void getCList() {
-        final List<Chapter> list = mSource.getCListFromRemote(chapterListUrl);
+    public void getCatalog() {
+        final List<Chapter> list = mSource.getCatalogFromRemote(chapterListUrl);
         assertNotNull("chapter list null", list);
-        chapterListCheck(list);
+        catalogCheck(list);
     }
 
     @Test
@@ -59,10 +59,10 @@ public class RemoteDataSourceTest {
         chapterCheck(chapter);
     }
 
-    private void chapterListCheck(List<Chapter> list) {
+    private void catalogCheck(List<Chapter> list) {
         StringBuilder sb = new StringBuilder();
         for (Chapter c : list) {
-            sb.append(c.getNum()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
+            sb.append(c.getIndex()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
         }
         WS(sb.toString());
     }

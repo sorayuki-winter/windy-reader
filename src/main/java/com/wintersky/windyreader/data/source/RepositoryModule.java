@@ -7,7 +7,6 @@ import android.content.res.AssetManager;
 import com.wintersky.windyreader.data.source.local.LocalDataSource;
 import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
 import com.wintersky.windyreader.util.AppExecutors;
-import com.wintersky.windyreader.util.DiskIOThreadExecutor;
 
 import org.keplerproject.luajava.JavaFunction;
 import org.keplerproject.luajava.LuaException;
@@ -35,8 +34,6 @@ import static com.wintersky.windyreader.util.Constants.luaSafeDoString;
 @Module
 abstract public class RepositoryModule {
 
-    private static final int THREAD_COUNT = 3;
-
     @Provides
     static SharedPreferences provideSP(Context context) {
         return context.getSharedPreferences("Book", Context.MODE_PRIVATE);
@@ -45,8 +42,8 @@ abstract public class RepositoryModule {
     @Singleton
     @Provides
     static AppExecutors provideAppExecutors() {
-        return new AppExecutors(new DiskIOThreadExecutor(),
-                Executors.newFixedThreadPool(THREAD_COUNT),
+        return new AppExecutors(Executors.newSingleThreadExecutor(),
+                Executors.newSingleThreadExecutor(),
                 new AppExecutors.MainThreadExecutor());
     }
 

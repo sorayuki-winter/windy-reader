@@ -11,9 +11,9 @@ public class Book extends RealmObject {
     private String author;
     private String detail;
     private String imgUrl;
-    private String listUrl;
-    private Chapter chapter;
-    private RealmList<Chapter> list;
+    private String catalogUrl;
+    private RealmList<Chapter> catalog;
+    private int index;
 
     public String getUrl() {
         return url;
@@ -55,27 +55,45 @@ public class Book extends RealmObject {
         this.imgUrl = imgUrl;
     }
 
-    public String getListUrl() {
-        return listUrl;
+    public String getCatalogUrl() {
+        return catalogUrl;
     }
 
-    public void setListUrl(String listUrl) {
-        this.listUrl = listUrl;
+    public void setCatalogUrl(String catalogUrl) {
+        this.catalogUrl = catalogUrl;
     }
 
-    public Chapter getChapter() {
-        return chapter;
+    public RealmList<Chapter> getCatalog() {
+        return catalog;
     }
 
-    public void setChapter(Chapter chapter) {
-        this.chapter = chapter;
+    public void setCatalog(RealmList<Chapter> catalog) {
+        this.catalog = catalog;
     }
 
-    public RealmList<Chapter> getList() {
-        return list;
+    public int getIndex() {
+        return index;
     }
 
-    public void setList(RealmList<Chapter> list) {
-        this.list = list;
+    public void setIndex(int index) {
+        this.index = index;
+    }
+
+    public Chapter getPrev() {
+        if (index > 0) {
+            return catalog.get(index - 1);
+        }
+        return null;
+    }
+
+    public Chapter getCurrent() {
+        return catalog.get(index);
+    }
+
+    public Chapter getNext() {
+        if (index < catalog.size() - 1) {
+            return catalog.get(index + 1);
+        }
+        return null;
     }
 }

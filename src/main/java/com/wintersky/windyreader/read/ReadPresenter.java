@@ -19,7 +19,6 @@ public class ReadPresenter implements ReadContract.Presenter {
     private Repository mRepository;
     private String mUrl;
     private Book mBook;
-    private Chapter mChapter;
 
     @Inject
     ReadPresenter(Repository repository, String url) {
@@ -49,7 +48,18 @@ public class ReadPresenter implements ReadContract.Presenter {
             @Override
             public void onLoaded(Book book) {
                 mBook = book;
-                loadChapter(book.getChapter().getUrl());
+                loadChapter(book.getCurrent().getUrl());
+                mRepository.updateCheck(book.getUrl(), new DataSource.UpdateCheckCallback() {
+                    @Override
+                    public void onChecked() {
+
+                    }
+
+                    @Override
+                    public void onDataNotAvailable() {
+                        WS("Read", "update check fail");
+                    }
+                });
             }
 
             @Override
@@ -64,11 +74,11 @@ public class ReadPresenter implements ReadContract.Presenter {
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
             public void onLoaded(Chapter chapter) {
-                mChapter = chapter;
+                if (mView == null) return;
                 mView.setChapter(chapter);
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
-                mBook.setChapter(chapter);
+                mBook.setIndex(chapter.getIndex());
                 realm.commitTransaction();
                 realm.close();
             }
@@ -82,11 +92,11 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void prevChapter() {
-        loadChapter(mChapter.getPrev());
+        loadChapter(mBook.getPrev().getUrl());
     }
 
     @Override
     public void nextChapter() {
-        loadChapter(mChapter.getNext());
+        loadChapter(mBook.getNext().getUrl());
     }
 }

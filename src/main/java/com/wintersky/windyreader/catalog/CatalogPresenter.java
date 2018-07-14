@@ -43,6 +43,7 @@ public class CatalogPresenter implements CatalogContract.Presenter {
         mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(final Book book) {
+                if (mView == null) return;
                 mView.setBook(book);
             }
 

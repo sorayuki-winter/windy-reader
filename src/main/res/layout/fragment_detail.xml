@@ -13,7 +13,7 @@
         android:text="@string/collect" />
 
     <ListView
-        android:id="@+id/chapter_list"
+        android:id="@+id/catalog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.realm.Realm;
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.Constants.WS;
@@ -19,11 +20,11 @@ public class LocalDataSourceTest {
 
     @Before
     public void setUp() {
-        mSource = new LocalDataSource(new SingleExecutors());
+        mSource = new LocalDataSource(new SingleExecutors(), Realm.getDefaultInstance());
     }
 
     @Test
-    public void clearCList() {
+    public void clearCatalog() {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
         realm.delete(Chapter.class);
@@ -34,11 +35,14 @@ public class LocalDataSourceTest {
     public void saveBook() {
         Book book = new Book();
         book.setUrl("http://zxzw.com/164588/");
+        book.setCatalogUrl("http://zxzw.com/164588/");
         book.setTitle("合体双修");
+        book.setCatalog(new RealmList<Chapter>());
         Chapter chapter = new Chapter();
-        chapter.setNum(83);
+        chapter.setIndex(83);
+        chapter.setTitle("");
         chapter.setUrl("http://zxzw.com/164588/14192209/");
-        book.setChapter(chapter);
+        book.getCatalog().add(chapter);
         mSource.saveBook(book);
     }
 
@@ -47,8 +51,8 @@ public class LocalDataSourceTest {
     }
 
     @Test
-    public void getBList() {
-        mSource.getBList(new DataSource.LoadBListCallback() {
+    public void getShelf() {
+        mSource.getShelf(new DataSource.GetShelfCallback() {
             @Override
             public void onLoaded(RealmResults<Book> list) {
                 if (list == null || list.isEmpty()) {
@@ -85,7 +89,7 @@ public class LocalDataSourceTest {
     }
 
     @Test
-    public void getCList() {
+    public void getCatalog() {
     }
 
     @Test

@@ -13,6 +13,7 @@ import dagger.BindsInstance;
 import dagger.Component;
 import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
+import io.realm.Realm;
 
 /**
  * This is a Dagger component. Refer to {@link MyDaggerApplication} for the list of Dagger components
@@ -32,9 +33,11 @@ import dagger.android.support.AndroidSupportInjectionModule;
         AndroidSupportInjectionModule.class})
 public interface AppComponent extends AndroidInjector<MyDaggerApplication> {
 
-    Repository getBooksRepository();
+    Repository getRepository();
 
     LuaState getLuaState();
+
+    Realm getRealm();
 
     // Gives us syntactic sugar. we can then do DaggerAppComponent.builder().application(this).build().inject(this);
     // never having to instantiate any modules or say which module we are passing the application to.

@@ -76,7 +76,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
             }
         });
 
-        ListView lvChapters = view.findViewById(R.id.chapter_list);
+        ListView lvChapters = view.findViewById(R.id.catalog);
         lvChapters.setAdapter(mAdapter);
         lvChapters.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

@@ -7,20 +7,18 @@ import io.realm.annotations.PrimaryKey;
 public class Chapter extends RealmObject {
     @PrimaryKey
     private String url;
-    private int num;
+    private int index;
     private String title;
     @Ignore
     private String content;
-    private String prev;
-    private String next;
     private boolean readed;
 
-    public int getNum() {
-        return num;
+    public int getIndex() {
+        return index;
     }
 
-    public void setNum(int num) {
-        this.num = num;
+    public void setIndex(int index) {
+        this.index = index;
     }
 
     public String getTitle() {
@@ -45,21 +43,5 @@ public class Chapter extends RealmObject {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public String getPrev() {
-        return prev;
-    }
-
-    public void setPrev(String prev) {
-        this.prev = prev;
-    }
-
-    public String getNext() {
-        return next;
-    }
-
-    public void setNext(String next) {
-        this.next = next;
     }
 }

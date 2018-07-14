@@ -10,13 +10,15 @@ import io.realm.RealmResults;
 
 public interface DataSource {
 
-    void getLList(LoadLListCallback callback);
+    void getLList(GetLListCallback callback);
 
     void searchBook(String url, String key, SearchBookCallback callback);
 
-    void getBList(LoadBListCallback callback);
+    void getShelf(GetShelfCallback callback);
 
     void getBook(String url, GetBookCallback callback);
+
+    void getCatalog(String url, GetCatalogCallback callback);
 
     void getChapter(String url, GetChapterCallback callback);
 
@@ -24,7 +26,7 @@ public interface DataSource {
 
     void updateCheck(String url, UpdateCheckCallback callback);
 
-    interface LoadLListCallback {
+    interface GetLListCallback {
 
         void onLoaded(List<Library> list);
 
@@ -38,7 +40,7 @@ public interface DataSource {
         void onDataNotAvailable();
     }
 
-    interface LoadBListCallback {
+    interface GetShelfCallback {
 
         void onLoaded(RealmResults<Book> list);
 
@@ -48,6 +50,13 @@ public interface DataSource {
     interface GetBookCallback {
 
         void onLoaded(Book book);
+
+        void onDataNotAvailable();
+    }
+
+    interface GetCatalogCallback {
+
+        void onLoaded(List<Chapter> list);
 
         void onDataNotAvailable();
     }
