@@ -11,10 +11,12 @@
     <color name="shelfBookBg1">#dddddd</color>
     <color name="shelfBookBg2">#ffffff</color>
     <color name="shelfCoverPress">#cccccc</color>
-
     <color name="bookTitle">#000000</color>
 
     <color name="readContent">#353535</color>
     <color name="readBg">#f8f3df</color>
     <color name="readBgDeep">#cac6b7</color>
+
+    <color name="catalog">#353535</color>
+    <color name="catalogRead">#aeaeae</color>
 </resources>

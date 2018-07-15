@@ -11,7 +11,7 @@ public class Chapter extends RealmObject {
     private String title;
     @Ignore
     private String content;
-    private boolean readed;
+    private boolean read;
 
     public int getIndex() {
         return index;
@@ -43,5 +43,13 @@ public class Chapter extends RealmObject {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public boolean isRead() {
+        return read;
+    }
+
+    public void setRead(boolean read) {
+        this.read = read;
     }
 }

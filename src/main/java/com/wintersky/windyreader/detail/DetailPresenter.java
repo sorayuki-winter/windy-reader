@@ -11,15 +11,13 @@ import static com.wintersky.windyreader.util.Constants.WS;
 public class DetailPresenter implements DetailContract.Presenter {
 
     private DetailContract.View mView;
-
-    private Repository mRepository;
-
-    private String bookUrl;
+    private final Repository mRepository;
+    private final String mUrl;
 
     @Inject
-    DetailPresenter(Repository repository, String bookUrl) {
-        this.mRepository = repository;
-        this.bookUrl = bookUrl;
+    DetailPresenter(Repository repository, String url) {
+        mRepository = repository;
+        mUrl = url;
     }
 
     @Override
@@ -34,7 +32,7 @@ public class DetailPresenter implements DetailContract.Presenter {
     }
 
     private void start() {
-        mRepository.getBook(bookUrl, new DataSource.GetBookCallback() {
+        mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(Book book) {
                 mView.setBook(book);

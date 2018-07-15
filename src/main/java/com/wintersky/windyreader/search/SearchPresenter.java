@@ -13,8 +13,7 @@ import static com.wintersky.windyreader.util.Constants.WS;
 public class SearchPresenter implements SearchContract.Presenter {
 
     private SearchContract.View mView;
-
-    private Repository mRepository;
+    private final Repository mRepository;
 
     @Inject
     SearchPresenter(Repository mRepository) {

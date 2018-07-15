@@ -103,7 +103,7 @@ public class SearchFragment extends DaggerFragment implements SearchContract.Vie
     static class ListAdapter extends BaseAdapter {
         private List<Book> mList;
 
-        private Context mContext;
+        private final Context mContext;
 
         @Inject
         ListAdapter(Context mContext) {

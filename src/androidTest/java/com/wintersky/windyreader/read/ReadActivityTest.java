@@ -3,7 +3,6 @@ package com.wintersky.windyreader.read;
 import android.content.Intent;
 import android.support.test.rule.ActivityTestRule;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,10 +32,6 @@ public class ReadActivityTest {
     @Before
     public void setUp() {
         latch = new CountDownLatch(1);
-    }
-
-    @After
-    public void tearDown() {
     }
 
     @Test

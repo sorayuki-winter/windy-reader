@@ -16,8 +16,8 @@ public class ReadPresenter implements ReadContract.Presenter {
     private boolean isFirst = true;
 
     private ReadContract.View mView;
-    private Repository mRepository;
-    private String mUrl;
+    private final Repository mRepository;
+    private final String mUrl;
     private Book mBook;
 
     @Inject

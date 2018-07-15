@@ -15,7 +15,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
     private boolean isFirst = true;
 
     private ShelfContract.View mView;
-    private Repository mRepository;
+    private final Repository mRepository;
 
     @Inject
     ShelfPresenter(Repository mRepository) {

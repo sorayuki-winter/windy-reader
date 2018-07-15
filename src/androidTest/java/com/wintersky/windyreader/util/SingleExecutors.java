@@ -23,7 +23,7 @@ import java.util.concurrent.Executors;
  * Allow instant execution of tasks.
  */
 public class SingleExecutors extends AppExecutors {
-    private static ExecutorService instant = Executors.newSingleThreadExecutor();
+    private static final ExecutorService instant = Executors.newSingleThreadExecutor();
 
     public SingleExecutors() {
         super(instant, instant, instant);

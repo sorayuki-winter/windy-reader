@@ -68,7 +68,12 @@ public class Repository implements DataSource {
                 mRemoteDataSource.getChapter(url, new GetChapterCallback() {
                     @Override
                     public void onLoaded(Chapter c) {
+                        Realm realm = Realm.getDefaultInstance();
+                        realm.beginTransaction();
                         chapter.setContent(c.getContent());
+                        chapter.setRead(true);
+                        realm.commitTransaction();
+                        realm.close();
                         callback.onLoaded(chapter);
                     }
 

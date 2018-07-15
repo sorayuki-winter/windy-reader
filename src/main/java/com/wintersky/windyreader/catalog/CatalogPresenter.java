@@ -13,8 +13,8 @@ public class CatalogPresenter implements CatalogContract.Presenter {
     private boolean isFirst = true;
 
     private CatalogContract.View mView;
-    private Repository mRepository;
-    private String mUrl;
+    private final Repository mRepository;
+    private final String mUrl;
 
     @Inject
     CatalogPresenter(Repository repository, String url) {

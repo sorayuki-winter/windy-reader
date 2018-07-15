@@ -110,7 +110,7 @@ public class DetailFragment extends DaggerFragment implements DetailContract.Vie
     static class ListAdapter extends BaseAdapter {
         List<Chapter> mList;
 
-        private Context mContext;
+        private final Context mContext;
 
         @Inject
         ListAdapter(Context mContext) {

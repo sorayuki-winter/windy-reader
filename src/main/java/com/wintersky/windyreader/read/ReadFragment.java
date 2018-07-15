@@ -45,14 +45,14 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     private ScrollView mScroll;
     private TextView mContent;
     private boolean mVisible = true;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     @Inject
     public ReadFragment() {
         // Required empty public constructor
     }
 
-    private Runnable showSystem = new Runnable() {
+    private final Runnable showSystem = new Runnable() {
         @Override
         public void run() {
             // Delayed removal of system UI
@@ -68,7 +68,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
         mPresenter.dropView();
     }
 
-    private Runnable hideControl = new Runnable() {
+    private final Runnable hideControl = new Runnable() {
         @Override
         public void run() {
             // Delayed removal of control bar
@@ -85,7 +85,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
         }
     }
 
-    private Runnable hideAll = new Runnable() {
+    private final Runnable hideAll = new Runnable() {
         @Override
         public void run() {
             hide();
@@ -191,9 +191,9 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
      * Schedules a call to hide() in delay milliseconds, canceling any
      * previously scheduled calls.
      */
-    private void delayedHide(int delayMillis) {
+    private void delayedHide() {
         mHandler.removeCallbacks(hideAll);
-        mHandler.postDelayed(hideAll, delayMillis);
+        mHandler.postDelayed(hideAll, AUTO_HIDE_DELAY_MILLIS);
     }
 
     private void toggle() {
@@ -201,7 +201,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             hide();
         } else {
             show();
-            delayedHide(AUTO_HIDE_DELAY_MILLIS);
+            delayedHide();
         }
     }
 }
