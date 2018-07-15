@@ -4,12 +4,10 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 
 import com.wintersky.windyreader.data.Chapter;
-import com.wintersky.windyreader.di.ComponentHolder;
 import com.wintersky.windyreader.util.SingleExecutors;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.keplerproject.luajava.LuaState;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
@@ -28,8 +26,7 @@ public class RemoteDataSourceTest {
         MockitoAnnotations.initMocks(this);
 
         Context context = InstrumentationRegistry.getTargetContext();
-        LuaState lua = ComponentHolder.getAppComponent().getLuaState();
-        mSource = new RemoteDataSource(context, new SingleExecutors(), lua);
+        mSource = new RemoteDataSource(context, new SingleExecutors());
 
         chapterListUrl = "http://zxzw.com/164588/";
         chapterUrl = "http://zxzw.com/164588/14192209/";

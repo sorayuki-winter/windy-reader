@@ -5,8 +5,6 @@ import android.app.Application;
 import com.wintersky.windyreader.data.source.Repository;
 import com.wintersky.windyreader.data.source.RepositoryModule;
 
-import org.keplerproject.luajava.LuaState;
-
 import javax.inject.Singleton;
 
 import dagger.BindsInstance;
@@ -34,8 +32,6 @@ import io.realm.Realm;
 public interface AppComponent extends AndroidInjector<MyDaggerApplication> {
 
     Repository getRepository();
-
-    LuaState getLuaState();
 
     Realm getRealm();
 
