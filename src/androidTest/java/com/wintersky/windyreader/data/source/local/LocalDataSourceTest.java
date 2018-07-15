@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.realm.Realm;
-import io.realm.RealmList;
 import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.Constants.WS;
@@ -29,6 +28,7 @@ public class LocalDataSourceTest {
         realm.beginTransaction();
         realm.delete(Chapter.class);
         realm.commitTransaction();
+        realm.close();
     }
 
     @Test
@@ -37,12 +37,6 @@ public class LocalDataSourceTest {
         book.setUrl("http://zxzw.com/164588/");
         book.setCatalogUrl("http://zxzw.com/164588/");
         book.setTitle("合体双修");
-        book.setCatalog(new RealmList<Chapter>());
-        Chapter chapter = new Chapter();
-        chapter.setIndex(83);
-        chapter.setTitle("");
-        chapter.setUrl("http://zxzw.com/164588/14192209/");
-        book.getCatalog().add(chapter);
         mSource.saveBook(book);
     }
 

@@ -92,7 +92,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         mAdapter = new CatalogAdapter(book.getCatalog());
         mListView.setAdapter(mAdapter);
 
-        mListView.setSelection(book.getIndex() - 10);
+        mListView.setSelection(book.getIndex() - 5);
     }
 
     class CatalogAdapter extends RealmBaseAdapter<Chapter> {

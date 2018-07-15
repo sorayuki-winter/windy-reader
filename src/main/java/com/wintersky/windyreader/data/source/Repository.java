@@ -108,10 +108,10 @@ public class Repository implements DataSource {
                         Realm realm = Realm.getDefaultInstance();
                         realm.beginTransaction();
                         RealmList<Chapter> catalog = book.getCatalog();
-                        catalog.clear();
-                        catalog.addAll(list);
+                        catalog.addAll(list.subList(catalog.size(), list.size()));
                         realm.commitTransaction();
                         realm.close();
+                        callback.onChecked();
                     }
 
                     @Override

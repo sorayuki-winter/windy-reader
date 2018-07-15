@@ -19,6 +19,8 @@ public class ReadPresenter implements ReadContract.Presenter {
     private final Repository mRepository;
     private final String mUrl;
     private Book mBook;
+    private Chapter mChapter;
+    private boolean loading = false;
 
     @Inject
     ReadPresenter(Repository repository, String url) {
@@ -46,13 +48,23 @@ public class ReadPresenter implements ReadContract.Presenter {
 
         mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
-            public void onLoaded(Book book) {
+            public void onLoaded(final Book book) {
                 mBook = book;
-                loadChapter(book.getCurrent().getUrl());
+                if (book.getCurrent() != null) {
+                    loadChapter(book.getCurrent().getUrl());
+                }
                 mRepository.updateCheck(book.getUrl(), new DataSource.UpdateCheckCallback() {
                     @Override
                     public void onChecked() {
-
+                        if (mChapter != null || loading) return;
+                        if (mBook.getCurrent() == null) {
+                            Chapter chapter = mBook.getCatalog().first();
+                            if (chapter != null) {
+                                loadChapter(chapter.getUrl());
+                            }
+                        } else {
+                            loadChapter(mBook.getCurrent().getUrl());
+                        }
                     }
 
                     @Override
@@ -71,32 +83,41 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void loadChapter(final String url) {
+        loading = true;
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
             public void onLoaded(Chapter chapter) {
-                if (mView == null) return;
-                mView.setChapter(chapter);
                 Realm realm = Realm.getDefaultInstance();
                 realm.beginTransaction();
                 mBook.setIndex(chapter.getIndex());
                 realm.commitTransaction();
                 realm.close();
+
+                loading = false;
+                mChapter = chapter;
+                if (mView == null) return;
+                mView.setChapter(chapter);
             }
 
             @Override
             public void onDataNotAvailable() {
                 WS("Read", "get chapter fail");
+                loadChapter(url);
             }
         });
     }
 
     @Override
     public void prevChapter() {
-        loadChapter(mBook.getPrev().getUrl());
+        if (mBook.getPrev() != null) {
+            loadChapter(mBook.getPrev().getUrl());
+        }
     }
 
     @Override
     public void nextChapter() {
-        loadChapter(mBook.getNext().getUrl());
+        if (mBook.getNext() != null) {
+            loadChapter(mBook.getNext().getUrl());
+        }
     }
 }

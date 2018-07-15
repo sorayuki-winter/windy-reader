@@ -87,7 +87,10 @@ public class Book extends RealmObject {
     }
 
     public Chapter getCurrent() {
-        return catalog.get(index);
+        if (index >= 0 && index < catalog.size()) {
+            return catalog.get(index);
+        }
+        return null;
     }
 
     public Chapter getNext() {
