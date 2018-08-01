@@ -1,0 +1,107 @@
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.wintersky.windyreader.read.ReadFragment">
+
+    <ScrollView
+        android:id="@+id/scroll"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/readBg">
+
+        <TextView
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingEnd="4dp"
+            android:paddingStart="4dp"
+            android:paddingTop="24dp"
+            android:textColor="@color/readContent"
+            android:textSize="22sp" />
+
+    </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/statusHigh"
+            android:background="@color/readBg" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/readBg"
+            android:gravity="center"
+            android:paddingBottom="12dp"
+            android:paddingTop="12dp"
+            android:textSize="18sp" />
+
+        <FrameLayout
+            android:id="@+id/top_divider"
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@drawable/divider_top" />
+
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/bottom_bar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom">
+
+            <FrameLayout
+                android:id="@+id/bottom_divider"
+                android:layout_width="match_parent"
+                android:layout_height="3dp"
+                android:background="@drawable/divider_bottom"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <Button
+                android:id="@+id/prev"
+                style="@style/ReadBBarB"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/last_chapter"
+                app:layout_constraintEnd_toStartOf="@id/catalog"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/bottom_divider" />
+
+            <Button
+                android:id="@+id/catalog"
+                style="@style/ReadBBarB"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/catalog"
+                app:layout_constraintEnd_toStartOf="@id/next"
+                app:layout_constraintStart_toEndOf="@id/prev"
+                app:layout_constraintTop_toBottomOf="@id/bottom_divider" />
+
+            <Button
+                android:id="@+id/next"
+                style="@style/ReadBBarB"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/next_chapter"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/catalog"
+                app:layout_constraintTop_toBottomOf="@id/bottom_divider" />
+
+        </android.support.constraint.ConstraintLayout>
+
+    </FrameLayout>
+
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">WindyReader</string>
+    <string name="search">搜索</string>
+    <string name="description">contentDescription</string>
+    <string name="collect">收藏</string>
+    <string name="catalog">目录</string>
+    <string name="last_chapter">上一章</string>
+    <string name="next_chapter">下一章</string>
+    <string name="content_dcp">contentDescription</string>
+    <string name="shelf">书架</string>
+    <string name="link">链接</string>
+</resources>
