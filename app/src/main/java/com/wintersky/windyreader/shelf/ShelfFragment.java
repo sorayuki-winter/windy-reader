@@ -21,7 +21,6 @@ import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
-import com.wintersky.windyreader.detail.DetailActivity;
 import com.wintersky.windyreader.read.ReadActivity;
 
 import javax.inject.Inject;
@@ -31,7 +30,7 @@ import io.realm.OrderedRealmCollection;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
+import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -91,14 +90,13 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
     @Override
     public void getBookFinish() {
+        mLink.setError("Error");
         mAdd.setEnabled(false);
     }
 
     @Override
     public void getBookFinish(Book book) {
-        Intent intent = new Intent(getContext(), DetailActivity.class);
-        intent.putExtra(BOOK_URL, book.getUrl());
-        startActivity(intent);
+        mLink.getText().clear();
     }
 
     class GridAdapter extends RealmBaseAdapter<Book> {

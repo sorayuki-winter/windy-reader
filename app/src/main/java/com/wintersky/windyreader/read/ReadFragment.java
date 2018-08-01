@@ -21,8 +21,8 @@ import javax.inject.Inject;
 import dagger.android.support.DaggerFragment;
 
 import static android.app.Activity.RESULT_OK;
-import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
+import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 import static com.wintersky.windyreader.util.Constants.WS;
 
 /**

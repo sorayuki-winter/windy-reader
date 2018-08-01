@@ -2,8 +2,6 @@ package com.wintersky.windyreader.di;
 
 import com.wintersky.windyreader.catalog.CatalogActivity;
 import com.wintersky.windyreader.catalog.CatalogModule;
-import com.wintersky.windyreader.detail.DetailActivity;
-import com.wintersky.windyreader.detail.DetailModule;
 import com.wintersky.windyreader.read.ReadActivity;
 import com.wintersky.windyreader.read.ReadModule;
 import com.wintersky.windyreader.shelf.ShelfActivity;
@@ -25,10 +23,6 @@ abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = ShelfModule.class)
     abstract ShelfActivity shelfActivity();
-
-    @ActivityScoped
-    @ContributesAndroidInjector(modules = DetailModule.class)
-    abstract DetailActivity detailActivity();
 
     @ActivityScoped
     @ContributesAndroidInjector(modules = ReadModule.class)

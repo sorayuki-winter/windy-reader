@@ -12,6 +12,8 @@ import dagger.android.support.DaggerAppCompatActivity;
 
 public class ShelfActivity extends DaggerAppCompatActivity {
 
+    public static final String BOOK_URL = "BOOK_URL";
+
     @Inject
     ShelfFragment shelfFragment;
 

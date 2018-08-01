@@ -8,7 +8,7 @@ import dagger.Module;
 import dagger.Provides;
 import dagger.android.ContributesAndroidInjector;
 
-import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
+import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
 @Module
 public abstract class CatalogModule {
