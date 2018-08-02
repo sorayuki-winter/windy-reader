@@ -14,6 +14,18 @@ import java.util.List;
 public class ZxzwComLua {
 
     @Test
+    public void getBook() throws Exception {
+        String url = "http://zxzw.com/26133/";
+        Document doc = Jsoup.connect(url).timeout(3000).get();
+
+        String BT = doc.select("div.text.t_c").get(0).select("a").get(0).ownText();
+
+        System.out.println("BU\n" + url);
+        System.out.println("BT\n" + BT);
+        System.out.println("CU\n" + url);
+    }
+
+    @Test
     public void getCatalog() throws Exception {
         List<Chapter> list = new ArrayList<>();
         long s = System.currentTimeMillis();

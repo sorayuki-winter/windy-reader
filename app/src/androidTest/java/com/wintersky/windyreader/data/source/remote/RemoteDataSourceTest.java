@@ -32,7 +32,7 @@ public class RemoteDataSourceTest {
 
         bookUrl = "http://zxzw.com/164588/";
         catalogUrl = "http://zxzw.com/164588/";
-        chapterUrl = "http://zxzw.com/164588/14192209/";
+        chapterUrl = "http://zxzw.com/26133/2478957/";
     }
 
     @Test
@@ -50,7 +50,7 @@ public class RemoteDataSourceTest {
     }
 
     @Test
-    public void getChapter() {
+    public void getChapter() throws Exception {
         Chapter chapter = mSource.getChapterFromRemote(chapterUrl);
         assertNotNull("chapter null", chapter);
         chapterCheck(chapter);

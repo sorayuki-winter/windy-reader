@@ -9,8 +9,8 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 
-import static com.wintersky.windyreader.detail.DetailActivity.BOOK_URL;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
+import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
 /**
  * Created by tiandong on 18-3-26.

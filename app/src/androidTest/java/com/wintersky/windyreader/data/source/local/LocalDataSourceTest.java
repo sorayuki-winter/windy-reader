@@ -23,6 +23,17 @@ public class LocalDataSourceTest {
     }
 
     @Test
+    public void clearShelf() {
+        clearCatalog();
+
+        Realm realm = Realm.getDefaultInstance();
+        realm.beginTransaction();
+        realm.delete(Book.class);
+        realm.commitTransaction();
+        realm.close();
+    }
+
+    @Test
     public void clearCatalog() {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();

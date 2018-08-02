@@ -76,7 +76,7 @@ public class LocalDataSource implements DataSource {
         if (chapter != null) {
             callback.onLoaded(chapter);
         } else {
-            callback.onDataNotAvailable();
+            callback.onDataNotAvailable(new Exception());
         }
     }
 

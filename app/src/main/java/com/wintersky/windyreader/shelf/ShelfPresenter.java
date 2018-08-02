@@ -59,6 +59,11 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             @Override
             public void onLoaded(Book book) {
                 if (mView == null) return;
+                if (book.getTitle().isEmpty()) {
+                    mView.getBookFinish();
+                    return;
+                }
+                mRepository.saveBook(book);
                 mView.getBookFinish(book);
             }
 

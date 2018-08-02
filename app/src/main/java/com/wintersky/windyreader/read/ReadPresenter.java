@@ -5,6 +5,9 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import javax.inject.Inject;
 
 import io.realm.Realm;
@@ -99,9 +102,14 @@ public class ReadPresenter implements ReadContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable() {
-                WS("Read", "get chapter fail");
-                loadChapter(url);
+            public void onDataNotAvailable(Exception e) {
+                PrintStream ps = new PrintStream(new ByteArrayOutputStream());
+                e.printStackTrace(ps);
+                String msg = ps.toString();
+                WS("Read", msg + "\nget chapter fail");
+                if (msg.contains("timeout")) {
+                    loadChapter(url);
+                }
             }
         });
     }

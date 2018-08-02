@@ -31,13 +31,6 @@ public interface DataSource {
         void onDataNotAvailable();
     }
 
-    interface SearchBookCallback {
-
-        void onSearched(List<Book> list);
-
-        void onDataNotAvailable();
-    }
-
     interface GetShelfCallback {
 
         void onLoaded(RealmResults<Book> list);
@@ -70,6 +63,6 @@ public interface DataSource {
 
         void onLoaded(Chapter chapter);
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(Exception e);
     }
 }

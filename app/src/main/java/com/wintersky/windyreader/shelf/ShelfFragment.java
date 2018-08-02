@@ -9,6 +9,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -70,13 +72,43 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         mAdd = view.findViewById(R.id.add);
         mGridView = view.findViewById(R.id.book_grid);
 
+        mLink.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (s.length() > 0) {
+                    mAdd.setEnabled(true);
+                } else {
+                    mAdd.setEnabled(false);
+                }
+            }
+        });
+
+        mAdd.setEnabled(false);
         mAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String url = mLink.toString();
+                String url = mLink.getText().toString();
+                if (!url.startsWith("http://") && !url.startsWith("https://")) {
+                    mLink.setError("URL should start with \"http(s)://\"");
+                    mAdd.setEnabled(false);
+                    return;
+                }
                 mPresenter.getBook(url);
             }
         });
+
+        mLink.getText().clear();
+        mLink.getText().append("http://zxzw.com/26133/");
 
         return view;
     }
@@ -84,7 +116,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     @Override
     public void setShelf(RealmResults<Book> list) {
         GridAdapter adapter = new GridAdapter(list);
-        //adapter.bind(getActivity());
         mGridView.setAdapter(adapter);
     }
 
@@ -97,6 +128,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     @Override
     public void getBookFinish(Book book) {
         mLink.getText().clear();
+        mAdd.setEnabled(false);
     }
 
     class GridAdapter extends RealmBaseAdapter<Book> {
@@ -141,6 +173,9 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                 holder = (ViewHolder) view.getTag();
             }
             if (adapterData != null && i < adapterData.size() && bk != null) {
+                holder.img.setImageResource(R.mipmap.cover);
+                holder.tv.setText(bk.getTitle());
+
                 holder.img.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
@@ -163,11 +198,9 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                         viewGroup.getContext().startActivity(intent);
                     }
                 });
-                holder.tv.setText(bk.getTitle());
             } else {
                 holder.img.setImageDrawable(null);
             }
-
             return view;
         }
 
