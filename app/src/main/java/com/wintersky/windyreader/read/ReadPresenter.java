@@ -111,7 +111,7 @@ public class ReadPresenter implements ReadContract.Presenter {
                 e.printStackTrace(new PrintStream(bs));
                 WS("Read - get chapter fail", bs.toString());
                 String msg = e.getMessage();
-                if (msg.contains("timeout")) {
+                if (msg.contains("connect timed out")) {
                     loadChapter(url);
                 }
             }
