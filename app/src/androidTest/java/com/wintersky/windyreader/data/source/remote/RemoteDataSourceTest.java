@@ -28,13 +28,13 @@ public class RemoteDataSourceTest {
         MockitoAnnotations.initMocks(this);
 
         Context context = InstrumentationRegistry.getTargetContext();
-        mSource = new RemoteDataSource(context, new SingleExecutors());
-        //*
+        mSource = new RemoteDataSource(context, new SingleExecutors(), mHttp);
+        /*
         bookUrl = "http://www.8wenku.com/book/1871";
         catalogUrl = "http://www.8wenku.com/book/1871";
         chapterUrl = "http://www.8wenku.com/chapter/view?id=1871&chapter_no=1";
         //*/
-        /*
+        //*
         bookUrl = "http://zxzw.com/164718/";
         catalogUrl = "http://zxzw.com/164718/";
         chapterUrl = "http://zxzw.com/164718/14181340/";

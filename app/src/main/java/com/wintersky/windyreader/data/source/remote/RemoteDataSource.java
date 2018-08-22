@@ -37,16 +37,18 @@ import static com.wintersky.windyreader.util.Constants.luaSafeRun;
 @Singleton
 public class RemoteDataSource implements DataSource {
 
-    private final AppExecutors mExecutors;
     private final Context mContext;
+    private final AppExecutors mExecutors;
+    private final OkHttpClient mHttp;
 
     private Future taskCatalog;
     private Future taskChapter;
 
     @Inject
-    RemoteDataSource(Context context, @NonNull AppExecutors executors) {
+    RemoteDataSource(Context context, @NonNull AppExecutors executors, OkHttpClient mHttp) {
         mContext = context;
         mExecutors = executors;
+        this.mHttp = mHttp;
     }
 
     @Override
@@ -202,10 +204,8 @@ public class RemoteDataSource implements DataSource {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = new OkHttpClient().newCall(request).execute();
+        Request request = new Request.Builder().url(url).build();
+        Response response = mHttp.newCall(request).execute();
         byte[] bytes = response.body().bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {
@@ -230,10 +230,8 @@ public class RemoteDataSource implements DataSource {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = new OkHttpClient().newCall(request).execute();
+        Request request = new Request.Builder().url(url).build();
+        Response response = mHttp.newCall(request).execute();
         byte[] bytes = response.body().bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {
@@ -259,10 +257,8 @@ public class RemoteDataSource implements DataSource {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-        Response response = new OkHttpClient().newCall(request).execute();
+        Request request = new Request.Builder().url(url).build();
+        Response response = mHttp.newCall(request).execute();
         byte[] bytes = response.body().bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {

@@ -5,18 +5,28 @@ import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
 import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
+import okhttp3.OkHttpClient;
 
 /**
  * This is used by Dagger to inject the required arguments into the {@link Repository}.
  */
 @Module
 abstract public class RepositoryModule {
+
+    @Singleton
+    @Provides
+    static OkHttpClient provideOkHttpClient() {
+        return new OkHttpClient.Builder()
+                .connectTimeout(1, TimeUnit.SECONDS)
+                .build();
+    }
 
     @Singleton
     @Provides
