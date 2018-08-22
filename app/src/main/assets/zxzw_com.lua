@@ -29,7 +29,7 @@ function getChapter(url, doc)
         m, _ = doc:find("<div", m + 1)
         _, e = doc:find("</div>", e + 1)
     end
-    local content = doc:sub(s, e):gsub("\r?\n", ""):gsub("<br/>", "\n"):gsub("<.->", "")
+    local content = doc:sub(s, e):gsub("\r?\n", ""):gsub("<br/>", "\n"):gsub("<.->", ""):gsub("\"", "\\\"")
     return ([[{
     "url":"%s",
     "title":"%s",

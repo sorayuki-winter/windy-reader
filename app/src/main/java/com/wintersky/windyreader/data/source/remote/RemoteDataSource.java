@@ -218,7 +218,11 @@ public class RemoteDataSource implements DataSource {
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
         String res = lua.toString(-1);
-        return new Gson().fromJson(res, Book.class);
+        try {
+            return new Gson().fromJson(res, Book.class);
+        } catch (Exception e) {
+            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+        }
     }
 
     @VisibleForTesting
@@ -242,8 +246,12 @@ public class RemoteDataSource implements DataSource {
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
         String res = lua.toString(-1);
-        return new Gson().fromJson(res, new TypeToken<RealmList<Chapter>>() {
-        }.getType());
+        try {
+            return new Gson().fromJson(res, new TypeToken<RealmList<Chapter>>() {
+            }.getType());
+        } catch (Exception e) {
+            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+        }
     }
 
     @VisibleForTesting
@@ -267,6 +275,10 @@ public class RemoteDataSource implements DataSource {
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
         String res = lua.toString(-1);
-        return new Gson().fromJson(res, Chapter.class);
+        try {
+            return new Gson().fromJson(res, Chapter.class);
+        } catch (Exception e) {
+            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+        }
     }
 }
