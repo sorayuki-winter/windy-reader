@@ -4,6 +4,9 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import javax.inject.Inject;
 
 import static com.wintersky.windyreader.util.Constants.WS;
@@ -47,8 +50,10 @@ public class CatalogPresenter implements CatalogContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable() {
-                WS("CatalogPresenter.start", "get book fail");
+            public void onDataNotAvailable(Exception e) {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("Catalog - get book fail", bs.toString());
             }
         });
     }

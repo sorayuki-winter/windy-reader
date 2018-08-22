@@ -4,6 +4,9 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import javax.inject.Inject;
 
 import io.realm.RealmResults;
@@ -47,8 +50,10 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable() {
-                WS("can not load shelf");
+            public void onDataNotAvailable(Exception e) {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("Shelf - can not load shelf", bs.toString());
             }
         });
     }
@@ -68,7 +73,10 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onDataNotAvailable(Exception e) {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("Shelf - get book fail", bs.toString());
                 if (mView == null) return;
                 mView.getBookFinish();
             }

@@ -2,15 +2,12 @@ package com.wintersky.windyreader.data.source;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
-import com.wintersky.windyreader.data.Library;
 
 import java.util.List;
 
 import io.realm.RealmResults;
 
 public interface DataSource {
-
-    void getLList(GetLListCallback callback);
 
     void getShelf(GetShelfCallback callback);
 
@@ -24,39 +21,32 @@ public interface DataSource {
 
     void updateCheck(String url, UpdateCheckCallback callback);
 
-    interface GetLListCallback {
-
-        void onLoaded(List<Library> list);
-
-        void onDataNotAvailable();
-    }
-
     interface GetShelfCallback {
 
         void onLoaded(RealmResults<Book> list);
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(Exception e);
     }
 
     interface GetBookCallback {
 
         void onLoaded(Book book);
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(Exception e);
     }
 
     interface GetCatalogCallback {
 
         void onLoaded(List<Chapter> list);
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(Exception e);
     }
 
     interface UpdateCheckCallback {
 
         void onChecked();
 
-        void onDataNotAvailable();
+        void onDataNotAvailable(Exception e);
     }
 
     interface GetChapterCallback {

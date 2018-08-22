@@ -108,7 +108,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         });
 
         mLink.getText().clear();
-        mLink.getText().append("http://zxzw.com/26133/");
 
         return view;
     }
@@ -135,26 +134,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
 
         GridAdapter(@Nullable OrderedRealmCollection<Book> data) {
             super(data);
-        }
-
-        @Override
-        public int getCount() {
-            if (adapterData == null) {
-                return 0;
-            } else if (adapterData.size() % 3 == 0) {
-                return adapterData.size();
-            } else {
-                return adapterData.size() / 3 * 3 + 3;
-            }
-        }
-
-        @Nullable
-        @Override
-        public Book getItem(int position) {
-            if (adapterData == null || position >= adapterData.size()) {
-                return null;
-            }
-            return adapterData.get(position);
         }
 
         @SuppressLint("ClickableViewAccessibility")

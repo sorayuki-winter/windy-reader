@@ -70,15 +70,19 @@ public class ReadPresenter implements ReadContract.Presenter {
                     }
 
                     @Override
-                    public void onDataNotAvailable() {
-                        WS("Read", "update check fail");
+                    public void onDataNotAvailable(Exception e) {
+                        ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                        e.printStackTrace(new PrintStream(bs));
+                        WS("Read - update check fail", bs.toString());
                     }
                 });
             }
 
             @Override
-            public void onDataNotAvailable() {
-                WS("Read", "get book fail");
+            public void onDataNotAvailable(Exception e) {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("Read - get book fail", bs.toString());
             }
         });
     }
@@ -103,10 +107,10 @@ public class ReadPresenter implements ReadContract.Presenter {
 
             @Override
             public void onDataNotAvailable(Exception e) {
-                PrintStream ps = new PrintStream(new ByteArrayOutputStream());
-                e.printStackTrace(ps);
-                String msg = ps.toString();
-                WS("Read", msg + "\nget chapter fail");
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("Read - get chapter fail", bs.toString());
+                String msg = e.getMessage();
                 if (msg.contains("timeout")) {
                     loadChapter(url);
                 }

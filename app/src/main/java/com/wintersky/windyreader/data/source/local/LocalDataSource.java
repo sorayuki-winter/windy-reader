@@ -45,11 +45,6 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void getLList(GetLListCallback callback) {
-        callback.onDataNotAvailable();
-    }
-
-    @Override
     public void getShelf(@NonNull final GetShelfCallback callback) {
         RealmResults<Book> books = mRealm.where(Book.class).findAll();
         callback.onLoaded(books);
@@ -61,7 +56,7 @@ public class LocalDataSource implements DataSource {
         if (book != null) {
             callback.onLoaded(book);
         } else {
-            callback.onDataNotAvailable();
+            callback.onDataNotAvailable(new Exception());
         }
     }
 

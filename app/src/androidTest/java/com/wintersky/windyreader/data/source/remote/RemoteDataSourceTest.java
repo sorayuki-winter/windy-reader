@@ -29,24 +29,32 @@ public class RemoteDataSourceTest {
 
         Context context = InstrumentationRegistry.getTargetContext();
         mSource = new RemoteDataSource(context, new SingleExecutors());
+        /*
+        bookUrl = "http://www.8wenku.com/book/1871";
+        catalogUrl = "http://www.8wenku.com/book/1871";
+        chapterUrl = "http://www.8wenku.com/chapter/view?id=1871&chapter_no=1";
+        */
 
-        bookUrl = "http://zxzw.com/164588/";
-        catalogUrl = "http://zxzw.com/164588/";
-        chapterUrl = "http://zxzw.com/26133/2478957/";
+        bookUrl = "http://zxzw.com/164718/";
+        catalogUrl = "http://zxzw.com/164718/";
+        chapterUrl = "http://zxzw.com/164718/14181340/";
     }
 
     @Test
-    public void getBook() {
+    public void getBook() throws Exception {
         Book book = mSource.getBookFromRemote(bookUrl);
         assertNotNull("book null", book);
         bookCheck(book);
     }
 
     @Test
-    public void getCatalog() {
+    public void getCatalog() throws Exception {
+        long st = System.currentTimeMillis();
         final List<Chapter> list = mSource.getCatalogFromRemote(catalogUrl);
+        long et = System.currentTimeMillis();
         assertNotNull("chapter list null", list);
         catalogCheck(list);
+        WS(String.format("cast: %d ms", et - st));
     }
 
     @Test

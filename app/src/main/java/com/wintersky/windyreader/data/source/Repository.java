@@ -26,11 +26,6 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getLList(GetLListCallback callback) {
-        mLocalDataSource.getLList(callback);
-    }
-
-    @Override
     public void getShelf(@NonNull final GetShelfCallback callback) {
         mLocalDataSource.getShelf(callback);
     }
@@ -44,7 +39,7 @@ public class Repository implements DataSource {
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onDataNotAvailable(Exception e) {
                 mRemoteDataSource.getBook(url, callback);
             }
         });
@@ -110,15 +105,15 @@ public class Repository implements DataSource {
                     }
 
                     @Override
-                    public void onDataNotAvailable() {
-                        callback.onDataNotAvailable();
+                    public void onDataNotAvailable(Exception e) {
+                        callback.onDataNotAvailable(e);
                     }
                 });
             }
 
             @Override
-            public void onDataNotAvailable() {
-                callback.onDataNotAvailable();
+            public void onDataNotAvailable(Exception e) {
+                callback.onDataNotAvailable(e);
             }
         });
     }

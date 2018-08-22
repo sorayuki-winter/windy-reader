@@ -73,7 +73,7 @@ public class LocalDataSourceTest {
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onDataNotAvailable(Exception e) {
 
             }
         });
@@ -88,7 +88,7 @@ public class LocalDataSourceTest {
             }
 
             @Override
-            public void onDataNotAvailable() {
+            public void onDataNotAvailable(Exception e) {
                 WS("not find");
             }
         });
