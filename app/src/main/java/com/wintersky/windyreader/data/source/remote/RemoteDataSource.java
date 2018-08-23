@@ -147,6 +147,11 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
+    public void deleteBook(String url) {
+        // none
+    }
+
+    @Override
     public void updateCheck(String url, UpdateCheckCallback callback) {
         // none
     }

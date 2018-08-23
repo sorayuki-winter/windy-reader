@@ -88,6 +88,11 @@ public class Repository implements DataSource {
     }
 
     @Override
+    public void deleteBook(String url) {
+        mLocalDataSource.deleteBook(url);
+    }
+
+    @Override
     public void updateCheck(final String url, final UpdateCheckCallback callback) {
         mLocalDataSource.getBook(url, new GetBookCallback() {
             @Override

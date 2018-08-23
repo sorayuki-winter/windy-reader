@@ -20,5 +20,7 @@ public interface ShelfContract {
     interface Presenter extends BasePresenter<View> {
 
         void getBook(String url);
+
+        void deleteBook(String url);
     }
 }

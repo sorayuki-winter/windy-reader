@@ -82,4 +82,9 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             }
         });
     }
+
+    @Override
+    public void deleteBook(String url) {
+        mRepository.deleteBook(url);
+    }
 }

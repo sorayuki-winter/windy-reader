@@ -23,11 +23,16 @@ import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+
+import static com.wintersky.windyreader.util.Constants.WS;
 
 /**
  * Concrete implementation of a data source as a db.
@@ -56,7 +61,7 @@ public class LocalDataSource implements DataSource {
         if (book != null) {
             callback.onLoaded(book);
         } else {
-            callback.onDataNotAvailable(new Exception());
+            callback.onDataNotAvailable(new Exception("book not find: " + url));
         }
     }
 
@@ -71,15 +76,41 @@ public class LocalDataSource implements DataSource {
         if (chapter != null) {
             callback.onLoaded(chapter);
         } else {
-            callback.onDataNotAvailable(new Exception());
+            callback.onDataNotAvailable(new Exception("chapter not find: " + url));
         }
     }
 
     @Override
     public void saveBook(final Book book) {
-        mRealm.beginTransaction();
-        mRealm.copyToRealmOrUpdate(book);
-        mRealm.commitTransaction();
+        mRealm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(@NonNull Realm realm) {
+                realm.copyToRealmOrUpdate(book);
+            }
+        });
+    }
+
+    @Override
+    public void deleteBook(String url) {
+        // TODO delete book
+        getBook(url, new GetBookCallback() {
+            @Override
+            public void onLoaded(final Book book) {
+                mRealm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(@NonNull Realm realm) {
+                        book.deleteFromRealm();
+                    }
+                });
+            }
+
+            @Override
+            public void onDataNotAvailable(Exception e) {
+                ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                e.printStackTrace(new PrintStream(bs));
+                WS("delete book fail", bs.toString());
+            }
+        });
     }
 
     @Override

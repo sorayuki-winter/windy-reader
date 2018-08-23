@@ -151,7 +151,11 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             } else {
                 holder = (ViewHolder) view.getTag();
             }
-            if (adapterData != null && i < adapterData.size() && bk != null) {
+
+            if (bk == null) {
+                holder.img.setImageDrawable(null);
+                holder.tv.setText(null);
+            } else {
                 holder.img.setImageResource(R.mipmap.cover);
                 holder.tv.setText(bk.getTitle());
 
@@ -177,8 +181,20 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                         viewGroup.getContext().startActivity(intent);
                     }
                 });
-            } else {
-                holder.img.setImageDrawable(null);
+                holder.img.setOnLongClickListener(new View.OnLongClickListener() {
+                    @Override
+                    public boolean onLongClick(View v) {
+                        DeleteFragment fragment = new DeleteFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("title", bk.getTitle());
+                        bundle.putString("url", bk.getUrl());
+                        fragment.setArguments(bundle);
+                        if (getFragmentManager() != null) {
+                            fragment.show(getFragmentManager(), "delete");
+                        }
+                        return true;
+                    }
+                });
             }
             return view;
         }

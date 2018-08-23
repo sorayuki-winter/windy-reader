@@ -12,6 +12,10 @@ public abstract class ShelfModule {
 
     @FragmentScoped
     @ContributesAndroidInjector
+    abstract DeleteFragment deleteFragment();
+
+    @FragmentScoped
+    @ContributesAndroidInjector
     abstract ShelfFragment shelfFragment();
 
     @ActivityScoped

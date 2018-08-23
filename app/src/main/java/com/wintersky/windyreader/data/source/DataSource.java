@@ -19,6 +19,8 @@ public interface DataSource {
 
     void saveBook(Book book);
 
+    void deleteBook(String url);
+
     void updateCheck(String url, UpdateCheckCallback callback);
 
     interface GetShelfCallback {

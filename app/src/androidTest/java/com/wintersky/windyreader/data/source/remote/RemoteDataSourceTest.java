@@ -13,6 +13,8 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.List;
 
+import okhttp3.OkHttpClient;
+
 import static com.wintersky.windyreader.util.Constants.WS;
 import static org.junit.Assert.assertNotNull;
 
@@ -28,7 +30,7 @@ public class RemoteDataSourceTest {
         MockitoAnnotations.initMocks(this);
 
         Context context = InstrumentationRegistry.getTargetContext();
-        mSource = new RemoteDataSource(context, new SingleExecutors(), mHttp);
+        mSource = new RemoteDataSource(context, new SingleExecutors(), new OkHttpClient());
         /*
         bookUrl = "http://www.8wenku.com/book/1871";
         catalogUrl = "http://www.8wenku.com/book/1871";
