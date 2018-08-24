@@ -1,7 +1,6 @@
 package com.wintersky.windyreader.util;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 
 import org.keplerproject.luajava.JavaFunction;
 import org.keplerproject.luajava.LuaException;
@@ -21,12 +20,9 @@ public class LuaTools {
         JavaFunction assetLoader = new JavaFunction(luaState) {
             @Override
             public int execute() {
-                String name = luaState.toString(-1);
-
-                AssetManager am = context.getAssets();
+                String name = luaState.toString(-1).replace(".", "/");
                 try {
-                    InputStream is = am.open(name + ".lua");
-                    byte[] bytes = is2String(is).getBytes();
+                    byte[] bytes = is2String(context.getAssets().open(name + ".lua")).getBytes();
                     luaState.LloadBuffer(bytes, name);
                     return 1;
                 } catch (Exception e) {
@@ -53,11 +49,10 @@ public class LuaTools {
         luaState.setField(-2, "path");            // package
         luaState.pop(1);
 
-        luaState.setTop(0);
         luaState.getGlobal("debug");
         luaState.getField(-1, "traceback");
-
-        luaSafeDoString(luaState, "require(\"windyreader_tools\")");
+        luaState.insert(1);
+        luaState.setTop(1);
 
         return luaState;
     }
@@ -93,19 +88,16 @@ public class LuaTools {
         return "Unknown error " + error;
     }
 
-    public static void luaSafeDoString(LuaState luaState, String src) throws LuaException {
+    public static void luaSafeDoString(LuaState luaState, String src, int out) throws LuaException {
         int ok = luaState.LloadString(src);
-        if (ok == 0) {
-            ok = luaState.pcall(0, 0, 0);
-            if (ok == 0) {
-                return;
-            }
+        if (ok != 0) {
+            throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
         }
-        throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
+        luaSafeRun(luaState, 0, out);
     }
 
     public static void luaSafeRun(LuaState luaState, int in, int out) throws LuaException {
-        int ok = luaState.pcall(in, out, 0);
+        int ok = luaState.pcall(in, out, 1);
         if (ok != 0) {
             throw new LuaException(errorReason(ok) + ": " + luaState.toString(-1));
         }
