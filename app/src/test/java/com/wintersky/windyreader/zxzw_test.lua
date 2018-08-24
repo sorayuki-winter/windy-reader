@@ -4,7 +4,8 @@
 --- DateTime: 2018/8/21 19:33
 ---
 package.path = package.path .. ";D:/WinterSky/Documents/AndroidStudio/WindyReader/app/src/main/assets/?.lua"
-require("zxzw_com")
+require("lua_api.util")
+local lib = require("zxzw_com")
 local http = require("socket.http")
 
 local bookUrl = "http://zxzw.com/164718/"
@@ -15,11 +16,10 @@ local bookDoc = http.request(bookUrl)
 local catalogDoc = http.request(catalogUrl)
 local chapterDoc = http.request(chapterUrl)
 
-local book = getBook(bookUrl, bookDoc)
+local book = lib.getBook(bookUrl, bookDoc)
+local catalog = lib.getCatalog(catalogUrl, catalogDoc)
+local chapter = lib.getChapter(chapterUrl, chapterDoc)
+
 print(book)
-
-local catalog = getCatalog(catalogUrl, catalogDoc)
 print(catalog)
-
-local chapter = getChapter(chapterUrl, chapterDoc)
 print(chapter)

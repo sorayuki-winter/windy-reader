@@ -164,8 +164,8 @@ public class RemoteDataSource implements DataSource {
             doc = new String(bytes, "GBK");
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)));
-        lua.getField(LuaState.LUA_GLOBALSINDEX, "getBook");
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "getBook");
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
@@ -190,8 +190,8 @@ public class RemoteDataSource implements DataSource {
             doc = new String(bytes, "GBK");
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)));
-        lua.getField(LuaState.LUA_GLOBALSINDEX, "getCatalog");
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "getCatalog");
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
@@ -217,8 +217,8 @@ public class RemoteDataSource implements DataSource {
             doc = new String(bytes, "GBK");
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)));
-        lua.getField(LuaState.LUA_GLOBALSINDEX, "getChapter");
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "getChapter");
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);

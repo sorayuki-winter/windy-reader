@@ -1,4 +1,9 @@
-function getBook(url, doc)
+-- zxzw.com
+require("util")
+
+local M = {}
+
+function M.getBook(url, doc)
     local title = doc:match("<div class=\"text t_c\">.-</div>"):match("<a href=.->(.-)</a>")
     return ([[{
     "url":"%s",
@@ -7,7 +12,7 @@ function getBook(url, doc)
 }]]):format(url, title, url)
 end
 
-function getCatalog(url, doc)
+function M.getCatalog(url, doc)
     local catalog = "["
     local i = 0
     for div in doc:gmatch("<div class=\"chapter\">.-</div>") do
@@ -20,19 +25,16 @@ function getCatalog(url, doc)
     return catalog:sub(1, -2) .. "\n]"
 end
 
-function getChapter(url, doc)
+function M.getChapter(url, doc)
     local title = doc:match("<div class=\"text t_c\"><h1>([^%c]-)</h1></div>")
-    local s, _ = doc:find("<div id=\"content\">")
-    local m, _ = doc:find("<div", s + 1)
-    local _, e = doc:find("</div>", s)
-    while m < e do
-        m, _ = doc:find("<div", m + 1)
-        _, e = doc:find("</div>", e + 1)
-    end
-    local content = doc:sub(s, e):gsub("\r?\n", ""):gsub("<br/>", "\n"):gsub("<.->", ""):gsub("\"", "\\\"")
+    local content = matchTag(doc, "div", "id=\"content\"")
+            :gsub("\r?\n", ""):gsub("<br */?> *", "\n"):gsub("%b<> *", ""):gsub("\"", "\\\"")
+            :gsub("\n+", "\n\n")
     return ([[{
     "url":"%s",
     "title":"%s",
     "content":"%s"
 }]]):format(url, title, content)
 end
+
+return M
