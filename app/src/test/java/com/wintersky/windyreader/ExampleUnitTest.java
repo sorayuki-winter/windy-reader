@@ -2,6 +2,7 @@ package com.wintersky.windyreader;
 
 import org.junit.Test;
 
+import static com.wintersky.windyreader.util.LogTools.LOG;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -16,7 +17,8 @@ public class ExampleUnitTest {
     }
 
     @Test
-    public void temp() {
-        throw new NullPointerException("Nothing");
+    public void log() {
+        LOG("hint", "log");
+        LOG("log");
     }
 }

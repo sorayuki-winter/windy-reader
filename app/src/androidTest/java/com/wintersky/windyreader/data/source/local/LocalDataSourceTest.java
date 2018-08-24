@@ -11,7 +11,7 @@ import org.junit.Test;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 public class LocalDataSourceTest {
 
@@ -52,24 +52,19 @@ public class LocalDataSourceTest {
     }
 
     @Test
-    public void getLList() {
-
-    }
-
-    @Test
     public void getShelf() {
         mSource.getShelf(new DataSource.GetShelfCallback() {
             @Override
             public void onLoaded(RealmResults<Book> list) {
                 if (list == null || list.isEmpty()) {
-                    WS("book list empty");
+                    LOG("book list empty");
                     return;
                 }
                 StringBuilder sb = new StringBuilder();
                 for (Book book : list) {
                     sb.append(book.getTitle()).append(" ").append(book.getUrl()).append("\n");
                 }
-                WS(sb.toString());
+                LOG(sb.toString());
             }
 
             @Override
@@ -84,12 +79,12 @@ public class LocalDataSourceTest {
         mSource.getBook("http://zxzw.com/164588/", new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(Book book) {
-                WS(book.getTitle() + " " + book.getUrl());
+                LOG(book.getTitle() + " " + book.getUrl());
             }
 
             @Override
             public void onDataNotAvailable(Exception e) {
-                WS("not find");
+                LOG("not find");
             }
         });
     }

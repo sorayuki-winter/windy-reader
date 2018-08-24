@@ -12,7 +12,7 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 public class ReadPresenter implements ReadContract.Presenter {
 
@@ -73,7 +73,7 @@ public class ReadPresenter implements ReadContract.Presenter {
                     public void onDataNotAvailable(Exception e) {
                         ByteArrayOutputStream bs = new ByteArrayOutputStream();
                         e.printStackTrace(new PrintStream(bs));
-                        WS("Read - update check fail", bs.toString());
+                        LOG("Read - update check fail", bs.toString());
                     }
                 });
             }
@@ -82,7 +82,7 @@ public class ReadPresenter implements ReadContract.Presenter {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("Read - get book fail", bs.toString());
+                LOG("Read - get book fail", bs.toString());
             }
         });
     }
@@ -109,7 +109,7 @@ public class ReadPresenter implements ReadContract.Presenter {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("Read - get chapter fail", bs.toString());
+                LOG("Read - get chapter fail", bs.toString());
                 String msg = e.getMessage();
                 if (msg.contains("connect timed out")) {
                     loadChapter(url);

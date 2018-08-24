@@ -2,6 +2,7 @@ package com.wintersky.windyreader.read;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -23,7 +24,7 @@ import dagger.android.support.DaggerFragment;
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -31,15 +32,20 @@ import static com.wintersky.windyreader.util.Constants.WS;
 public class ReadFragment extends DaggerFragment implements ReadContract.View {
 
     private static final int REQUEST_CATALOG = 1;
-
     private static final int UI_ANIMATION_DELAY = 300;
     private static final int AUTO_HIDE_DELAY_MILLIS = 3000;
-    private final Handler mHandler = new Handler();
+
     @Inject
     ReadContract.Presenter mPresenter;
+    private final Handler mHandler = new Handler();
     @Inject
-    String mUrl;
+    String mBookUrl;
+    String mChapterUrl;
     private View mTBar, mBBar;
+    private TextView mTitle;
+    private ScrollView mScroll;
+    private TextView mContent;
+    private boolean mVisible = true;
     private final Runnable hideControl = new Runnable() {
         @Override
         public void run() {
@@ -48,10 +54,6 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             mBBar.setVisibility(View.GONE);
         }
     };
-    private TextView mTitle;
-    private ScrollView mScroll;
-    private TextView mContent;
-    private boolean mVisible = true;
     private final Runnable showSystem = new Runnable() {
         @Override
         public void run() {
@@ -122,10 +124,10 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
                 if (activity != null) {
                     Intent intent = new Intent();
                     intent.setClass(activity, CatalogActivity.class);
-                    intent.putExtra(BOOK_URL, mUrl);
+                    intent.putExtra(BOOK_URL, mBookUrl);
                     startActivityForResult(intent, REQUEST_CATALOG);
                 } else {
-                    WS("showCatalog onClick", "Activity null");
+                    LOG("showCatalog onClick", "Activity null");
                 }
             }
         });
@@ -143,6 +145,15 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             }
         });
 
+        view.findViewById(R.id.open_web).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse(mChapterUrl);
+                Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                startActivity(intent);
+            }
+        });
+
         hide();
 
         return view;
@@ -150,6 +161,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
 
     @Override
     public void setChapter(Chapter chapter) {
+        mChapterUrl = chapter.getUrl();
         mTitle.setText(chapter.getTitle());
         mContent.setText(chapter.getContent());
         mScroll.scrollTo(0, 0);

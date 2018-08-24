@@ -32,7 +32,7 @@ import javax.inject.Singleton;
 import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 /**
  * Concrete implementation of a data source as a db.
@@ -92,7 +92,6 @@ public class LocalDataSource implements DataSource {
 
     @Override
     public void deleteBook(String url) {
-        // TODO delete book
         getBook(url, new GetBookCallback() {
             @Override
             public void onLoaded(final Book book) {
@@ -108,7 +107,7 @@ public class LocalDataSource implements DataSource {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("delete book fail", bs.toString());
+                LOG("delete book fail", bs.toString());
             }
         });
     }

@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 public class ShelfPresenter implements ShelfContract.Presenter {
 
@@ -53,7 +53,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("Shelf - can not load shelf", bs.toString());
+                LOG("Shelf - can not load shelf", bs.toString());
             }
         });
     }
@@ -76,7 +76,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("Shelf - get book fail", bs.toString());
+                LOG("Shelf - get book fail", bs.toString());
                 if (mView == null) return;
                 mView.getBookFinish();
             }

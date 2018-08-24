@@ -12,6 +12,7 @@ import dagger.Component;
 import dagger.android.AndroidInjector;
 import dagger.android.support.AndroidSupportInjectionModule;
 import io.realm.Realm;
+import okhttp3.OkHttpClient;
 
 /**
  * This is a Dagger component. Refer to {@link MyDaggerApplication} for the list of Dagger components
@@ -34,6 +35,8 @@ public interface AppComponent extends AndroidInjector<MyDaggerApplication> {
     Repository getRepository();
 
     Realm getRealm();
+
+    OkHttpClient getOkHttpClient();
 
     // Gives us syntactic sugar. we can then do DaggerAppComponent.builder().application(this).build().inject(this);
     // never having to instantiate any modules or say which module we are passing the application to.

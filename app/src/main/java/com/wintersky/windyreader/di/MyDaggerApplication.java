@@ -15,6 +15,11 @@ public class MyDaggerApplication extends DaggerApplication {
     @Override
     public void onCreate() {
         super.onCreate();
+        AppComponent appComponent = DaggerAppComponent.builder()
+                .application(this)
+                .build();
+        Component.set(appComponent);
+
         Realm.init(this);
         RealmConfiguration config = new RealmConfiguration.Builder()
                 .deleteRealmIfMigrationNeeded()

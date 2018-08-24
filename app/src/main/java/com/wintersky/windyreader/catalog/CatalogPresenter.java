@@ -9,7 +9,7 @@ import java.io.PrintStream;
 
 import javax.inject.Inject;
 
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 public class CatalogPresenter implements CatalogContract.Presenter {
 
@@ -53,7 +53,7 @@ public class CatalogPresenter implements CatalogContract.Presenter {
             public void onDataNotAvailable(Exception e) {
                 ByteArrayOutputStream bs = new ByteArrayOutputStream();
                 e.printStackTrace(new PrintStream(bs));
-                WS("Catalog - get book fail", bs.toString());
+                LOG("Catalog - get book fail", bs.toString());
             }
         });
     }

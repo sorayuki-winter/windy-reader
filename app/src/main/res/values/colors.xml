@@ -6,6 +6,7 @@
 
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
+    <color name="translucent">#ffffffff</color>
 
     <color name="shelfBottom">#eeeeee</color>
     <color name="shelfBackDark">#dddddd</color>

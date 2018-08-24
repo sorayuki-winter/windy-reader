@@ -26,7 +26,7 @@ import io.realm.RealmList;
 
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
-import static com.wintersky.windyreader.util.Constants.WS;
+import static com.wintersky.windyreader.util.LogTools.LOG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -78,7 +78,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
                     activity.setResult(RESULT_OK, intent);
                     activity.finish();
                 } else {
-                    WS("CatalogFragment.mListView.onItemClick", "activity or chapter null");
+                    LOG("CatalogFragment.mListView.onItemClick", "activity or chapter null");
                 }
             }
         });

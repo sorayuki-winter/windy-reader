@@ -24,7 +24,7 @@ function getChapter(url, doc)
     local title = doc:match("<div class=\"article%-title\">.-</div>")
     title = title:match("<h1>%s?([^%c]-)</h1>")
     local content = doc:match("<div class=\"article%-body\" role=\"article%-body\">.-</div>")
-    content = content:gsub("\n", ""):gsub("<br */> *", "\n"):gsub("<.-> *", ""):gsub("&nbsp;", " "):gsub("\"", "\\\"")
+    content = content:gsub("\n", ""):gsub("<br */> *", "\n"):gsub("<.-> *", ""):gsub("&nbsp;", " "):gsub("\"", "\\\""):gsub("&middot;", "·")
     return ([[{
     "url":"%s",
     "title":"%s",

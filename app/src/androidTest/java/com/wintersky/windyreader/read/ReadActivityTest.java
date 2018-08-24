@@ -12,9 +12,6 @@ import java.util.concurrent.CountDownLatch;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
-/**
- * Created by tiandong on 18-3-26.
- */
 public class ReadActivityTest {
     @Rule
     public ActivityTestRule<ReadActivity> testRule = new ActivityTestRule<ReadActivity>(ReadActivity.class) {
