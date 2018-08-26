@@ -23,6 +23,8 @@ public interface DataSource {
 
     void updateCheck(String url, UpdateCheckCallback callback);
 
+    void cacheChapter(Chapter chapter);
+
     interface GetShelfCallback {
 
         void onLoaded(RealmResults<Book> list);

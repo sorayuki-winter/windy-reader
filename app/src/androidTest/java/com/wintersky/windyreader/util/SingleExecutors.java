@@ -16,16 +16,55 @@
 
 package com.wintersky.windyreader.util;
 
+import android.support.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.AbstractExecutorService;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Allow instant execution of tasks.
  */
 public class SingleExecutors extends AppExecutors {
-    private static final ExecutorService instant = Executors.newSingleThreadExecutor();
+    private static final ExecutorService instant = new MyExecutor();
 
     public SingleExecutors() {
         super(instant, instant, instant);
+    }
+
+    private static class MyExecutor extends AbstractExecutorService {
+
+        @Override
+        public void shutdown() {
+
+        }
+
+        @NonNull
+        @Override
+        public List<Runnable> shutdownNow() {
+            return new ArrayList<>();
+        }
+
+        @Override
+        public boolean isShutdown() {
+            return false;
+        }
+
+        @Override
+        public boolean isTerminated() {
+            return false;
+        }
+
+        @Override
+        public boolean awaitTermination(long timeout, @NonNull TimeUnit unit) {
+            return false;
+        }
+
+        @Override
+        public void execute(@NonNull Runnable command) {
+            command.run();
+        }
     }
 }

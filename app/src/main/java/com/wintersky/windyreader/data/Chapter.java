@@ -7,11 +7,11 @@ import io.realm.annotations.PrimaryKey;
 public class Chapter extends RealmObject {
     @PrimaryKey
     private String url;
-    private int index;
     private String title;
+    private int index;
+    private boolean read;
     @Ignore
     private String content;
-    private boolean read;
 
     public int getIndex() {
         return index;

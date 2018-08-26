@@ -14,6 +14,7 @@ import com.wintersky.windyreader.util.AppExecutors;
 import org.keplerproject.luajava.LuaState;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Future;
 
 import javax.inject.Inject;
@@ -52,7 +53,7 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void run() {
                 try {
-                    final Book book = getBookFromRemote(url);
+                    final Book book = getBookFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -85,7 +86,7 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void run() {
                 try {
-                    final List<Chapter> list = getCatalogFromRemote(url);
+                    final List<Chapter> list = getCatalogFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -115,7 +116,7 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void run() {
                 try {
-                    final Chapter chapter = getChapterFromRemote(url);
+                    final Chapter chapter = getChapterFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -151,14 +152,19 @@ public class RemoteDataSource implements DataSource {
         // none
     }
 
+    @Override
+    public void cacheChapter(Chapter chapter) {
+        // none
+    }
+
     @VisibleForTesting
-    Book getBookFromRemote(String url) throws Exception {
+    Book getBookFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = response.body().bytes();
+        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {
             doc = new String(bytes, "GBK");
@@ -178,13 +184,13 @@ public class RemoteDataSource implements DataSource {
     }
 
     @VisibleForTesting
-    RealmList<Chapter> getCatalogFromRemote(String url) throws Exception {
+    RealmList<Chapter> getCatalogFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = response.body().bytes();
+        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {
             doc = new String(bytes, "GBK");
@@ -205,13 +211,13 @@ public class RemoteDataSource implements DataSource {
     }
 
     @VisibleForTesting
-    Chapter getChapterFromRemote(String url) throws Exception {
+    Chapter getChapterFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = response.body().bytes();
+        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
         String doc = new String(bytes, "UTF-8");
         if (doc.contains("charset=gbk")) {
             doc = new String(bytes, "GBK");

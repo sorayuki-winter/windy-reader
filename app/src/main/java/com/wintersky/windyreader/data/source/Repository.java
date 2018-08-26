@@ -18,11 +18,13 @@ public class Repository implements DataSource {
 
     private final DataSource mLocalDataSource;
     private final DataSource mRemoteDataSource;
+    private final Realm mRealm;
 
     @Inject
-    Repository(@Remote DataSource remoteDataSource, @Local DataSource localDataSource) {
+    Repository(@Remote DataSource remoteDataSource, @Local DataSource localDataSource, Realm realm) {
         mRemoteDataSource = remoteDataSource;
         mLocalDataSource = localDataSource;
+        mRealm = realm;
     }
 
     @Override
@@ -54,17 +56,29 @@ public class Repository implements DataSource {
     public void getChapter(final String url, final GetChapterCallback callback) {
         mLocalDataSource.getChapter(url, new GetChapterCallback() {
             @Override
-            public void onLoaded(final Chapter chapter) {
+            public void onLoaded(final Chapter chapterL) {
+                if (chapterL.getContent() != null) {
+                    mRealm.executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(@NonNull Realm realm) {
+                            chapterL.setRead(true);
+                        }
+                    });
+                    callback.onLoaded(chapterL);
+                    return;
+                }
+
                 mRemoteDataSource.getChapter(url, new GetChapterCallback() {
                     @Override
-                    public void onLoaded(Chapter c) {
-                        Realm realm = Realm.getDefaultInstance();
-                        realm.beginTransaction();
-                        chapter.setContent(c.getContent());
-                        chapter.setRead(true);
-                        realm.commitTransaction();
-                        realm.close();
-                        callback.onLoaded(chapter);
+                    public void onLoaded(final Chapter chapterR) {
+                        mRealm.executeTransaction(new Realm.Transaction() {
+                            @Override
+                            public void execute(@NonNull Realm realm) {
+                                chapterL.setContent(chapterR.getContent());
+                                chapterL.setRead(true);
+                            }
+                        });
+                        callback.onLoaded(chapterL);
                     }
 
                     @Override
@@ -72,7 +86,6 @@ public class Repository implements DataSource {
                         callback.onDataNotAvailable(e);
                     }
                 });
-
             }
 
             @Override
@@ -121,5 +134,10 @@ public class Repository implements DataSource {
                 callback.onDataNotAvailable(e);
             }
         });
+    }
+
+    @Override
+    public void cacheChapter(Chapter chapter) {
+        mLocalDataSource.cacheChapter(chapter);
     }
 }
