@@ -24,6 +24,7 @@ import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
 import static com.wintersky.windyreader.util.CheckUtil.checkChapter;
 import static com.wintersky.windyreader.util.CheckUtil.checkShelf;
 import static com.wintersky.windyreader.util.LogTools.LOG;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -155,6 +156,8 @@ public class LocalDataSourceTest {
 
     @Test
     public void localGetContentFrom() throws Exception {
-        LOG("content", mSource.getContentFrom(mChapter.getUrl()).replace("\n", "\\n"));
+        String content = mSource.getContentFrom(mChapter.getUrl());
+        assertNotNull(content);
+        LOG("content", content.replace("\n", "\n"));
     }
 }

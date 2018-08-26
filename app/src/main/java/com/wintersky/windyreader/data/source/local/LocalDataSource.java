@@ -170,7 +170,7 @@ public class LocalDataSource implements DataSource {
         if (!chapter.exists() && !chapter.mkdir()) {
             return false;
         }
-        File file = new File(chapter, url.replace("/", "_"));
+        File file = new File(chapter, url.replace("/", "_") + ".txt");
         try {
             if (!file.exists() && !file.createNewFile()) {
                 return false;
@@ -203,17 +203,12 @@ public class LocalDataSource implements DataSource {
         }
         File chapter = new File(root, "chapter");
         if (chapter.exists() || chapter.mkdir()) {
-            File content = new File(chapter, url.replace("/", "_"));
-            if (content.exists()) {
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(content));
-                byte[] buff = new byte[1024];
-                StringBuilder sb = new StringBuilder();
-                int len = 0;
-                while (len != -1) {
-                    sb.append(new String(buff, 0, len));
-                    len = bis.read(buff);
-                }
-                return sb.toString();
+            File file = new File(chapter, url.replace("/", "_") + ".txt");
+            if (file.exists()) {
+                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+                byte[] buff = new byte[bis.available()];
+                bis.read(buff);
+                return new String(buff);
             }
         }
         return null;

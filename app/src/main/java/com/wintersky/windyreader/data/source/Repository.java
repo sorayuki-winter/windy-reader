@@ -78,6 +78,7 @@ public class Repository implements DataSource {
                                 chapterL.setRead(true);
                             }
                         });
+                        cacheChapter(chapterL);
                         callback.onLoaded(chapterL);
                     }
 
