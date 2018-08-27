@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.catalog.CatalogActivity;
@@ -166,6 +167,11 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
         mContent.setText(chapter.getContent());
         mScroll.scrollTo(0, 0);
         hide();
+    }
+
+    @Override
+    public void onBookCached() {
+        Toast.makeText(getContext(), "cache finished", Toast.LENGTH_SHORT).show();
     }
 
     private void hide() {

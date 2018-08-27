@@ -9,6 +9,8 @@ public interface ReadContract {
     interface View extends BaseView<Presenter> {
 
         void setChapter(Chapter chapter);
+
+        void onBookCached();
     }
 
     interface Presenter extends BasePresenter<View> {

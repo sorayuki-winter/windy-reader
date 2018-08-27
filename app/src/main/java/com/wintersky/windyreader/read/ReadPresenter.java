@@ -58,6 +58,13 @@ public class ReadPresenter implements ReadContract.Presenter {
                 mRepository.updateCheck(book.getUrl(), new DataSource.UpdateCheckCallback() {
                     @Override
                     public void onChecked() {
+                        mRepository.cacheBook(mUrl, new DataSource.CacheBookCallback() {
+                            @Override
+                            public void onCached() {
+                                if (mView != null)
+                                    mView.onBookCached();
+                            }
+                        });
                         if (mChapter != null || loading) return;
                         if (mBook.getCurrent() == null) {
                             Chapter chapter = mBook.getCatalog().first();
@@ -111,7 +118,7 @@ public class ReadPresenter implements ReadContract.Presenter {
                 e.printStackTrace(new PrintStream(bs));
                 LOG("Read - get chapter fail", bs.toString());
                 String msg = e.getMessage();
-                if (msg.contains("connect timed out")) {
+                if (msg.contains("timed out")) {
                     loadChapter(url);
                 }
             }

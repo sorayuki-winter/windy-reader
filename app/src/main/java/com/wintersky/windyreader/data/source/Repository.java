@@ -1,9 +1,12 @@
 package com.wintersky.windyreader.data.source;
 
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
+import com.wintersky.windyreader.data.source.local.LocalDataSource;
+import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
 
 import java.util.List;
 
@@ -13,19 +16,15 @@ import javax.inject.Singleton;
 import io.realm.Realm;
 import io.realm.RealmList;
 
+import static com.wintersky.windyreader.util.LogTools.LOG;
+
 @Singleton
-public class Repository implements DataSource {
+public class Repository implements DataSource, DataSource.Repository {
 
-    private final DataSource mLocalDataSource;
-    private final DataSource mRemoteDataSource;
+    private final LocalDataSource mLocalDataSource;
+    private final RemoteDataSource mRemoteDataSource;
     private final Realm mRealm;
-
-    @Inject
-    Repository(@Remote DataSource remoteDataSource, @Local DataSource localDataSource, Realm realm) {
-        mRemoteDataSource = remoteDataSource;
-        mLocalDataSource = localDataSource;
-        mRealm = realm;
-    }
+    private CacheBookTask mCacheBookTask = null;
 
     @Override
     public void getShelf(@NonNull final GetShelfCallback callback) {
@@ -78,7 +77,6 @@ public class Repository implements DataSource {
                                 chapterL.setRead(true);
                             }
                         });
-                        cacheChapter(chapterL);
                         callback.onLoaded(chapterL);
                     }
 
@@ -140,5 +138,64 @@ public class Repository implements DataSource {
     @Override
     public void cacheChapter(Chapter chapter) {
         mLocalDataSource.cacheChapter(chapter);
+    }
+
+    @Inject
+    Repository(LocalDataSource localDataSource, RemoteDataSource remoteDataSource, Realm realm) {
+        mLocalDataSource = localDataSource;
+        mRemoteDataSource = remoteDataSource;
+        mRealm = realm;
+    }
+
+    @Override
+    public void cacheBook(String url, CacheBookCallback callback) {
+        if (mCacheBookTask != null) {
+            mCacheBookTask.cancel(true);
+        }
+        mCacheBookTask = new CacheBookTask();
+        mCacheBookTask.execute(mLocalDataSource, mRemoteDataSource, callback, url);
+    }
+
+    private static class CacheBookTask extends AsyncTask<Object, Void, Void> {
+
+        private CacheBookCallback mCallback;
+
+        @Override
+        protected Void doInBackground(Object... objects) {
+            final LocalDataSource local = (LocalDataSource) objects[0];
+            final RemoteDataSource remote = (RemoteDataSource) objects[1];
+            mCallback = (CacheBookCallback) objects[2];
+            String bookUrl = (String) objects[3];
+
+            Realm realm = Realm.getDefaultInstance();
+            Book book = realm.where(Book.class).equalTo("url", bookUrl).findFirst();
+            if (book != null) {
+                List<Chapter> catalog = book.getCatalog();
+                for (int i = 0; i < catalog.size(); i++) {
+                    if (isCancelled())
+                        break;
+                    final Chapter c = catalog.get(i);
+                    if (c == null) continue;
+                    if (!local.isContentExist(c.getUrl())) {
+                        try {
+                            String content = remote.getChapterFrom(c.getUrl()).getContent();
+                            local.saveContentTo(c.getUrl(), content);
+                        } catch (Exception e) {
+                            LOG(e);
+                        }
+                    }
+                }
+            } else {
+                LOG(new Exception("book not find: " + bookUrl));
+            }
+            realm.close();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            mCallback.onCached();
+        }
     }
 }

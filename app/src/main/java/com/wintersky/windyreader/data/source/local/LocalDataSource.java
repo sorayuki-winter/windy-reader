@@ -18,7 +18,6 @@ package com.wintersky.windyreader.data.source.local;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
@@ -45,7 +44,7 @@ import static com.wintersky.windyreader.util.LogTools.LOG;
  * Concrete implementation of a data source as a db.
  */
 @Singleton
-public class LocalDataSource implements DataSource {
+public class LocalDataSource implements DataSource, DataSource.Local {
 
     private final Context mContext;
     private final AppExecutors mExecutors;
@@ -144,11 +143,6 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void updateCheck(String url, UpdateCheckCallback callback) {
-        // none
-    }
-
-    @Override
     public void cacheChapter(final Chapter chapter) {
         final String url = chapter.getUrl();
         final String content = chapter.getContent();
@@ -160,8 +154,8 @@ public class LocalDataSource implements DataSource {
         });
     }
 
-    @VisibleForTesting
-    boolean saveContentTo(String url, String content) {
+
+    public boolean saveContentTo(String url, String content) {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
             return false;
@@ -195,8 +189,8 @@ public class LocalDataSource implements DataSource {
         return true;
     }
 
-    @VisibleForTesting
-    String getContentFrom(String url) throws Exception {
+
+    public String getContentFrom(String url) throws Exception {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
             return null;
@@ -212,5 +206,13 @@ public class LocalDataSource implements DataSource {
             }
         }
         return null;
+    }
+
+
+    public boolean isContentExist(String url) {
+        File root = mContext.getExternalFilesDir("");
+        if (root == null) return false;
+        File file = new File(root, "chapter/" + url.replace("/", "_") + ".txt");
+        return file.exists();
     }
 }

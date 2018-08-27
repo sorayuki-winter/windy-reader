@@ -1,7 +1,5 @@
 package com.wintersky.windyreader.data.source;
 
-import com.wintersky.windyreader.data.source.local.LocalDataSource;
-import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
 import java.util.concurrent.Executors;
@@ -9,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.inject.Singleton;
 
-import dagger.Binds;
 import dagger.Module;
 import dagger.Provides;
 import okhttp3.OkHttpClient;
@@ -24,7 +21,7 @@ abstract public class RepositoryModule {
     @Provides
     static OkHttpClient provideOkHttpClient() {
         return new OkHttpClient.Builder()
-                .connectTimeout(1, TimeUnit.SECONDS)
+                .connectTimeout(2, TimeUnit.SECONDS)
                 .build();
     }
 
@@ -35,14 +32,4 @@ abstract public class RepositoryModule {
                 Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors()),
                 new AppExecutors.MainThreadExecutor());
     }
-
-    @Singleton
-    @Binds
-    @Local
-    abstract DataSource provideBooksLocalDataSource(LocalDataSource dataSource);
-
-    @Singleton
-    @Binds
-    @Remote
-    abstract DataSource provideBooksRemoteDataSource(RemoteDataSource dataSource);
 }

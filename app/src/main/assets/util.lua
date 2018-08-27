@@ -10,3 +10,9 @@ function matchTag(doc, tag, attr)
     assert(e ~= nil, ("< *%s *%s not closed"):format(tag, attr))
     return doc:sub(s, e)
 end
+
+function toContent(str)
+    return str:gsub(" *\r?\n *", ""):gsub(" *<br */?> *", "\n"):gsub(" *%b<> *", "")
+              :gsub("\n+", "\n\n"):gsub("\"", "\\\""):gsub("\\", "\\\\")
+              :gsub("&middot;", "·"):gsub("&nbsp;", " "):gsub("&times;", "×")
+end

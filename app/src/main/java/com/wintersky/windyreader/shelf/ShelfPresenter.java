@@ -48,13 +48,6 @@ public class ShelfPresenter implements ShelfContract.Presenter {
                 if (mView == null) return;
                 mView.setShelf(list);
             }
-
-            @Override
-            public void onDataNotAvailable(Exception e) {
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(bs));
-                LOG("Shelf - can not load shelf", bs.toString());
-            }
         });
     }
 

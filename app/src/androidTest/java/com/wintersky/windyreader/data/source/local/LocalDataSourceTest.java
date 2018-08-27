@@ -81,11 +81,6 @@ public class LocalDataSourceTest {
             public void onLoaded(RealmResults<Book> list) {
                 checkShelf(list);
             }
-
-            @Override
-            public void onDataNotAvailable(Exception e) {
-                fail(e.getMessage());
-            }
         });
     }
 
@@ -158,6 +153,6 @@ public class LocalDataSourceTest {
     public void localGetContentFrom() throws Exception {
         String content = mSource.getContentFrom(mChapter.getUrl());
         assertNotNull(content);
-        LOG("content", content.replace("\n", "\n"));
+        LOG("content", content.replace("\n", "\\n"));
     }
 }

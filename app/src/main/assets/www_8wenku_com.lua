@@ -28,8 +28,7 @@ end
 function M.getChapter(url, doc)
     local title = matchTag(doc, "div", [[class="article%-title"]]):match("<h1> *([^%c]-)</h1>")
     local content = matchTag(doc, "div", [[class="article%-body" role="article%-body"]])
-            :gsub("\r?\n", ""):gsub("<br */?> *", "\n"):gsub("%b<> *", ""):gsub("\"", "\\\"")
-            :gsub("\n+", "\n\n"):gsub("&middot;", "·"):gsub("&nbsp;", " ")
+    content = toContent(content);
     return ([[{
     "url":"%s",
     "title":"%s",

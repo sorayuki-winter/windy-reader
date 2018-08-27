@@ -9,27 +9,37 @@ import io.realm.RealmResults;
 
 public interface DataSource {
 
-    void getShelf(GetShelfCallback callback);
-
     void getBook(String url, GetBookCallback callback);
 
     void getCatalog(String url, GetCatalogCallback callback);
 
     void getChapter(String url, GetChapterCallback callback);
 
-    void saveBook(Book book);
+    interface Local {
 
-    void deleteBook(String url);
+        void getShelf(GetShelfCallback callback);
 
-    void updateCheck(String url, UpdateCheckCallback callback);
+        void saveBook(Book book);
 
-    void cacheChapter(Chapter chapter);
+        void deleteBook(String url);
+
+        void cacheChapter(Chapter chapter);
+    }
+
+    interface Remote {
+
+    }
+
+    interface Repository extends Local, Remote {
+
+        void updateCheck(String url, UpdateCheckCallback callback);
+
+        void cacheBook(String url, CacheBookCallback callback);
+    }
 
     interface GetShelfCallback {
 
         void onLoaded(RealmResults<Book> list);
-
-        void onDataNotAvailable(Exception e);
     }
 
     interface GetBookCallback {
@@ -58,5 +68,9 @@ public interface DataSource {
         void onLoaded(Chapter chapter);
 
         void onDataNotAvailable(Exception e);
+    }
+
+    interface CacheBookCallback {
+        void onCached();
     }
 }

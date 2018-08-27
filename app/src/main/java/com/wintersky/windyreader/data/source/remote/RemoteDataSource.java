@@ -2,7 +2,6 @@ package com.wintersky.windyreader.data.source.remote;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -16,6 +15,8 @@ import org.keplerproject.luajava.LuaState;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -31,7 +32,7 @@ import static com.wintersky.windyreader.util.LuaTools.luaSafeDoString;
 import static com.wintersky.windyreader.util.LuaTools.luaSafeRun;
 
 @Singleton
-public class RemoteDataSource implements DataSource {
+public class RemoteDataSource implements DataSource, DataSource.Remote {
 
     private final Context mContext;
     private final AppExecutors mExecutors;
@@ -41,10 +42,10 @@ public class RemoteDataSource implements DataSource {
     private Future taskChapter;
 
     @Inject
-    RemoteDataSource(Context context, @NonNull AppExecutors executors, OkHttpClient mHttp) {
+    RemoteDataSource(Context context, @NonNull AppExecutors executors, OkHttpClient http) {
         mContext = context;
         mExecutors = executors;
-        this.mHttp = mHttp;
+        mHttp = http;
     }
 
     @Override
@@ -70,11 +71,6 @@ public class RemoteDataSource implements DataSource {
                 }
             }
         });
-    }
-
-    @Override
-    public void getShelf(final @NonNull GetShelfCallback callback) {
-        // none
     }
 
     @Override
@@ -137,28 +133,8 @@ public class RemoteDataSource implements DataSource {
         });
     }
 
-    @Override
-    public void saveBook(Book book) {
-        // none
-    }
 
-    @Override
-    public void deleteBook(String url) {
-        // none
-    }
-
-    @Override
-    public void updateCheck(String url, UpdateCheckCallback callback) {
-        // none
-    }
-
-    @Override
-    public void cacheChapter(Chapter chapter) {
-        // none
-    }
-
-    @VisibleForTesting
-    Book getBookFrom(String url) throws Exception {
+    public Book getBookFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -179,12 +155,12 @@ public class RemoteDataSource implements DataSource {
         try {
             return new Gson().fromJson(res, Book.class);
         } catch (Exception e) {
-            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+            throw formatJsonError(url, res, e);
         }
     }
 
-    @VisibleForTesting
-    RealmList<Chapter> getCatalogFrom(String url) throws Exception {
+
+    public RealmList<Chapter> getCatalogFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -206,12 +182,12 @@ public class RemoteDataSource implements DataSource {
             return new Gson().fromJson(res, new TypeToken<RealmList<Chapter>>() {
             }.getType());
         } catch (Exception e) {
-            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+            throw formatJsonError(url, res, e);
         }
     }
 
-    @VisibleForTesting
-    Chapter getChapterFrom(String url) throws Exception {
+
+    public Chapter getChapterFrom(String url) throws Exception {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -232,7 +208,25 @@ public class RemoteDataSource implements DataSource {
         try {
             return new Gson().fromJson(res, Chapter.class);
         } catch (Exception e) {
-            throw new Exception(String.format("%s\n%s", res, e.getMessage()), e);
+            throw formatJsonError(url, res, e);
         }
+    }
+
+    private Exception formatJsonError(String url, String json, Exception e) {
+        Matcher matcher = Pattern.compile("at line (\\d+) column (\\d+) path \\$\\.(\\w+)").matcher(e.getMessage());
+        if (matcher.find()) {
+            int line = Integer.valueOf(matcher.group(1));
+            String error = json.split("\n")[line - 1];
+            Exception exception = new Exception(e.getMessage());
+            StackTraceElement[] elements = e.getStackTrace();
+            StackTraceElement element = elements[0];
+            element = new StackTraceElement(
+                    String.format("%s\nurl: %s\nat %s", error, url, element.getClassName()),
+                    element.getMethodName(), element.getFileName(), element.getLineNumber());
+            elements[0] = element;
+            exception.setStackTrace(elements);
+            return exception;
+        }
+        return e;
     }
 }

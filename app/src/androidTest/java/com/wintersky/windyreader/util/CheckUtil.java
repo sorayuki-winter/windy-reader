@@ -30,6 +30,6 @@ public class CheckUtil {
     }
 
     public static void checkChapter(Chapter chapter) {
-        LOG("chapter", chapter.getTitle() + " " + chapter.getUrl() + "\n" + chapter.getContent().replace("\n", "\\n"));
+        LOG("chapter: " + chapter.getTitle() + " " + chapter.getUrl(), chapter.getContent().replace("\n", "\\n"));
     }
 }

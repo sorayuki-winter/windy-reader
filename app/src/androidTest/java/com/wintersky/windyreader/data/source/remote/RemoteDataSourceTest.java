@@ -71,7 +71,6 @@ public class RemoteDataSourceTest {
         for (String url : chapterList) {
             Chapter chapter = mSource.getChapterFrom(url);
             assertNotNull("chapter null: " + url, chapter);
-            LOG(chapter.getContent().replace("\n", "\\n"), "");
             checkChapter(chapter);
         }
     }
