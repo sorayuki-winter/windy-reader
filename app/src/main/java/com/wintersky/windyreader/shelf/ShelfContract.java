@@ -8,18 +8,16 @@ import io.realm.RealmResults;
 
 public interface ShelfContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
 
         void setShelf(RealmResults<Book> list);
 
-        void getBookFinish();
-
-        void getBookFinish(Book book);
+        void onBookSaved(boolean ok);
     }
 
     interface Presenter extends BasePresenter<View> {
 
-        void getBook(String url);
+        void saveBook(String url);
 
         void deleteBook(String url);
     }

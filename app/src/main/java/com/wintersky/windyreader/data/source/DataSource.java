@@ -32,8 +32,6 @@ public interface DataSource {
 
     interface Repository extends Local, Remote {
 
-        void updateCheck(String url, UpdateCheckCallback callback);
-
         void cacheBook(String url, CacheBookCallback callback);
     }
 

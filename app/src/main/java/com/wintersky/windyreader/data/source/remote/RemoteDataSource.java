@@ -4,14 +4,17 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.util.AppExecutors;
 
+import org.keplerproject.luajava.LuaException;
 import org.keplerproject.luajava.LuaState;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
@@ -134,7 +137,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     }
 
 
-    public Book getBookFrom(String url) throws Exception {
+    public Book getBookFrom(String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -154,13 +157,13 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         String res = lua.toString(-1);
         try {
             return new Gson().fromJson(res, Book.class);
-        } catch (Exception e) {
+        } catch (JsonSyntaxException e) {
             throw formatJsonError(url, res, e);
         }
     }
 
 
-    public RealmList<Chapter> getCatalogFrom(String url) throws Exception {
+    public RealmList<Chapter> getCatalogFrom(String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -181,13 +184,13 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         try {
             return new Gson().fromJson(res, new TypeToken<RealmList<Chapter>>() {
             }.getType());
-        } catch (Exception e) {
+        } catch (JsonSyntaxException e) {
             throw formatJsonError(url, res, e);
         }
     }
 
 
-    public Chapter getChapterFrom(String url) throws Exception {
+    public Chapter getChapterFrom(String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -207,17 +210,17 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         String res = lua.toString(-1);
         try {
             return new Gson().fromJson(res, Chapter.class);
-        } catch (Exception e) {
+        } catch (JsonSyntaxException e) {
             throw formatJsonError(url, res, e);
         }
     }
 
-    private Exception formatJsonError(String url, String json, Exception e) {
+    private JsonSyntaxException formatJsonError(String url, String json, JsonSyntaxException e) {
         Matcher matcher = Pattern.compile("at line (\\d+) column (\\d+) path \\$\\.(\\w+)").matcher(e.getMessage());
         if (matcher.find()) {
             int line = Integer.valueOf(matcher.group(1));
             String error = json.split("\n")[line - 1];
-            Exception exception = new Exception(e.getMessage());
+            JsonSyntaxException exception = new JsonSyntaxException(e.getMessage());
             StackTraceElement[] elements = e.getStackTrace();
             StackTraceElement element = elements[0];
             element = new StackTraceElement(

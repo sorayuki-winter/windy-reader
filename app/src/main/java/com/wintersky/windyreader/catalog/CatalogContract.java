@@ -6,7 +6,7 @@ import com.wintersky.windyreader.data.Book;
 
 public interface CatalogContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
 
         void setBook(Book book);
     }

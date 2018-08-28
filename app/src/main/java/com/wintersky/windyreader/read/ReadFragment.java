@@ -38,16 +38,19 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
 
     @Inject
     ReadContract.Presenter mPresenter;
-    private final Handler mHandler = new Handler();
     @Inject
     String mBookUrl;
-    String mChapterUrl;
+
+    private String mChapterUrl;
+
     private View mTBar, mBBar;
     private TextView mTitle;
     private ScrollView mScroll;
     private TextView mContent;
+
+    private Handler mHandler = new Handler();
     private boolean mVisible = true;
-    private final Runnable hideControl = new Runnable() {
+    private Runnable hideControl = new Runnable() {
         @Override
         public void run() {
             // Delayed removal of control bar
@@ -55,7 +58,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             mBBar.setVisibility(View.GONE);
         }
     };
-    private final Runnable showSystem = new Runnable() {
+    private Runnable showSystem = new Runnable() {
         @Override
         public void run() {
             // Delayed removal of system UI
@@ -64,7 +67,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             mVisible = true;
         }
     };
-    private final Runnable hideAll = new Runnable() {
+    private Runnable hideAll = new Runnable() {
         @Override
         public void run() {
             hide();

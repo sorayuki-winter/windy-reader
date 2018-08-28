@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import javax.inject.Inject;
@@ -190,7 +191,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
 
-    public String getContentFrom(String url) throws Exception {
+    public String getContentFrom(String url) throws IOException {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
             return null;

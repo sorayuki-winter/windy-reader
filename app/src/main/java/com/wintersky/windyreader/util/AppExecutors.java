@@ -35,9 +35,7 @@ import javax.inject.Singleton;
 public class AppExecutors {
 
     private final ExecutorService diskIO;
-
     private final ExecutorService networkIO;
-
     private final Executor mainThread;
 
     public AppExecutors(ExecutorService diskIO, ExecutorService networkIO, Executor mainThread) {

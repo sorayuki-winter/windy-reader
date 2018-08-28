@@ -16,6 +16,6 @@
 
 package com.wintersky.windyreader;
 
-public interface BaseView<T> {
+public interface BaseView {
 
 }

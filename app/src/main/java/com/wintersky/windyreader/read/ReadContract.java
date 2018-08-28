@@ -6,7 +6,7 @@ import com.wintersky.windyreader.data.Chapter;
 
 public interface ReadContract {
 
-    interface View extends BaseView<Presenter> {
+    interface View extends BaseView {
 
         void setChapter(Chapter chapter);
 

@@ -16,7 +16,6 @@ import android.view.Window;
 import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
-import com.wintersky.windyreader.data.Book;
 
 import javax.inject.Inject;
 
@@ -30,7 +29,8 @@ public class DeleteFragment extends DialogFragment {
     @Inject
     ShelfContract.Presenter mPresenter;
 
-    private Book mBook;
+    private String mUrl;
+    private String mTitle;
 
     @Inject
     public DeleteFragment() {
@@ -41,11 +41,11 @@ public class DeleteFragment extends DialogFragment {
     public void setArguments(@Nullable Bundle args) {
         super.setArguments(args);
         if (args == null) {
-            mBook = null;
+            mUrl = null;
+            mTitle = null;
         } else {
-            mBook = new Book();
-            mBook.setUrl(args.getString("url"));
-            mBook.setTitle(args.getString("title"));
+            mUrl = args.getString("url");
+            mTitle = args.getString("title");
         }
     }
 
@@ -75,12 +75,12 @@ public class DeleteFragment extends DialogFragment {
 
         TextView title = view.findViewById(R.id.title);
 
-        title.setText(mBook.getTitle());
+        title.setText(mTitle);
 
         view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mPresenter.deleteBook(mBook.getUrl());
+                mPresenter.deleteBook(mUrl);
                 dismiss();
             }
         });

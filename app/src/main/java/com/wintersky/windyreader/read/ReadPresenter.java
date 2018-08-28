@@ -1,12 +1,11 @@
 package com.wintersky.windyreader.read;
 
+import android.support.annotation.NonNull;
+
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 
 import javax.inject.Inject;
 
@@ -18,11 +17,10 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     private final Repository mRepository;
     private final String mUrl;
-    private boolean isFirst = true;
     private ReadContract.View mView;
+    private boolean isFirst = true;
+
     private Book mBook;
-    private Chapter mChapter;
-    private boolean loading = false;
 
     @Inject
     ReadPresenter(Repository repository, String url) {
@@ -47,76 +45,54 @@ public class ReadPresenter implements ReadContract.Presenter {
         } else {
             return;
         }
-
         mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(final Book book) {
                 mBook = book;
-                if (book.getCurrent() != null) {
-                    loadChapter(book.getCurrent().getUrl());
+                Chapter chapter = mBook.getCurrent();
+                if (chapter != null) {
+                    loadChapter(chapter.getUrl());
                 }
-                mRepository.updateCheck(book.getUrl(), new DataSource.UpdateCheckCallback() {
-                    @Override
-                    public void onChecked() {
-                        mRepository.cacheBook(mUrl, new DataSource.CacheBookCallback() {
-                            @Override
-                            public void onCached() {
-                                if (mView != null)
-                                    mView.onBookCached();
-                            }
-                        });
-                        if (mChapter != null || loading) return;
-                        if (mBook.getCurrent() == null) {
-                            Chapter chapter = mBook.getCatalog().first();
-                            if (chapter != null) {
-                                loadChapter(chapter.getUrl());
-                            }
-                        } else {
-                            loadChapter(mBook.getCurrent().getUrl());
-                        }
-                    }
 
+                mRepository.cacheBook(mUrl, new DataSource.CacheBookCallback() {
                     @Override
-                    public void onDataNotAvailable(Exception e) {
-                        ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                        e.printStackTrace(new PrintStream(bs));
-                        LOG("Read - update check fail", bs.toString());
+                    public void onCached() {
+                        if (mView != null) {
+                            mView.onBookCached();
+                        }
                     }
                 });
             }
 
             @Override
             public void onDataNotAvailable(Exception e) {
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(bs));
-                LOG("Read - get book fail", bs.toString());
+                LOG("Read - get book fail", e);
             }
         });
     }
 
     @Override
     public void loadChapter(final String url) {
-        loading = true;
         mRepository.getChapter(url, new DataSource.GetChapterCallback() {
             @Override
-            public void onLoaded(Chapter chapter) {
+            public void onLoaded(final Chapter chapter) {
                 Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                mBook.setIndex(chapter.getIndex());
-                realm.commitTransaction();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(@NonNull Realm realm) {
+                        mBook.setIndex(chapter.getIndex());
+                    }
+                });
                 realm.close();
 
-                loading = false;
-                mChapter = chapter;
-                if (mView == null) return;
-                mView.setChapter(chapter);
+                if (mView != null) {
+                    mView.setChapter(chapter);
+                }
             }
 
             @Override
             public void onDataNotAvailable(Exception e) {
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(bs));
-                LOG("Read - get chapter fail", bs.toString());
+                LOG("Read - get chapter fail", e);
                 String msg = e.getMessage();
                 if (msg.contains("timed out")) {
                     loadChapter(url);
@@ -127,15 +103,17 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void prevChapter() {
-        if (mBook.getPrev() != null) {
-            loadChapter(mBook.getPrev().getUrl());
+        Chapter chapter = mBook.getPrev();
+        if (chapter != null) {
+            loadChapter(chapter.getUrl());
         }
     }
 
     @Override
     public void nextChapter() {
-        if (mBook.getNext() != null) {
-            loadChapter(mBook.getNext().getUrl());
+        Chapter chapter = mBook.getNext();
+        if (chapter != null) {
+            loadChapter(chapter.getUrl());
         }
     }
 }

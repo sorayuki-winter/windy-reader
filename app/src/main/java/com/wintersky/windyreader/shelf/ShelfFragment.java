@@ -103,7 +103,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     mAdd.setEnabled(false);
                     return;
                 }
-                mPresenter.getBook(url);
+                mPresenter.saveBook(url);
             }
         });
 
@@ -119,14 +119,12 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     }
 
     @Override
-    public void getBookFinish() {
-        mLink.setError("Error");
-        mAdd.setEnabled(false);
-    }
-
-    @Override
-    public void getBookFinish(Book book) {
-        mLink.getText().clear();
+    public void onBookSaved(boolean ok) {
+        if (ok) {
+            mLink.getText().clear();
+        } else {
+            mLink.setError("Error");
+        }
         mAdd.setEnabled(false);
     }
 

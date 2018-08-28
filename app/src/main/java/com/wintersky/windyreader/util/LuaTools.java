@@ -13,7 +13,8 @@ import java.io.InputStream;
 import java.io.PrintStream;
 
 public class LuaTools {
-    public static LuaState getLua(final Context context) throws Exception {
+
+    public static LuaState getLua(final Context context) throws LuaException {
         final LuaState luaState = LuaStateFactory.newLuaState();
         luaState.openLibs();
 
@@ -69,7 +70,7 @@ public class LuaTools {
             bos.close();
         } catch (IOException e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
         return bos.toString();
     }

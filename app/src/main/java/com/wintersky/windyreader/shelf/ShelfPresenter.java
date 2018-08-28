@@ -4,9 +4,6 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import javax.inject.Inject;
 
 import io.realm.RealmResults;
@@ -16,8 +13,8 @@ import static com.wintersky.windyreader.util.LogTools.LOG;
 public class ShelfPresenter implements ShelfContract.Presenter {
 
     private final Repository mRepository;
-    private boolean isFirst = true;
     private ShelfContract.View mView;
+    private boolean isFirst = true;
 
     @Inject
     ShelfPresenter(Repository mRepository) {
@@ -41,37 +38,33 @@ public class ShelfPresenter implements ShelfContract.Presenter {
         } else {
             return;
         }
-
         mRepository.getShelf(new DataSource.GetShelfCallback() {
             @Override
             public void onLoaded(RealmResults<Book> list) {
-                if (mView == null) return;
-                mView.setShelf(list);
+                if (mView != null) {
+                    mView.setShelf(list);
+                }
             }
         });
     }
 
     @Override
-    public void getBook(String url) {
+    public void saveBook(String url) {
         mRepository.getBook(url, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(Book book) {
-                if (mView == null) return;
-                if (book.getTitle().isEmpty()) {
-                    mView.getBookFinish();
-                    return;
-                }
                 mRepository.saveBook(book);
-                mView.getBookFinish(book);
+                if (mView != null) {
+                    mView.onBookSaved(true);
+                }
             }
 
             @Override
             public void onDataNotAvailable(Exception e) {
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(bs));
-                LOG("Shelf - get book fail", bs.toString());
-                if (mView == null) return;
-                mView.getBookFinish();
+                LOG("Shelf - save book fail", e);
+                if (mView != null) {
+                    mView.onBookSaved(false);
+                }
             }
         });
     }
