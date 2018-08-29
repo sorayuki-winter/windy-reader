@@ -8,7 +8,9 @@ public class LogTools {
         if (hint != null) {
             System.out.println(">>>>>>>>>> " + hint);
         }
-        if (msg == null) msg = "log message null";
+        if (msg == null) {
+            msg = "log message null";
+        }
 
         List<String> logList = new ArrayList<>();
         String[] lines = msg.split("\n");

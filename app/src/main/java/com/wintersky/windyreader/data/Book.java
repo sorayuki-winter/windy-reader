@@ -1,5 +1,7 @@
 package com.wintersky.windyreader.data;
 
+import java.util.Date;
+
 import io.realm.RealmList;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -14,6 +16,24 @@ public class Book extends RealmObject {
     private String catalogUrl;
     private RealmList<Chapter> catalog;
     private int index;
+    private Date lastRead;
+    private boolean hasNew;
+
+    public Date getLastRead() {
+        return lastRead;
+    }
+
+    public void setLastRead(Date lastRead) {
+        this.lastRead = lastRead;
+    }
+
+    public boolean isHasNew() {
+        return hasNew;
+    }
+
+    public void setHasNew(boolean hasNew) {
+        this.hasNew = hasNew;
+    }
 
     public String getUrl() {
         return url;

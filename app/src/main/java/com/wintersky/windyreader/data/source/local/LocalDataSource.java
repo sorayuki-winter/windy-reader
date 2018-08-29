@@ -212,7 +212,9 @@ public class LocalDataSource implements DataSource, DataSource.Local {
 
     public boolean isContentExist(String url) {
         File root = mContext.getExternalFilesDir("");
-        if (root == null) return false;
+        if (root == null) {
+            return false;
+        }
         File file = new File(root, "chapter/" + url.replace("/", "_") + ".txt");
         return file.exists();
     }
