@@ -12,16 +12,14 @@ import io.realm.RealmSchema;
 
 public class Migration implements RealmMigration {
 
-    public static int REALM_VERSION = 1;
+    public static int REALM_VERSION = 2;
 
     @Override
     public void migrate(@NonNull final DynamicRealm realm, long oldVersion, long newVersion) {
         // DynamicRealm exposes an editable schema
         RealmSchema schema = realm.getSchema();
 
-        /* Migrate to version 1:
-         *
-         * book:
+        /* book:
          * + private Date lastRead;
          * + private boolean hasNew;
          *
@@ -45,6 +43,28 @@ public class Migration implements RealmMigration {
                             }
                         }
                     });
+            oldVersion++;
+        }
+
+        /* chapter:
+         * - private String bookUrl;
+         * + private String catalogUrl;
+         */
+        if (oldVersion == 1) {
+            schema.get("Chapter")
+                    .renameField("bookUrl", "catalogUrl")
+                    .transform(new RealmObjectSchema.Function() {
+                        @Override
+                        public void apply(@NonNull DynamicRealmObject obj) {
+                            DynamicRealmObject bk = realm.where("Book")
+                                    .equalTo("url", obj.getString("catalogUrl"))
+                                    .findFirst();
+                            if (bk != null) {
+                                obj.setString("catalogUrl", bk.getString("catalogUrl"));
+                            }
+                        }
+                    });
+            oldVersion++;
         }
     }
 }

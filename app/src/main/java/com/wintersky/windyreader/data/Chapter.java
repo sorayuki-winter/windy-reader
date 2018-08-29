@@ -7,19 +7,19 @@ import io.realm.annotations.PrimaryKey;
 public class Chapter extends RealmObject {
     @PrimaryKey
     private String url;
-    private String bookUrl;
+    private String catalogUrl;
     private String title;
     private int index;
     private boolean read;
     @Ignore
     private String content;
 
-    public String getBookUrl() {
-        return bookUrl;
+    public String getCatalogUrl() {
+        return catalogUrl;
     }
 
-    public void setBookUrl(String bookUrl) {
-        this.bookUrl = bookUrl;
+    public void setCatalogUrl(String catalogUrl) {
+        this.catalogUrl = catalogUrl;
     }
 
     public int getIndex() {
