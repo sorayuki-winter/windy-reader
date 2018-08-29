@@ -12,6 +12,7 @@ import com.wintersky.windyreader.util.SingleExecutors;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
@@ -24,6 +25,7 @@ import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
 import static com.wintersky.windyreader.util.CheckUtil.checkChapter;
 import static com.wintersky.windyreader.util.CheckUtil.checkShelf;
 import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogTools.LOGD;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -43,8 +45,7 @@ public class LocalDataSourceTest {
                 .name("test.realm")
                 .deleteRealmIfMigrationNeeded()
                 .build();
-        Realm.setDefaultConfiguration(config);
-        mRealm = Realm.getDefaultInstance();
+        mRealm = Realm.getInstance(config);
         mSource = new LocalDataSource(context, new SingleExecutors(), mRealm);
 
         mChapter = new Chapter();
@@ -72,6 +73,31 @@ public class LocalDataSourceTest {
                 realm.deleteAll();
             }
         });
+    }
+
+    @Test
+    public void clearUselessChapter() {
+        Realm realm = Realm.getDefaultInstance();
+        realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(@NonNull Realm realm) {
+                RealmResults<Book> books = realm.where(Book.class).findAll();
+                final List<String> bkUrls = new ArrayList<>();
+                for (Book bk : books.createSnapshot()) {
+                    bkUrls.add(bk.getUrl());
+                }
+                final RealmResults<Chapter> chapters = realm.where(Chapter.class)
+                        .findAll();
+                final RealmResults<Chapter> del = realm.where(Chapter.class)
+                        .not().in("bookUrl", bkUrls.toArray(new String[]{}))
+                        .findAll();
+                LOGD(String.format("del %d in %d", del.size(), chapters.size()));
+                if (!del.isEmpty()) {
+                    assertTrue(del.deleteAllFromRealm());
+                }
+            }
+        });
+        realm.close();
     }
 
     @Test
@@ -115,7 +141,7 @@ public class LocalDataSourceTest {
     }
 
     @Test
-    public void localGetChapter() {
+    public void localGetContent() {
         mSource.getChapter(mChapter.getUrl(), new DataSource.GetChapterCallback() {
             @Override
             public void onLoaded(Chapter chapter) {

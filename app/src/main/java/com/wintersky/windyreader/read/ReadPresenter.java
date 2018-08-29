@@ -1,11 +1,11 @@
 package com.wintersky.windyreader.read;
 
-import android.support.annotation.NonNull;
-
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
+
+import java.util.Date;
 
 import javax.inject.Inject;
 
@@ -49,6 +49,14 @@ public class ReadPresenter implements ReadContract.Presenter {
             @Override
             public void onLoaded(final Book book) {
                 mBook = book;
+
+                Realm realm = Realm.getDefaultInstance();
+                realm.beginTransaction();
+                mBook.setLastRead(new Date());
+                mBook.setHasNew(false);
+                realm.commitTransaction();
+                realm.close();
+
                 Chapter chapter = mBook.getCurrent();
                 if (chapter != null) {
                     loadChapter(chapter.getUrl());
@@ -77,12 +85,10 @@ public class ReadPresenter implements ReadContract.Presenter {
             @Override
             public void onLoaded(final Chapter chapter) {
                 Realm realm = Realm.getDefaultInstance();
-                realm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(@NonNull Realm realm) {
-                        mBook.setIndex(chapter.getIndex());
-                    }
-                });
+                realm.beginTransaction();
+                mBook.setIndex(chapter.getIndex());
+                chapter.setRead(true);
+                realm.commitTransaction();
                 realm.close();
 
                 if (mView != null) {

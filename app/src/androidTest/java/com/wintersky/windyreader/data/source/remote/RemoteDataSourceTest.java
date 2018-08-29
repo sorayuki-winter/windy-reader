@@ -16,7 +16,6 @@ import java.util.List;
 
 import static com.wintersky.windyreader.util.CheckUtil.checkBook;
 import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
-import static com.wintersky.windyreader.util.CheckUtil.checkChapter;
 import static com.wintersky.windyreader.util.LogTools.LOG;
 import static org.junit.Assert.assertNotNull;
 
@@ -67,11 +66,11 @@ public class RemoteDataSourceTest {
     }
 
     @Test
-    public void remoteGetChapterFrom() throws Exception {
+    public void remoteGetContentFrom() throws Exception {
         for (String url : chapterList) {
-            Chapter chapter = mSource.getChapterFrom(url);
-            assertNotNull("chapter null: " + url, chapter);
-            checkChapter(chapter);
+            String content = mSource.getContentFrom(url);
+            assertNotNull("content null: " + url, content);
+            LOG("content: " + url, content);
         }
     }
 }

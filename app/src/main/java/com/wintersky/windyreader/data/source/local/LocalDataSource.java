@@ -38,6 +38,8 @@ import javax.inject.Singleton;
 
 import io.realm.Realm;
 import io.realm.RealmResults;
+import io.realm.Sort;
+import io.realm.exceptions.RealmException;
 
 import static com.wintersky.windyreader.util.LogTools.LOG;
 
@@ -60,7 +62,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
 
     @Override
     public void getShelf(@NonNull final GetShelfCallback callback) {
-        RealmResults<Book> books = mRealm.where(Book.class).findAll();
+        RealmResults<Book> books = mRealm.where(Book.class).findAll().sort("lastRead", Sort.DESCENDING);
         callback.onLoaded(books);
     }
 
@@ -85,27 +87,39 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void getChapter(final String url, final GetChapterCallback callback) {
-        final Chapter chapter = mRealm.where(Chapter.class).equalTo("url", url).findFirst();
-        if (chapter != null) {
-            mExecutors.diskIO().execute(new Runnable() {
-                @Override
-                public void run() {
-                    String content = null;
-                    try {
-                        content = getContentFrom(url);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    chapter.setContent(content);
+    public void getContent(final String url, final GetContentCallback callback) {
+        mExecutors.diskIO().execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final String content = getContentFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onLoaded(chapter);
+                            if (content != null) {
+                                callback.onLoaded(content);
+                            } else {
+                                callback.onDataNotAvailable(new NullPointerException("content null"));
+                            }
+                        }
+                    });
+                } catch (final IOException e) {
+                    mExecutors.mainThread().execute(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onDataNotAvailable(e);
                         }
                     });
                 }
-            });
+            }
+        });
+    }
+
+    @Override
+    public void getChapter(final String url, final GetChapterCallback callback) {
+        final Chapter chapter = mRealm.where(Chapter.class).equalTo("url", url).findFirst();
+        if (chapter != null) {
+            callback.onLoaded(chapter);
         } else {
             callback.onDataNotAvailable(new Exception("chapter not find: " + url));
         }
@@ -123,24 +137,12 @@ public class LocalDataSource implements DataSource, DataSource.Local {
 
     @Override
     public void deleteBook(String url) {
-        getBook(url, new GetBookCallback() {
-            @Override
-            public void onLoaded(final Book book) {
-                mRealm.executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(@NonNull Realm realm) {
-                        book.deleteFromRealm();
-                    }
-                });
-            }
-
-            @Override
-            public void onDataNotAvailable(Exception e) {
-                ByteArrayOutputStream bs = new ByteArrayOutputStream();
-                e.printStackTrace(new PrintStream(bs));
-                LOG("delete book fail", bs.toString());
-            }
-        });
+        Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
+        if (book != null) {
+            book.deleteFromRealm();
+        } else {
+            LOG(new RealmException("Delete - book not find: " + url));
+        }
     }
 
     @Override

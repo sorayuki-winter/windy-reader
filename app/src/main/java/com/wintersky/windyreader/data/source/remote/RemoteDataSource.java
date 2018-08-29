@@ -42,7 +42,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     private final OkHttpClient mHttp;
 
     private Future taskCatalog;
-    private Future taskChapter;
+    private Future mContentFuture;
 
     @Inject
     RemoteDataSource(Context context, @NonNull AppExecutors executors, OkHttpClient http) {
@@ -107,20 +107,20 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     }
 
     @Override
-    public void getChapter(final String url, final GetChapterCallback callback) {
-        if (taskChapter != null) {
-            taskChapter.cancel(true);
+    public void getContent(final String url, final GetContentCallback callback) {
+        if (mContentFuture != null) {
+            mContentFuture.cancel(true);
         }
-        taskChapter = mExecutors.networkIO().submit(new Runnable() {
+        mContentFuture = mExecutors.networkIO().submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Chapter chapter = getChapterFrom(url);
+                    final String content = getContentFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onLoaded(chapter);
-                            taskChapter = null;
+                            callback.onLoaded(content);
+                            mContentFuture = null;
                         }
                     });
                 } catch (final Exception e) {
@@ -128,12 +128,13 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
                         @Override
                         public void run() {
                             callback.onDataNotAvailable(e);
-                            taskChapter = null;
+                            mContentFuture = null;
                         }
                     });
                 }
             }
         });
+
     }
 
 
@@ -190,7 +191,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     }
 
 
-    public Chapter getChapterFrom(String url) throws LuaException, IOException {
+    public String getContentFrom(String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -203,16 +204,11 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         }
 
         luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
-        lua.getField(-1, "getChapter");
+        lua.getField(-1, "getContent");
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
-        String res = lua.toString(-1);
-        try {
-            return new Gson().fromJson(res, Chapter.class);
-        } catch (JsonSyntaxException e) {
-            throw formatJsonError(url, res, e);
-        }
+        return lua.toString(-1);
     }
 
     private JsonSyntaxException formatJsonError(String url, String json, JsonSyntaxException e) {

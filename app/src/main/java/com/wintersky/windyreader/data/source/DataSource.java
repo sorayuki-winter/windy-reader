@@ -13,11 +13,13 @@ public interface DataSource {
 
     void getCatalog(String url, GetCatalogCallback callback);
 
-    void getChapter(String url, GetChapterCallback callback);
+    void getContent(String url, GetContentCallback callback);
 
     interface Local {
 
         void getShelf(GetShelfCallback callback);
+
+        void getChapter(String url, GetChapterCallback callback);
 
         void saveBook(Book book);
 
@@ -54,13 +56,6 @@ public interface DataSource {
         void onDataNotAvailable(Exception e);
     }
 
-    interface UpdateCheckCallback {
-
-        void onChecked();
-
-        void onDataNotAvailable(Exception e);
-    }
-
     interface GetChapterCallback {
 
         void onLoaded(Chapter chapter);
@@ -70,5 +65,12 @@ public interface DataSource {
 
     interface CacheBookCallback {
         void onCached();
+    }
+
+    interface GetContentCallback {
+
+        void onLoaded(String content);
+
+        void onDataNotAvailable(Exception e);
     }
 }

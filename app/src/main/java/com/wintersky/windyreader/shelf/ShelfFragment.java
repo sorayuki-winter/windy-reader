@@ -143,21 +143,28 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             if (view == null) {
                 holder = new ViewHolder();
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_shelf, viewGroup, false);
-                holder.img = view.findViewById(R.id.cover);
-                holder.tv = view.findViewById(R.id.title);
+                holder.cover = view.findViewById(R.id.cover);
+                holder.title = view.findViewById(R.id.title);
+                holder.hasNew = view.findViewById(R.id.has_new);
                 view.setTag(holder);
             } else {
                 holder = (ViewHolder) view.getTag();
             }
 
             if (bk == null) {
-                holder.img.setImageDrawable(null);
-                holder.tv.setText(null);
+                holder.cover.setImageDrawable(null);
+                holder.title.setText(null);
+                holder.hasNew.setVisibility(View.INVISIBLE);
             } else {
-                holder.img.setImageResource(R.mipmap.cover);
-                holder.tv.setText(bk.getTitle());
+                holder.cover.setImageResource(R.mipmap.cover);
+                holder.title.setText(bk.getTitle());
+                if (bk.isHasNew()) {
+                    holder.hasNew.setVisibility(View.VISIBLE);
+                } else {
+                    holder.hasNew.setVisibility(View.INVISIBLE);
+                }
 
-                holder.img.setOnTouchListener(new View.OnTouchListener() {
+                holder.cover.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
                         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -171,7 +178,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                         return false;
                     }
                 });
-                holder.img.setOnClickListener(new View.OnClickListener() {
+                holder.cover.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(viewGroup.getContext(), ReadActivity.class);
@@ -179,7 +186,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                         viewGroup.getContext().startActivity(intent);
                     }
                 });
-                holder.img.setOnLongClickListener(new View.OnLongClickListener() {
+                holder.cover.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
                         DeleteFragment fragment = new DeleteFragment();
@@ -198,8 +205,9 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         }
 
         class ViewHolder {
-            ImageView img;
-            TextView tv;
+            ImageView cover;
+            TextView title;
+            ImageView hasNew;
         }
     }
 }

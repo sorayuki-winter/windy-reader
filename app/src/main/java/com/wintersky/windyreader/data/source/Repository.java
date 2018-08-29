@@ -11,6 +11,7 @@ import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
 import org.keplerproject.luajava.LuaException;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -29,27 +30,28 @@ public class Repository implements DataSource, DataSource.Repository {
 
     private final LocalDataSource mLocalDataSource;
     private final RemoteDataSource mRemoteDataSource;
-    private final Realm mRealm;
 
     private CacheBookTask mCacheBookTask = null;
 
     @Inject
-    Repository(LocalDataSource localDataSource, RemoteDataSource remoteDataSource, Realm realm) {
+    Repository(LocalDataSource localDataSource, RemoteDataSource remoteDataSource) {
         mLocalDataSource = localDataSource;
         mRemoteDataSource = remoteDataSource;
-        mRealm = realm;
         Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 Realm realm = Realm.getDefaultInstance();
                 RealmResults<Book> results = realm.where(Book.class).findAll();
-                for (Book book : results.createSnapshot()) {
+                for (final Book book : results.createSnapshot()) {
                     try {
                         final List<Chapter> list = mRemoteDataSource.getCatalogFrom(book.getCatalogUrl());
                         final List<Chapter> catalog = book.getCatalog();
                         realm.executeTransaction(new Realm.Transaction() {
                             @Override
                             public void execute(@NonNull Realm realm) {
+                                if (catalog.size() < list.size()) {
+                                    book.setHasNew(true);
+                                }
                                 catalog.addAll(list.subList(catalog.size(), list.size()));
                             }
                         });
@@ -88,32 +90,30 @@ public class Repository implements DataSource, DataSource.Repository {
     }
 
     @Override
+    public void getContent(final String url, final GetContentCallback callback) {
+        mLocalDataSource.getContent(url, new GetContentCallback() {
+            @Override
+            public void onLoaded(String content) {
+                callback.onLoaded(content);
+            }
+
+            @Override
+            public void onDataNotAvailable(Exception e) {
+                mRemoteDataSource.getContent(url, callback);
+            }
+        });
+    }
+
+    @Override
     public void getChapter(final String url, final GetChapterCallback callback) {
         mLocalDataSource.getChapter(url, new GetChapterCallback() {
             @Override
-            public void onLoaded(final Chapter chapterL) {
-                if (chapterL.getContent() != null) {
-                    mRealm.executeTransaction(new Realm.Transaction() {
-                        @Override
-                        public void execute(@NonNull Realm realm) {
-                            chapterL.setRead(true);
-                        }
-                    });
-                    callback.onLoaded(chapterL);
-                    return;
-                }
-
-                mRemoteDataSource.getChapter(url, new GetChapterCallback() {
+            public void onLoaded(final Chapter chapter) {
+                getContent(chapter.getUrl(), new GetContentCallback() {
                     @Override
-                    public void onLoaded(final Chapter chapterR) {
-                        mRealm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(@NonNull Realm realm) {
-                                chapterL.setContent(chapterR.getContent());
-                                chapterL.setRead(true);
-                            }
-                        });
-                        callback.onLoaded(chapterL);
+                    public void onLoaded(String content) {
+                        chapter.setContent(content);
+                        callback.onLoaded(chapter);
                     }
 
                     @Override
@@ -140,6 +140,8 @@ public class Repository implements DataSource, DataSource.Repository {
                 }
                 book.getCatalog().clear();
                 book.getCatalog().addAll(list);
+                book.setLastRead(new Date());
+                book.setHasNew(true);
                 mLocalDataSource.saveBook(book);
             }
 
@@ -199,7 +201,7 @@ public class Repository implements DataSource, DataSource.Repository {
                     }
                     if (!mLocal.isContentExist(c.getUrl())) {
                         try {
-                            String content = mRemote.getChapterFrom(c.getUrl()).getContent();
+                            String content = mRemote.getContentFrom(c.getUrl());
                             mLocal.saveContentTo(c.getUrl(), content);
                         } catch (Exception e) {
                             LOG(e);
