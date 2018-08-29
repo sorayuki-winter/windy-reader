@@ -21,7 +21,7 @@ public interface DataSource {
 
         void getChapter(String url, GetChapterCallback callback);
 
-        void saveBook(Book book);
+        void saveBook(Book book, SaveBookCallback callback);
 
         void deleteBook(String url);
 
@@ -46,21 +46,21 @@ public interface DataSource {
 
         void onLoaded(Book book);
 
-        void onDataNotAvailable(Exception e);
+        void onFailed(Exception e);
     }
 
     interface GetCatalogCallback {
 
         void onLoaded(List<Chapter> list);
 
-        void onDataNotAvailable(Exception e);
+        void onFailed(Exception e);
     }
 
     interface GetChapterCallback {
 
         void onLoaded(Chapter chapter);
 
-        void onDataNotAvailable(Exception e);
+        void onFailed(Exception e);
     }
 
     interface CacheBookCallback {
@@ -71,6 +71,13 @@ public interface DataSource {
 
         void onLoaded(String content);
 
-        void onDataNotAvailable(Exception e);
+        void onFailed(Exception e);
+    }
+
+    interface SaveBookCallback {
+
+        void onSaved();
+
+        void onFailed(Exception e);
     }
 }

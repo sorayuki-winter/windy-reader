@@ -25,7 +25,7 @@ import dagger.android.support.DaggerFragment;
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 /**
  * A simple {@link Fragment} subclass.

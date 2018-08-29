@@ -6,7 +6,7 @@ import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 public class CatalogPresenter implements CatalogContract.Presenter {
 
@@ -47,7 +47,7 @@ public class CatalogPresenter implements CatalogContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 LOG("Catalog - get book fail", e);
             }
         });

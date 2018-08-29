@@ -22,8 +22,9 @@ import javax.inject.Singleton;
 import io.realm.Realm;
 import io.realm.RealmList;
 import io.realm.RealmResults;
+import io.realm.exceptions.RealmException;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 @Singleton
 public class Repository implements DataSource, DataSource.Repository {
@@ -51,6 +52,7 @@ public class Repository implements DataSource, DataSource.Repository {
                             public void execute(@NonNull Realm realm) {
                                 if (catalog.size() < list.size()) {
                                     book.setHasNew(true);
+                                    book.setLastRead(new Date());
                                 }
                                 catalog.addAll(list.subList(catalog.size(), list.size()));
                             }
@@ -78,7 +80,7 @@ public class Repository implements DataSource, DataSource.Repository {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 mRemoteDataSource.getBook(url, callback);
             }
         });
@@ -98,7 +100,7 @@ public class Repository implements DataSource, DataSource.Repository {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 mRemoteDataSource.getContent(url, callback);
             }
         });
@@ -117,37 +119,43 @@ public class Repository implements DataSource, DataSource.Repository {
                     }
 
                     @Override
-                    public void onDataNotAvailable(Exception e) {
-                        callback.onDataNotAvailable(e);
+                    public void onFailed(Exception e) {
+                        callback.onFailed(e);
                     }
                 });
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
-                callback.onDataNotAvailable(e);
+            public void onFailed(Exception e) {
+                callback.onFailed(e);
             }
         });
     }
 
     @Override
-    public void saveBook(final Book book) {
-        mRemoteDataSource.getCatalog(book.getCatalogUrl(), new GetCatalogCallback() {
+    public void saveBook(final Book book, final SaveBookCallback callback) {
+        mLocalDataSource.getBook(book.getUrl(), new GetBookCallback() {
             @Override
-            public void onLoaded(List<Chapter> list) {
-                if (book.getCatalog() == null) {
-                    book.setCatalog(new RealmList<Chapter>());
-                }
-                book.getCatalog().clear();
-                book.getCatalog().addAll(list);
-                book.setLastRead(new Date());
-                book.setHasNew(true);
-                mLocalDataSource.saveBook(book);
+            public void onLoaded(Book book) {
+                callback.onFailed(new RealmException("book exist: " + book.getUrl()));
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
-                LOG(e);
+            public void onFailed(Exception e) {
+                mRemoteDataSource.getCatalog(book.getCatalogUrl(), new GetCatalogCallback() {
+                    @Override
+                    public void onLoaded(List<Chapter> list) {
+                        book.setCatalog(new RealmList<>(list.toArray(new Chapter[]{})));
+                        book.setLastRead(new Date());
+                        book.setHasNew(true);
+                        mLocalDataSource.saveBook(book, callback);
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
+                        callback.onFailed(e);
+                    }
+                });
             }
         });
     }

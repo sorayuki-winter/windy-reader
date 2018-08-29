@@ -3,7 +3,7 @@ package com.wintersky.windyreader.util;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogTools {
+public class LogUtil {
     public static void LOG(String hint, String msg) {
         if (hint != null) {
             System.out.println(">>>>>>>>>> " + hint);

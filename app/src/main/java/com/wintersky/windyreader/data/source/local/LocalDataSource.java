@@ -41,7 +41,7 @@ import io.realm.RealmResults;
 import io.realm.Sort;
 import io.realm.exceptions.RealmException;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 /**
  * Concrete implementation of a data source as a db.
@@ -72,7 +72,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
         if (book != null) {
             callback.onLoaded(book);
         } else {
-            callback.onDataNotAvailable(new Exception("book not find: " + url));
+            callback.onFailed(new Exception("book not find: " + url));
         }
     }
 
@@ -82,7 +82,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
         if (book != null) {
             callback.onLoaded(book.getCatalog());
         } else {
-            callback.onDataNotAvailable(new Exception("Book not find: " + url));
+            callback.onFailed(new Exception("Book not find: " + url));
         }
     }
 
@@ -99,7 +99,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
                             if (content != null) {
                                 callback.onLoaded(content);
                             } else {
-                                callback.onDataNotAvailable(new NullPointerException("content null"));
+                                callback.onFailed(new NullPointerException("content null"));
                             }
                         }
                     });
@@ -107,7 +107,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onDataNotAvailable(e);
+                            callback.onFailed(e);
                         }
                     });
                 }
@@ -121,18 +121,19 @@ public class LocalDataSource implements DataSource, DataSource.Local {
         if (chapter != null) {
             callback.onLoaded(chapter);
         } else {
-            callback.onDataNotAvailable(new Exception("chapter not find: " + url));
+            callback.onFailed(new Exception("chapter not find: " + url));
         }
     }
 
     @Override
-    public void saveBook(final Book book) {
+    public void saveBook(final Book book, SaveBookCallback callback) {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
                 realm.copyToRealmOrUpdate(book);
             }
         });
+        callback.onSaved();
     }
 
     @Override

@@ -16,7 +16,7 @@ import java.util.List;
 
 import static com.wintersky.windyreader.util.CheckUtil.checkBook;
 import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 import static org.junit.Assert.assertNotNull;
 
 public class RemoteDataSourceTest {

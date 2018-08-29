@@ -29,10 +29,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.wintersky.windyreader.util.LuaTools.getLua;
-import static com.wintersky.windyreader.util.LuaTools.is2String;
-import static com.wintersky.windyreader.util.LuaTools.luaSafeDoString;
-import static com.wintersky.windyreader.util.LuaTools.luaSafeRun;
+import static com.wintersky.windyreader.util.LuaUtil.getLua;
+import static com.wintersky.windyreader.util.LuaUtil.is2String;
+import static com.wintersky.windyreader.util.LuaUtil.luaSafeDoString;
+import static com.wintersky.windyreader.util.LuaUtil.luaSafeRun;
 
 @Singleton
 public class RemoteDataSource implements DataSource, DataSource.Remote {
@@ -68,7 +68,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onDataNotAvailable(e);
+                            callback.onFailed(e);
                         }
                     });
                 }
@@ -97,7 +97,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onDataNotAvailable(e);
+                            callback.onFailed(e);
                             taskCatalog = null;
                         }
                     });
@@ -127,7 +127,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            callback.onDataNotAvailable(e);
+                            callback.onFailed(e);
                             mContentFuture = null;
                         }
                     });

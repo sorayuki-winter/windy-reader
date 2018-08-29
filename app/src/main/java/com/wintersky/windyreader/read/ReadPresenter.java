@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import io.realm.Realm;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 public class ReadPresenter implements ReadContract.Presenter {
 
@@ -73,7 +73,7 @@ public class ReadPresenter implements ReadContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 LOG("Read - get book fail", e);
             }
         });
@@ -97,7 +97,7 @@ public class ReadPresenter implements ReadContract.Presenter {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 LOG("Read - get chapter fail", e);
                 String msg = e.getMessage();
                 if (msg.contains("timed out")) {

@@ -48,6 +48,8 @@
         android:background="@android:color/white"
         android:listSelector="@android:color/white"
         android:numColumns="3"
+        android:paddingEnd="4dp"
+        android:paddingStart="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider" />
 

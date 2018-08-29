@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 
-public class LuaTools {
+public class LuaUtil {
 
     public static LuaState getLua(final Context context) throws LuaException {
         final LuaState luaState = LuaStateFactory.newLuaState();

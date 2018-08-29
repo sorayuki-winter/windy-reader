@@ -24,8 +24,8 @@ import static com.wintersky.windyreader.util.CheckUtil.checkBook;
 import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
 import static com.wintersky.windyreader.util.CheckUtil.checkChapter;
 import static com.wintersky.windyreader.util.CheckUtil.checkShelf;
-import static com.wintersky.windyreader.util.LogTools.LOG;
-import static com.wintersky.windyreader.util.LogTools.LOGD;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOGD;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -119,7 +119,7 @@ public class LocalDataSourceTest {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -134,7 +134,7 @@ public class LocalDataSourceTest {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -149,7 +149,7 @@ public class LocalDataSourceTest {
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 fail(e.getMessage());
             }
         });

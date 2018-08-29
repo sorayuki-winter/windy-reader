@@ -2,7 +2,7 @@ package com.wintersky.windyreader;
 
 import org.junit.Test;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 import static org.junit.Assert.assertEquals;
 
 /**

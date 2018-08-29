@@ -5,7 +5,7 @@ import com.wintersky.windyreader.data.Chapter;
 
 import java.util.List;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 public class CheckUtil {
 

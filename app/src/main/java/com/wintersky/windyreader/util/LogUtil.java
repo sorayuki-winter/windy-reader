@@ -7,7 +7,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LogTools {
+public class LogUtil {
 
     public static void LOG(String hint, Exception e) {
         if (hint != null) {

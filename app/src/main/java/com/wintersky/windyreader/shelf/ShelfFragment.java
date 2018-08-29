@@ -24,6 +24,7 @@ import android.widget.TextView;
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.read.ReadActivity;
+import com.wintersky.windyreader.util.KeyboardUtil;
 
 import javax.inject.Inject;
 
@@ -104,6 +105,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     return;
                 }
                 mPresenter.saveBook(url);
+                KeyboardUtil.hideKeyboard(mLink);
             }
         });
 
@@ -124,6 +126,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             mLink.getText().clear();
         } else {
             mLink.setError("Error");
+            KeyboardUtil.showKeyboard(mLink);
         }
         mAdd.setEnabled(false);
     }

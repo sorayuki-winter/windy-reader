@@ -6,9 +6,10 @@ import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
 
+import io.realm.Realm;
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.util.LogTools.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 public class ShelfPresenter implements ShelfContract.Presenter {
 
@@ -50,17 +51,36 @@ public class ShelfPresenter implements ShelfContract.Presenter {
 
     @Override
     public void saveBook(String url) {
+        Realm realm = Realm.getDefaultInstance();
+        if (realm.where(Book.class).equalTo("url", url).findFirst() != null) {
+            mView.onBookSaved(true);
+            realm.close();
+            return;
+        }
+        realm.close();
         mRepository.getBook(url, new DataSource.GetBookCallback() {
             @Override
             public void onLoaded(Book book) {
-                mRepository.saveBook(book);
-                if (mView != null) {
-                    mView.onBookSaved(true);
-                }
+                mRepository.saveBook(book, new DataSource.SaveBookCallback() {
+                    @Override
+                    public void onSaved() {
+                        if (mView != null) {
+                            mView.onBookSaved(true);
+                        }
+                    }
+
+                    @Override
+                    public void onFailed(Exception e) {
+                        LOG("Shelf - save book fail", e);
+                        if (mView != null) {
+                            mView.onBookSaved(true);
+                        }
+                    }
+                });
             }
 
             @Override
-            public void onDataNotAvailable(Exception e) {
+            public void onFailed(Exception e) {
                 LOG("Shelf - save book fail", e);
                 if (mView != null) {
                     mView.onBookSaved(false);
