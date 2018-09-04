@@ -4,7 +4,7 @@
 --- DateTime: 2018/8/22 8:40
 ---
 package.path = package.path .. ";D:/WinterSky/Documents/AndroidStudio/WindyReader/app/src/main/assets/?.lua"
-require("lua_api.util")
+require("util")
 local lib = require("www_8wenku_com")
 local http = require("socket.http")
 
@@ -18,8 +18,8 @@ local chapterDoc = http.request(chapterUrl)
 
 local book = lib.getBook(bookUrl, bookDoc)
 local catalog = lib.getCatalog(catalogUrl, catalogDoc)
-local chapter = lib.getChapter(chapterUrl, chapterDoc)
+local content = lib.getContent(chapterUrl, chapterDoc)
 
 print(book)
 print(catalog)
-print(chapter)
+print(content)

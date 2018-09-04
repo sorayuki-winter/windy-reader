@@ -38,6 +38,8 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     @Inject
     String mUrl;
 
+    private int mIndex;
+
     private TextView mTitle;
     private ListView mListView;
     private CatalogAdapter mAdapter;
@@ -88,11 +90,12 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
 
     @Override
     public void setBook(Book book) {
+        mIndex = (int) book.index;
+
         mTitle.setText(book.getTitle());
         mAdapter = new CatalogAdapter(book.getCatalog());
         mListView.setAdapter(mAdapter);
-
-        mListView.setSelection((int) book.getIndex() - 5);
+        mListView.setSelection(mIndex);
     }
 
     class CatalogAdapter extends RealmBaseAdapter<Chapter> {
@@ -112,25 +115,34 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
                         .inflate(R.layout.item_catalog, parent, false);
 
                 holder.title = convertView.findViewById(R.id.title);
+                holder.flag = convertView.findViewById(R.id.mark);
 
                 convertView.setTag(holder);
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            assert chapter != null;
-            holder.title.setText(chapter.getTitle().trim());
-            if (chapter.isRead()) {
-                holder.title.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.catalogRead));
+            if (chapter != null) {
+                holder.title.setText(chapter.getTitle().trim());
+                if (chapter.isRead()) {
+                    holder.title.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.catalogRead));
+                } else {
+                    holder.title.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.catalogUnread));
+                }
+                if (chapter.index == mIndex) {
+                    holder.flag.setVisibility(View.VISIBLE);
+                } else {
+                    holder.flag.setVisibility(View.INVISIBLE);
+                }
             } else {
-                holder.title.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.catalog));
+                holder.title.setText(null);
             }
-
             return convertView;
         }
 
         class ViewHolder {
             TextView title;
+            View flag;
         }
     }
 }

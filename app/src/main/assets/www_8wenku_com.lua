@@ -14,7 +14,7 @@ function M.getCatalog(url, doc)
     for u, t in doc:gmatch([[<a target="_blank" href="(/chapter/view%?id=%d+&amp;chapter_no=%d+)"> *([^%c]-) *</a>]]) do
         u = "http://www.8wenku.com" .. u
         u = u:gsub("&amp;", "&")
-        catalog = catalog .. "\n" .. chapterJson(u, i, t, url) .. ","
+        catalog = catalog .. "\n\t" .. chapterJson(u, i, t, url) .. ","
         i = i + 1
     end
     return catalog:sub(1, -2) .. "\n]"

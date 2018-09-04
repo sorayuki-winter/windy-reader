@@ -33,34 +33,38 @@
                 android:background="@drawable/divider_bottom"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/catalog"
-                style="@style/AppTheme.Read.BottomBarButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/description"
-                android:padding="14dp"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/ic_catalog"
-                android:tint="@color/black"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintRight_toLeftOf="@id/browser"
-                app:layout_constraintTop_toBottomOf="@id/bottom_divider" />
+            <android.support.constraint.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/readBack"
+                app:layout_constraintTop_toBottomOf="@id/bottom_divider">
 
-            <ImageButton
-                android:id="@+id/browser"
-                style="@style/AppTheme.Read.BottomBarButton"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/description"
-                android:padding="12dp"
-                android:scaleType="fitCenter"
-                android:src="@mipmap/ic_browser"
-                android:tint="@color/black"
-                app:layout_constraintLeft_toRightOf="@id/catalog"
-                app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/bottom_divider" />
+                <ImageButton
+                    android:id="@+id/catalog"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/description"
+                    android:padding="14dp"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/ic_catalog"
+                    android:tint="@color/black"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toLeftOf="@id/browser" />
 
+                <ImageButton
+                    android:id="@+id/browser"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:contentDescription="@string/description"
+                    android:padding="12dp"
+                    android:scaleType="fitCenter"
+                    android:src="@mipmap/ic_browser"
+                    android:tint="@color/black"
+                    app:layout_constraintLeft_toRightOf="@id/catalog"
+                    app:layout_constraintRight_toRightOf="parent" />
+            </android.support.constraint.ConstraintLayout>
         </android.support.constraint.ConstraintLayout>
     </FrameLayout>
 </android.support.constraint.ConstraintLayout>

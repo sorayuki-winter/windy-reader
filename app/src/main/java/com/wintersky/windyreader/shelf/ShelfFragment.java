@@ -1,9 +1,9 @@
 package com.wintersky.windyreader.shelf;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -110,8 +110,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
             }
         });
 
-        mLink.getText().clear();
-
         return view;
     }
 
@@ -142,7 +140,7 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         @Override
         public View getView(int i, View view, final ViewGroup viewGroup) {
             ViewHolder holder;
-            final Book bk = getItem(i);
+            final Book book = getItem(i);
 
             if (view == null) {
                 holder = new ViewHolder();
@@ -155,29 +153,31 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                 holder = (ViewHolder) view.getTag();
             }
 
-            if (bk == null) {
+            if (book == null) {
                 holder.cover.setImageDrawable(null);
                 holder.title.setText(null);
                 holder.hasNew.setVisibility(View.INVISIBLE);
             } else {
                 holder.cover.setImageResource(R.mipmap.cover);
-                holder.title.setText(bk.getTitle());
-                if (bk.isHasNew()) {
+                holder.title.setText(book.getTitle());
+                if (book.isHasNew()) {
                     holder.hasNew.setVisibility(View.VISIBLE);
                 } else {
                     holder.hasNew.setVisibility(View.INVISIBLE);
                 }
-
                 holder.cover.setOnTouchListener(new View.OnTouchListener() {
                     @Override
                     public boolean onTouch(View v, MotionEvent event) {
-                        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-                            Drawable drawable = ((ImageView) v).getDrawable();
-                            int color = ContextCompat.getColor(viewGroup.getContext(), R.color.shelfCoverPress);
-                            drawable.setColorFilter(color, PorterDuff.Mode.MULTIPLY);
-                        } else if (event.getAction() == MotionEvent.ACTION_UP || event.getAction() == MotionEvent.ACTION_CANCEL) {
-                            Drawable drawable = ((ImageView) v).getDrawable();
-                            drawable.clearColorFilter();
+                        switch (event.getAction()) {
+                            case MotionEvent.ACTION_DOWN:
+                                int color = ContextCompat.getColor(viewGroup.getContext(), R.color.shelfCoverPress);
+                                ((ImageView) v).setColorFilter(color, PorterDuff.Mode.MULTIPLY);
+                                break;
+
+                            case MotionEvent.ACTION_UP:
+                            case MotionEvent.ACTION_CANCEL:
+                                ((ImageView) v).clearColorFilter();
+                                break;
                         }
                         return false;
                     }
@@ -185,9 +185,12 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                 holder.cover.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Intent intent = new Intent(viewGroup.getContext(), ReadActivity.class);
-                        intent.putExtra(BOOK_URL, bk.getUrl());
-                        viewGroup.getContext().startActivity(intent);
+                        Activity activity = getActivity();
+                        if (activity != null) {
+                            Intent intent = new Intent(activity, ReadActivity.class);
+                            intent.putExtra(BOOK_URL, book.url);
+                            activity.startActivity(intent);
+                        }
                     }
                 });
                 holder.cover.setOnLongClickListener(new View.OnLongClickListener() {
@@ -195,12 +198,10 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     public boolean onLongClick(View v) {
                         DeleteFragment fragment = new DeleteFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putString(BOOK_URL, bk.getUrl());
-                        bundle.putString(BOOK_TIT, bk.getTitle());
+                        bundle.putString(BOOK_URL, book.url);
+                        bundle.putString(BOOK_TIT, book.title);
                         fragment.setArguments(bundle);
-                        if (getFragmentManager() != null) {
-                            fragment.show(getFragmentManager(), DeleteFragment.TAG);
-                        }
+                        fragment.show(getChildFragmentManager(), DeleteFragment.TAG);
                         return true;
                     }
                 });

@@ -43,6 +43,6 @@ end
 --- @param title string
 --- @param catalog string
 function chapterJson(chapter, index, title, catalog)
-    return ([[{"url":"%s", "progress":%d, "title":"%s", "catalogUrl":"%s"}]])
+    return ([[{"url":"%s", "index":%d, "title":"%s", "catalogUrl":"%s"}]])
             :format(chapter, index, title, catalog)
 end

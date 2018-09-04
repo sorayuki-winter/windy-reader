@@ -83,14 +83,14 @@ public class LocalDataSourceTest {
             @Override
             public void execute(@NonNull Realm realm) {
                 RealmResults<Book> books = realm.where(Book.class).findAll();
-                final List<String> bkUrls = new ArrayList<>();
+                final List<String> catalogUrls = new ArrayList<>();
                 for (Book bk : books.createSnapshot()) {
-                    bkUrls.add(bk.getUrl());
+                    catalogUrls.add(bk.catalogUrl);
                 }
                 final RealmResults<Chapter> chapters = realm.where(Chapter.class)
                         .findAll();
                 final RealmResults<Chapter> del = realm.where(Chapter.class)
-                        .not().in("bookUrl", bkUrls.toArray(new String[]{}))
+                        .not().in("catalogUrl", catalogUrls.toArray(new String[]{}))
                         .findAll();
                 LOGD(String.format("del %d in %d", del.size(), chapters.size()));
                 if (!del.isEmpty()) {

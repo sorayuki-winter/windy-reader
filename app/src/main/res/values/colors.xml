@@ -6,11 +6,8 @@
 
     <color name="white">#ffffff</color>
     <color name="black">#000000</color>
-    <color name="translucent">#ffffffff</color>
+    <color name="translucent">#00000000</color>
 
-    <color name="shelfBottom">#eeeeee</color>
-    <color name="shelfBackDark">#dddddd</color>
-    <color name="shelfBackLight">#ffffff</color>
     <color name="shelfCoverPress">#cccccc</color>
     <color name="shelfTitle">#000000</color>
     <color name="shelfDivider">#eeeeee</color>
@@ -18,9 +15,9 @@
     <color name="deleteDivider">#eeeeee</color>
 
     <color name="readContent">#353535</color>
-    <color name="readBg">#f8f3df</color>
-    <color name="readBgDeep">#cac6b7</color>
+    <color name="readBack">#f8f3df</color>
 
-    <color name="catalog">#353535</color>
+    <color name="catalogReading">#222222</color>
+    <color name="catalogUnread">#353535</color>
     <color name="catalogRead">#aeaeae</color>
 </resources>

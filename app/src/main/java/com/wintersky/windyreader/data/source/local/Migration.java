@@ -69,8 +69,8 @@ public class Migration implements RealmMigration {
         }
 
         /* Book:
-         * - private int progress;
-         * + private float progress;
+         * - private int index;
+         * + private float index;
          */
         if (oldVersion == 2) {
             Objects.requireNonNull(schema.get("Book"))
@@ -78,12 +78,11 @@ public class Migration implements RealmMigration {
                     .transform(new RealmObjectSchema.Function() {
                         @Override
                         public void apply(@NonNull DynamicRealmObject obj) {
-                            float index = obj.getInt("progress");
-                            obj.setFloat("index_temp", index);
+                            obj.setFloat("index_temp", obj.getInt("index"));
                         }
                     })
-                    .removeField("progress")
-                    .renameField("index_temp", "progress");
+                    .removeField("index")
+                    .renameField("index_temp", "index");
             //noinspection UnusedAssignment
             oldVersion++;
         }
