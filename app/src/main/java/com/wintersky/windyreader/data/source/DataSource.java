@@ -25,7 +25,7 @@ public interface DataSource {
 
         void deleteBook(String url);
 
-        void cacheChapter(Chapter chapter);
+        void cacheChapter(Chapter chapter, String content);
     }
 
     interface Remote {

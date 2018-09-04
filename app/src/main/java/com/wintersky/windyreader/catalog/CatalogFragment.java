@@ -25,7 +25,7 @@ import io.realm.RealmBaseAdapter;
 import io.realm.RealmList;
 
 import static android.app.Activity.RESULT_OK;
-import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_URL;
+import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_IDX;
 import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 /**
@@ -74,7 +74,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
                 Chapter chapter = mAdapter.getItem(position);
                 if (activity != null && chapter != null) {
                     Intent intent = new Intent();
-                    intent.putExtra(CHAPTER_URL, chapter.getUrl());
+                    intent.putExtra(CHAPTER_IDX, chapter.index);
                     activity.setResult(RESULT_OK, intent);
                     activity.finish();
                 } else {
@@ -92,7 +92,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         mAdapter = new CatalogAdapter(book.getCatalog());
         mListView.setAdapter(mAdapter);
 
-        mListView.setSelection(book.getIndex() - 5);
+        mListView.setSelection((int) book.getIndex() - 5);
     }
 
     class CatalogAdapter extends RealmBaseAdapter<Chapter> {
@@ -119,7 +119,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
             }
 
             assert chapter != null;
-            holder.title.setText(chapter.getTitle());
+            holder.title.setText(chapter.getTitle().trim());
             if (chapter.isRead()) {
                 holder.title.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.catalogRead));
             } else {

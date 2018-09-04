@@ -1,9 +1,12 @@
 package com.wintersky.windyreader.read;
 
+import android.support.annotation.NonNull;
+
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
+import com.wintersky.windyreader.di.Component;
 
 import java.util.Date;
 
@@ -49,19 +52,13 @@ public class ReadPresenter implements ReadContract.Presenter {
             @Override
             public void onLoaded(final Book book) {
                 mBook = book;
-
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                mBook.setLastRead(new Date());
-                mBook.setHasNew(false);
-                realm.commitTransaction();
-                realm.close();
-
-                Chapter chapter = mBook.getCurrent();
-                if (chapter != null) {
-                    loadChapter(chapter.getUrl());
-                }
-
+                Component.get().getRealm().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(@NonNull Realm realm) {
+                        book.lastRead = new Date();
+                        book.hasNew = false;
+                    }
+                });
                 mRepository.cacheBook(mUrl, new DataSource.CacheBookCallback() {
                     @Override
                     public void onCached() {
@@ -70,6 +67,9 @@ public class ReadPresenter implements ReadContract.Presenter {
                         }
                     }
                 });
+                if (mView != null) {
+                    mView.setBook(book);
+                }
             }
 
             @Override
@@ -80,46 +80,34 @@ public class ReadPresenter implements ReadContract.Presenter {
     }
 
     @Override
-    public void loadChapter(final String url) {
-        mRepository.getChapter(url, new DataSource.GetChapterCallback() {
+    public void saveReadIndex(final float index) {
+        Component.get().getRealm().executeTransaction(new Realm.Transaction() {
             @Override
-            public void onLoaded(final Chapter chapter) {
-                Realm realm = Realm.getDefaultInstance();
-                realm.beginTransaction();
-                mBook.setIndex(chapter.getIndex());
-                chapter.setRead(true);
-                realm.commitTransaction();
-                realm.close();
-
-                if (mView != null) {
-                    mView.setChapter(chapter);
-                }
-            }
-
-            @Override
-            public void onFailed(Exception e) {
-                LOG("Read - get chapter fail", e);
-                String msg = e.getMessage();
-                if (msg.contains("timed out")) {
-                    loadChapter(url);
+            public void execute(@NonNull Realm realm) {
+                if (mBook != null) {
+                    mBook.index = index;
                 }
             }
         });
     }
 
     @Override
-    public void prevChapter() {
-        Chapter chapter = mBook.getPrev();
-        if (chapter != null) {
-            loadChapter(chapter.getUrl());
-        }
-    }
+    public void loadContent(final Chapter chapter, final float progress) {
+        mRepository.getContent(chapter.url, new DataSource.GetContentCallback() {
+            @Override
+            public void onLoaded(String content) {
+                if (mView != null) {
+                    mView.setContent(chapter, content.trim(), progress);
+                }
+            }
 
-    @Override
-    public void nextChapter() {
-        Chapter chapter = mBook.getNext();
-        if (chapter != null) {
-            loadChapter(chapter.getUrl());
-        }
+            @Override
+            public void onFailed(Exception e) {
+                LOG(e);
+                if (mView != null) {
+                    mView.setContent(chapter, e.getMessage(), progress);
+                }
+            }
+        });
     }
 }

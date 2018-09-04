@@ -138,18 +138,23 @@ public class LocalDataSource implements DataSource, DataSource.Local {
 
     @Override
     public void deleteBook(String url) {
-        Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
+        final Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
         if (book != null) {
-            book.deleteFromRealm();
+            mRealm.executeTransaction(new Realm.Transaction() {
+                @Override
+                public void execute(@NonNull Realm realm) {
+                    book.getCatalog().deleteAllFromRealm();
+                    book.deleteFromRealm();
+                }
+            });
         } else {
             LOG(new RealmException("Delete - book not find: " + url));
         }
     }
 
     @Override
-    public void cacheChapter(final Chapter chapter) {
+    public void cacheChapter(final Chapter chapter, final String content) {
         final String url = chapter.getUrl();
-        final String content = chapter.getContent();
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {

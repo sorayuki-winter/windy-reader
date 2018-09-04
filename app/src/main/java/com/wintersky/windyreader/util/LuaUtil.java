@@ -23,7 +23,9 @@ public class LuaUtil {
             public int execute() {
                 String name = luaState.toString(-1).replace(".", "/");
                 try {
-                    byte[] bytes = is2String(context.getAssets().open(name + ".lua")).getBytes();
+                    InputStream is = context.getAssets().open(name + ".lua");
+                    byte[] bytes = new byte[is.available()];
+                    is.read(bytes);
                     luaState.LloadBuffer(bytes, name);
                     return 1;
                 } catch (Exception e) {

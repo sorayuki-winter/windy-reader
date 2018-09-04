@@ -1,6 +1,5 @@
 package com.wintersky.windyreader.data.source;
 
-import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
@@ -111,18 +110,7 @@ public class Repository implements DataSource, DataSource.Repository {
         mLocalDataSource.getChapter(url, new GetChapterCallback() {
             @Override
             public void onLoaded(final Chapter chapter) {
-                getContent(chapter.getUrl(), new GetContentCallback() {
-                    @Override
-                    public void onLoaded(String content) {
-                        chapter.setContent(content);
-                        callback.onLoaded(chapter);
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        callback.onFailed(e);
-                    }
-                });
+                callback.onLoaded(chapter);
             }
 
             @Override
@@ -166,8 +154,8 @@ public class Repository implements DataSource, DataSource.Repository {
     }
 
     @Override
-    public void cacheChapter(Chapter chapter) {
-        mLocalDataSource.cacheChapter(chapter);
+    public void cacheChapter(Chapter chapter, String content) {
+        mLocalDataSource.cacheChapter(chapter, content);
     }
 
     @Override
@@ -177,56 +165,5 @@ public class Repository implements DataSource, DataSource.Repository {
         }
         mCacheBookTask = new CacheBookTask(mLocalDataSource, mRemoteDataSource, callback);
         mCacheBookTask.execute(url);
-    }
-
-    private static class CacheBookTask extends AsyncTask<String, Void, Void> {
-
-        private LocalDataSource mLocal;
-        private RemoteDataSource mRemote;
-        private CacheBookCallback mCallback;
-
-        CacheBookTask(LocalDataSource localDataSource, RemoteDataSource remoteDataSource, CacheBookCallback callback) {
-            mLocal = localDataSource;
-            mRemote = remoteDataSource;
-            mCallback = callback;
-        }
-
-        @Override
-        protected Void doInBackground(String... strings) {
-            String bookUrl = strings[0];
-
-            Realm realm = Realm.getDefaultInstance();
-            Book book = realm.where(Book.class).equalTo("url", bookUrl).findFirst();
-            if (book != null) {
-                List<Chapter> catalog = book.getCatalog();
-                for (int i = 0; i < catalog.size(); i++) {
-                    if (isCancelled()) {
-                        break;
-                    }
-                    final Chapter c = catalog.get(i);
-                    if (c == null) {
-                        continue;
-                    }
-                    if (!mLocal.isContentExist(c.getUrl())) {
-                        try {
-                            String content = mRemote.getContentFrom(c.getUrl());
-                            mLocal.saveContentTo(c.getUrl(), content);
-                        } catch (Exception e) {
-                            LOG(e);
-                        }
-                    }
-                }
-            } else {
-                LOG(new Exception("book not find: " + bookUrl));
-            }
-            realm.close();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            mCallback.onCached();
-        }
     }
 }

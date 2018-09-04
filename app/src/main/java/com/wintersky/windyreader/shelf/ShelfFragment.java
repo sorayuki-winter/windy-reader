@@ -33,6 +33,7 @@ import io.realm.OrderedRealmCollection;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
+import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_TIT;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
 /**
@@ -194,11 +195,11 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                     public boolean onLongClick(View v) {
                         DeleteFragment fragment = new DeleteFragment();
                         Bundle bundle = new Bundle();
-                        bundle.putString("title", bk.getTitle());
-                        bundle.putString("url", bk.getUrl());
+                        bundle.putString(BOOK_URL, bk.getUrl());
+                        bundle.putString(BOOK_TIT, bk.getTitle());
                         fragment.setArguments(bundle);
                         if (getFragmentManager() != null) {
-                            fragment.show(getFragmentManager(), "delete");
+                            fragment.show(getFragmentManager(), DeleteFragment.TAG);
                         }
                         return true;
                     }

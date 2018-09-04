@@ -10,8 +10,8 @@
         <item name="android:windowTranslucentStatus">true</item>
     </style>
 
-    <style name="ReadBBarB" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:background">@drawable/button_read_bottom</item>
+    <style name="AppTheme.Read.BottomBarButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:background">@color/readBg</item>
         <item name="android:colorAccent">@color/readContent</item>
     </style>
 
