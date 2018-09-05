@@ -1,5 +1,7 @@
 package com.wintersky.windyreader.data.source;
 
+import android.support.annotation.NonNull;
+
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 
@@ -9,75 +11,58 @@ import io.realm.RealmResults;
 
 public interface DataSource {
 
-    void getBook(String url, GetBookCallback callback);
+    void getShelf(@NonNull GetShelfCallback callback);
 
-    void getCatalog(String url, GetCatalogCallback callback);
+    void getBook(@NonNull String url, @NonNull GetBookCallback callback);
 
-    void getContent(String url, GetContentCallback callback);
+    void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback);
 
-    interface Local {
+    void getContent(@NonNull String url, @NonNull GetContentCallback callback);
 
-        void getShelf(GetShelfCallback callback);
+    @SuppressWarnings("unused")
+    void saveBook(@NonNull String url, @NonNull SaveBookCallback callback);
 
-        void getChapter(String url, GetChapterCallback callback);
+    void saveBook(@NonNull Book book, @NonNull SaveBookCallback callback);
 
-        void saveBook(Book book, SaveBookCallback callback);
-
-        void deleteBook(String url);
-
-        void cacheChapter(Chapter chapter, String content);
-    }
-
-    interface Remote {
-
-    }
-
-    interface Repository extends Local, Remote {
-
-        void cacheBook(String url, CacheBookCallback callback);
-    }
+    void deleteBook(@NonNull String url);
 
     interface GetShelfCallback {
 
-        void onLoaded(RealmResults<Book> list);
+        void onLoaded(@NonNull RealmResults<Book> list);
     }
 
     interface GetBookCallback {
 
-        void onLoaded(Book book);
+        void onLoaded(@NonNull Book book);
 
-        void onFailed(Exception e);
+        void onFailed(@NonNull Exception e);
     }
 
     interface GetCatalogCallback {
 
-        void onLoaded(List<Chapter> list);
+        void onLoaded(@NonNull List<Chapter> list);
 
-        void onFailed(Exception e);
+        void onFailed(@NonNull Exception e);
     }
 
     interface GetChapterCallback {
 
-        void onLoaded(Chapter chapter);
+        void onLoaded(@NonNull Chapter chapter);
 
-        void onFailed(Exception e);
-    }
-
-    interface CacheBookCallback {
-        void onCached();
+        void onFailed(@NonNull Exception e);
     }
 
     interface GetContentCallback {
 
-        void onLoaded(String content);
+        void onLoaded(@NonNull String content);
 
-        void onFailed(Exception e);
+        void onFailed(@NonNull Exception e);
     }
 
     interface SaveBookCallback {
 
-        void onSaved();
+        void onSaved(@NonNull Book book);
 
-        void onFailed(Exception e);
+        void onFailed(@NonNull Exception e);
     }
 }

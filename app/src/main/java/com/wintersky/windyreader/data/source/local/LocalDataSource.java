@@ -26,12 +26,13 @@ import com.wintersky.windyreader.util.AppExecutors;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,6 +41,7 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 import io.realm.Sort;
 import io.realm.exceptions.RealmException;
+import lombok.Cleanup;
 
 import static com.wintersky.windyreader.util.LogUtil.LOG;
 
@@ -47,14 +49,14 @@ import static com.wintersky.windyreader.util.LogUtil.LOG;
  * Concrete implementation of a data source as a db.
  */
 @Singleton
-public class LocalDataSource implements DataSource, DataSource.Local {
+public class LocalDataSource implements DataSource {
 
     private final Context mContext;
     private final AppExecutors mExecutors;
     private final Realm mRealm;
 
     @Inject
-    LocalDataSource(Context context, @NonNull AppExecutors executors, Realm realm) {
+    LocalDataSource(@NonNull Context context, @NonNull AppExecutors executors, @NonNull Realm realm) {
         mContext = context;
         mExecutors = executors;
         mRealm = realm;
@@ -67,7 +69,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void getBook(final String url, final GetBookCallback callback) {
+    public void getBook(@NonNull final String url, @NonNull final GetBookCallback callback) {
         Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
         if (book != null) {
             callback.onLoaded(book);
@@ -77,7 +79,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void getCatalog(String url, GetCatalogCallback callback) {
+    public void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback) {
         Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
         if (book != null) {
             callback.onLoaded(book.getCatalog());
@@ -87,7 +89,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void getContent(final String url, final GetContentCallback callback) {
+    public void getContent(@NonNull final String url, @NonNull final GetContentCallback callback) {
         mExecutors.diskIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -96,11 +98,7 @@ public class LocalDataSource implements DataSource, DataSource.Local {
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            if (content != null) {
-                                callback.onLoaded(content);
-                            } else {
-                                callback.onFailed(new NullPointerException("content null"));
-                            }
+                            callback.onLoaded(content);
                         }
                     });
                 } catch (final IOException e) {
@@ -116,7 +114,11 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void getChapter(final String url, final GetChapterCallback callback) {
+    public void saveBook(@NonNull String url, @NonNull SaveBookCallback callback) {
+
+    }
+
+    public void getChapter(@NonNull final String url, @NonNull final GetChapterCallback callback) {
         final Chapter chapter = mRealm.where(Chapter.class).equalTo("url", url).findFirst();
         if (chapter != null) {
             callback.onLoaded(chapter);
@@ -126,20 +128,24 @@ public class LocalDataSource implements DataSource, DataSource.Local {
     }
 
     @Override
-    public void saveBook(final Book book, SaveBookCallback callback) {
+    public void saveBook(@NonNull final Book book, @NonNull SaveBookCallback callback) {
         mRealm.executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
                 realm.copyToRealmOrUpdate(book);
             }
         });
-        callback.onSaved();
+        callback.onSaved(book);
     }
 
     @Override
-    public void deleteBook(String url) {
+    public void deleteBook(@NonNull String url) {
         final Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
         if (book != null) {
+            final List<String> list = new ArrayList<>();
+            for (Chapter chapter : book.catalog.createSnapshot()) {
+                list.add(chapter.url);
+            }
             mRealm.executeTransaction(new Realm.Transaction() {
                 @Override
                 public void execute(@NonNull Realm realm) {
@@ -147,24 +153,24 @@ public class LocalDataSource implements DataSource, DataSource.Local {
                     book.deleteFromRealm();
                 }
             });
+            mExecutors.diskIO().execute(new Runnable() {
+                @Override
+                public void run() {
+                    for (String url : list) {
+                        try {
+                            delContentFrom(url);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
         } else {
             LOG(new RealmException("Delete - book not find: " + url));
         }
     }
 
-    @Override
-    public void cacheChapter(final Chapter chapter, final String content) {
-        final String url = chapter.getUrl();
-        mExecutors.diskIO().execute(new Runnable() {
-            @Override
-            public void run() {
-                saveContentTo(url, content);
-            }
-        });
-    }
-
-
-    public boolean saveContentTo(String url, String content) {
+    public boolean saveContentTo(@NonNull String url, @NonNull String content) {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
             return false;
@@ -178,47 +184,58 @@ public class LocalDataSource implements DataSource, DataSource.Local {
             if (!file.exists() && !file.createNewFile()) {
                 return false;
             }
-        } catch (Exception e) {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            e.printStackTrace(new PrintStream(bo));
-            LOG(bo.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
             return false;
         }
         try {
-            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            @Cleanup BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
             bos.write(content.getBytes());
             bos.flush();
-        } catch (Exception e) {
-            ByteArrayOutputStream bo = new ByteArrayOutputStream();
-            e.printStackTrace(new PrintStream(bo));
-            LOG(bo.toString());
+            return true;
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        } catch (IOException e) {
+            e.printStackTrace();
+            //noinspection ResultOfMethodCallIgnored
             file.delete();
             return false;
         }
-        return true;
     }
 
-
-    public String getContentFrom(String url) throws IOException {
+    public void delContentFrom(@NonNull String url) throws IOException {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
-            return null;
+            throw new IOException("shared storage is not currently available");
         }
-        File chapter = new File(root, "chapter");
-        if (chapter.exists() || chapter.mkdir()) {
-            File file = new File(chapter, url.replace("/", "_") + ".txt");
-            if (file.exists()) {
-                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-                byte[] buff = new byte[bis.available()];
-                bis.read(buff);
-                return new String(buff);
-            }
+        String fileName = url.replace("/", "_") + ".txt";
+        File file = new File(root, "chapter/" + fileName);
+        if (file.exists()) {
+            //noinspection ResultOfMethodCallIgnored
+            file.delete();
         }
-        return null;
     }
 
+    @NonNull
+    public String getContentFrom(@NonNull String url) throws IOException {
+        File root = mContext.getExternalFilesDir("");
+        if (root == null) {
+            throw new IOException("shared storage is not currently available");
+        }
+        String fileName = url.replace("/", "_") + ".txt";
+        File file = new File(root, "chapter/" + fileName);
+        if (!file.exists()) {
+            throw new IOException(file.getAbsolutePath() + " not exist");
+        }
+        @Cleanup BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+        byte[] buff = new byte[bis.available()];
+        //noinspection ResultOfMethodCallIgnored
+        bis.read(buff);
+        return new String(buff);
+    }
 
-    public boolean isContentExist(String url) {
+    public boolean isContentExist(@NonNull String url) {
         File root = mContext.getExternalFilesDir("");
         if (root == null) {
             return false;

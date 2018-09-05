@@ -35,7 +35,7 @@ import static com.wintersky.windyreader.util.LuaUtil.luaSafeDoString;
 import static com.wintersky.windyreader.util.LuaUtil.luaSafeRun;
 
 @Singleton
-public class RemoteDataSource implements DataSource, DataSource.Remote {
+public class RemoteDataSource implements DataSource {
 
     private final Context mContext;
     private final AppExecutors mExecutors;
@@ -45,14 +45,19 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     private Future mContentFuture;
 
     @Inject
-    RemoteDataSource(Context context, @NonNull AppExecutors executors, OkHttpClient http) {
+    RemoteDataSource(@NonNull Context context, @NonNull AppExecutors executors, @NonNull OkHttpClient http) {
         mContext = context;
         mExecutors = executors;
         mHttp = http;
     }
 
     @Override
-    public void getBook(final String url, final GetBookCallback callback) {
+    public void getShelf(@NonNull GetShelfCallback callback) {
+        throw new NoSuchMethodError();
+    }
+
+    @Override
+    public void getBook(@NonNull final String url, @NonNull final GetBookCallback callback) {
         mExecutors.networkIO().execute(new Runnable() {
             @Override
             public void run() {
@@ -77,7 +82,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     }
 
     @Override
-    public void getCatalog(final String url, final GetCatalogCallback callback) {
+    public void getCatalog(@NonNull final String url, @NonNull final GetCatalogCallback callback) {
         if (taskCatalog != null) {
             taskCatalog.cancel(true);
         }
@@ -107,7 +112,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
     }
 
     @Override
-    public void getContent(final String url, final GetContentCallback callback) {
+    public void getContent(@NonNull final String url, @NonNull final GetContentCallback callback) {
         if (mContentFuture != null) {
             mContentFuture.cancel(true);
         }
@@ -137,8 +142,23 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
 
     }
 
+    @Override
+    public void saveBook(@NonNull String url, @NonNull SaveBookCallback callback) {
+        throw new NoSuchMethodError();
+    }
 
-    public Book getBookFrom(String url) throws LuaException, IOException {
+    @Override
+    public void saveBook(@NonNull Book book, @NonNull SaveBookCallback callback) {
+        throw new NoSuchMethodError();
+    }
+
+    @Override
+    public void deleteBook(@NonNull String url) {
+        throw new NoSuchMethodError();
+    }
+
+    @NonNull
+    public Book getBookFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -155,16 +175,16 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
-        String res = lua.toString(-1);
+        String json = lua.toString(-1);
         try {
-            return new Gson().fromJson(res, Book.class);
+            return new Gson().fromJson(json, Book.class);
         } catch (JsonSyntaxException e) {
-            throw formatJsonError(url, res, e);
+            throw formatJsonError(url, json, e);
         }
     }
 
-
-    public RealmList<Chapter> getCatalogFrom(String url) throws LuaException, IOException {
+    @NonNull
+    public RealmList<Chapter> getCatalogFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -181,17 +201,16 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
-        String res = lua.toString(-1);
+        String json = lua.toString(-1);
         try {
-            return new Gson().fromJson(res, new TypeToken<RealmList<Chapter>>() {
-            }.getType());
+            return new Gson().fromJson(json, new TypeToken<RealmList<Chapter>>() {}.getType());
         } catch (JsonSyntaxException e) {
-            throw formatJsonError(url, res, e);
+            throw formatJsonError(url, json, e);
         }
     }
 
-
-    public String getContentFrom(String url) throws LuaException, IOException {
+    @NonNull
+    public String getContentFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
         LuaState lua = getLua(mContext);
 
@@ -211,7 +230,8 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         return lua.toString(-1);
     }
 
-    private JsonSyntaxException formatJsonError(String url, String json, JsonSyntaxException e) {
+    @NonNull
+    private JsonSyntaxException formatJsonError(@NonNull String url, @NonNull String json, @NonNull JsonSyntaxException e) {
         Matcher matcher = Pattern.compile("at line (\\d+) column (\\d+) path \\$\\.(\\w+)").matcher(e.getMessage());
         if (matcher.find()) {
             int line = Integer.valueOf(matcher.group(1));

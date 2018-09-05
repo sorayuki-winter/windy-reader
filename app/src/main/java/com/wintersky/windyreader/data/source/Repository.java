@@ -4,63 +4,27 @@ import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
-import com.wintersky.windyreader.data.source.local.LocalDataSource;
-import com.wintersky.windyreader.data.source.remote.RemoteDataSource;
+import com.wintersky.windyreader.di.Component;
 
-import org.keplerproject.luajava.LuaException;
-
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.realm.Realm;
 import io.realm.RealmList;
-import io.realm.RealmResults;
-import io.realm.exceptions.RealmException;
 
 @Singleton
-public class Repository implements DataSource, DataSource.Repository {
+public class Repository implements DataSource {
 
-    private final LocalDataSource mLocalDataSource;
-    private final RemoteDataSource mRemoteDataSource;
-
-    private CacheBookTask mCacheBookTask = null;
+    private final DataSource mLocalDataSource;
+    private final DataSource mRemoteDataSource;
 
     @Inject
-    Repository(LocalDataSource localDataSource, RemoteDataSource remoteDataSource) {
+    Repository(@Remote DataSource remoteDataSource, @Local DataSource localDataSource) {
         mLocalDataSource = localDataSource;
         mRemoteDataSource = remoteDataSource;
-        Executors.newScheduledThreadPool(1).scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                Realm realm = Realm.getDefaultInstance();
-                RealmResults<Book> results = realm.where(Book.class).findAll();
-                for (final Book book : results.createSnapshot()) {
-                    try {
-                        final List<Chapter> list = mRemoteDataSource.getCatalogFrom(book.getCatalogUrl());
-                        final List<Chapter> catalog = book.getCatalog();
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(@NonNull Realm realm) {
-                                if (catalog.size() < list.size()) {
-                                    book.setHasNew(true);
-                                    book.setLastRead(new Date());
-                                }
-                                catalog.addAll(list.subList(catalog.size(), list.size()));
-                            }
-                        });
-                    } catch (LuaException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                realm.close();
-            }
-        }, 0, 5, TimeUnit.MINUTES);
     }
 
     @Override
@@ -69,99 +33,91 @@ public class Repository implements DataSource, DataSource.Repository {
     }
 
     @Override
-    public void getBook(final String url, final GetBookCallback callback) {
+    public void getBook(@NonNull final String url, @NonNull final GetBookCallback callback) {
         mLocalDataSource.getBook(url, new GetBookCallback() {
             @Override
-            public void onLoaded(Book book) {
+            public void onLoaded(@NonNull Book book) {
                 callback.onLoaded(book);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 mRemoteDataSource.getBook(url, callback);
             }
         });
     }
 
     @Override
-    public void getCatalog(String url, GetCatalogCallback callback) {
+    public void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback) {
         mRemoteDataSource.getCatalog(url, callback);
     }
 
     @Override
-    public void getContent(final String url, final GetContentCallback callback) {
+    public void getContent(@NonNull final String url, @NonNull final GetContentCallback callback) {
         mLocalDataSource.getContent(url, new GetContentCallback() {
             @Override
-            public void onLoaded(String content) {
+            public void onLoaded(@NonNull String content) {
                 callback.onLoaded(content);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 mRemoteDataSource.getContent(url, callback);
             }
         });
     }
 
     @Override
-    public void getChapter(final String url, final GetChapterCallback callback) {
-        mLocalDataSource.getChapter(url, new GetChapterCallback() {
+    public void saveBook(@NonNull final Book book, @NonNull final SaveBookCallback callback) {
+        mRemoteDataSource.getCatalog(book.getCatalogUrl(), new GetCatalogCallback() {
             @Override
-            public void onLoaded(final Chapter chapter) {
-                callback.onLoaded(chapter);
+            public void onLoaded(@NonNull List<Chapter> list) {
+                book.setCatalog(new RealmList<>(list.toArray(new Chapter[]{})));
+                book.setLastRead(new Date());
+                book.setHasNew(true);
+                mLocalDataSource.saveBook(book, callback);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 callback.onFailed(e);
             }
         });
     }
 
     @Override
-    public void saveBook(final Book book, final SaveBookCallback callback) {
-        mLocalDataSource.getBook(book.getUrl(), new GetBookCallback() {
+    public void deleteBook(@NonNull String url) {
+        mLocalDataSource.deleteBook(url);
+    }
+
+    @Override
+    public void saveBook(@NonNull final String url, @NonNull final SaveBookCallback callback) {
+        mLocalDataSource.getBook(url, new GetBookCallback() {
             @Override
-            public void onLoaded(Book book) {
-                callback.onFailed(new RealmException("book exist: " + book.getUrl()));
+            public void onLoaded(@NonNull final Book book) {
+                Component.get().getRealm().executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(@NonNull Realm realm) {
+                        book.lastRead = new Date();
+                    }
+                });
+                callback.onSaved(book);
             }
 
             @Override
-            public void onFailed(Exception e) {
-                mRemoteDataSource.getCatalog(book.getCatalogUrl(), new GetCatalogCallback() {
+            public void onFailed(@NonNull Exception e) {
+                mRemoteDataSource.getBook(url, new GetBookCallback() {
                     @Override
-                    public void onLoaded(List<Chapter> list) {
-                        book.setCatalog(new RealmList<>(list.toArray(new Chapter[]{})));
-                        book.setLastRead(new Date());
-                        book.setHasNew(true);
-                        mLocalDataSource.saveBook(book, callback);
+                    public void onLoaded(@NonNull Book book) {
+                        saveBook(book, callback);
                     }
 
                     @Override
-                    public void onFailed(Exception e) {
+                    public void onFailed(@NonNull Exception e) {
                         callback.onFailed(e);
                     }
                 });
             }
         });
-    }
-
-    @Override
-    public void deleteBook(String url) {
-        mLocalDataSource.deleteBook(url);
-    }
-
-    @Override
-    public void cacheChapter(Chapter chapter, String content) {
-        mLocalDataSource.cacheChapter(chapter, content);
-    }
-
-    @Override
-    public void cacheBook(String url, CacheBookCallback callback) {
-        if (mCacheBookTask != null) {
-            mCacheBookTask.cancel(true);
-        }
-        mCacheBookTask = new CacheBookTask(mLocalDataSource, mRemoteDataSource, callback);
-        mCacheBookTask.execute(url);
     }
 }
