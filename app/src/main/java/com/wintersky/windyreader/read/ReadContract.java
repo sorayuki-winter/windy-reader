@@ -20,6 +20,6 @@ public interface ReadContract {
 
         void saveReadIndex(float index);
 
-        void loadContent(Chapter chapter, float progress);
+        void getContent(Chapter chapter, float progress);
     }
 }

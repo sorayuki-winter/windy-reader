@@ -23,8 +23,6 @@ import io.realm.RealmList;
 import io.realm.RealmResults;
 import io.realm.exceptions.RealmException;
 
-import static com.wintersky.windyreader.util.LogUtil.LOG;
-
 @Singleton
 public class Repository implements DataSource, DataSource.Repository {
 
@@ -57,7 +55,7 @@ public class Repository implements DataSource, DataSource.Repository {
                             }
                         });
                     } catch (LuaException | IOException e) {
-                        LOG(e);
+                        e.printStackTrace();
                     }
                 }
                 realm.close();

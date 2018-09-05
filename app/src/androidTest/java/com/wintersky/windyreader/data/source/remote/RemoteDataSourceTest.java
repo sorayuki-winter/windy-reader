@@ -39,6 +39,10 @@ public class RemoteDataSourceTest {
         catalogList.add("http://www.8wenku.com/book/1871");
         chapterList.add("http://www.8wenku.com/chapter/view?id=1871&chapter_no=1");
 
+        bookList.add("http://www.8wenku.com/book/3030");
+        catalogList.add("http://www.8wenku.com/book/3030");
+        chapterList.add("http://www.8wenku.com/chapter/view?id=3030&chapter_no=1");
+
         bookList.add("http://zxzw.com/164718/");
         catalogList.add("http://zxzw.com/164718/");
         chapterList.add("http://zxzw.com/164718/14181340/");

@@ -204,7 +204,7 @@ public class RemoteDataSource implements DataSource, DataSource.Remote {
         }
 
         luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
-        lua.getField(-1, "loadContent");
+        lua.getField(-1, "getContent");
         lua.pushString(url);
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);

@@ -74,7 +74,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
             int index = data.getIntExtra(CHAPTER_IDX, 0);
             if (index < mBook.catalog.size()) {
                 mPresenter.saveReadIndex(index);
-                mPresenter.loadContent(mBook.catalog.get(index), 0);
+                mPresenter.getContent(mBook.catalog.get(index), 0);
             }
         }
     }
@@ -199,7 +199,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     public void setBook(Book book) {
         mBook = book;
         if (book.index < book.catalog.size()) {
-            mPresenter.loadContent(book.catalog.get((int) book.index), book.index % 1);
+            mPresenter.getContent(book.catalog.get((int) book.index), book.index % 1);
         }
     }
 
@@ -252,14 +252,14 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
         if (!loadingNext && mBook.index >= mAdapter.getNextIndex()) {
             int index = (int) mBook.index + 1;
             if (index < mBook.catalog.size()) {
-                mPresenter.loadContent(mBook.catalog.get(index), -1);
+                mPresenter.getContent(mBook.catalog.get(index), -1);
                 loadingNext = true;
             }
         }
         if (!loadingPrev && mBook.index - 1 < mAdapter.getPrevIndex()) {
             int index = (int) mBook.index - 1;
             if (index >= 0) {
-                mPresenter.loadContent(mBook.catalog.get(index), 2);
+                mPresenter.getContent(mBook.catalog.get(index), 2);
                 loadingPrev = true;
             }
         }

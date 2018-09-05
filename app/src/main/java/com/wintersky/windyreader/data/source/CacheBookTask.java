@@ -12,8 +12,6 @@ import java.util.List;
 
 import io.realm.Realm;
 
-import static com.wintersky.windyreader.util.LogUtil.LOG;
-
 public class CacheBookTask extends AsyncTask<String, Void, Void> {
 
     private LocalDataSource mLocal;
@@ -47,12 +45,12 @@ public class CacheBookTask extends AsyncTask<String, Void, Void> {
                         String content = mRemote.getContentFrom(c.getUrl());
                         mLocal.saveContentTo(c.getUrl(), content);
                     } catch (Exception e) {
-                        LOG(e);
+                        e.printStackTrace();
                     }
                 }
             }
         } else {
-            LOG(new Exception("book not find: " + bookUrl));
+            new Exception("book not find: " + bookUrl).printStackTrace();
         }
         realm.close();
         return null;

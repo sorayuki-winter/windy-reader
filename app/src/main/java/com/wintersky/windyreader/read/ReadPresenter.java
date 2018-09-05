@@ -92,7 +92,7 @@ public class ReadPresenter implements ReadContract.Presenter {
     }
 
     @Override
-    public void loadContent(final Chapter chapter, final float progress) {
+    public void getContent(final Chapter chapter, final float progress) {
         mRepository.getContent(chapter.url, new DataSource.GetContentCallback() {
             @Override
             public void onLoaded(String content) {
