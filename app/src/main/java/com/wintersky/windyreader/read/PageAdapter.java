@@ -4,12 +4,12 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
-import android.view.ViewGroup;
 
 import com.wintersky.windyreader.data.Chapter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class PageAdapter extends FragmentStatePagerAdapter {
 
@@ -74,7 +74,9 @@ public class PageAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return new PageFragment();
+        Page page = getPage(position);
+        String progress = String.format(Locale.CHINA, "%d/%d", page.pageIndex, page.pageCount);
+        return PageFragment.newInstance(page.title, page.content, progress);
     }
 
     @Override
@@ -90,20 +92,12 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
-    @NonNull
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-        PageFragment fragment = (PageFragment) super.instantiateItem(container, position);
-        fragment.setPage(mList.get(position));
-        return fragment;
-    }
-
     public static class Page {
-        public int chapterIndex;
-        public int pageIndex;
-        public int pageCount;
-        public String title;
-        public String content;
+        public final int chapterIndex;
+        public final int pageIndex;
+        public final int pageCount;
+        public final String title;
+        public final String content;
 
         public Page(int chapterIndex, int pageIndex, int pageCount, String title, String content) {
             this.chapterIndex = chapterIndex;

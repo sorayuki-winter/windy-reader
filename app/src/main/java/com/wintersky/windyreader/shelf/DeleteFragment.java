@@ -21,33 +21,39 @@ import javax.inject.Inject;
 
 import dagger.android.support.AndroidSupportInjection;
 
-import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_TIT;
-import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
-
 /**
  * A simple {@link Fragment} subclass.
  */
 public class DeleteFragment extends DialogFragment {
 
-    public static String TAG = "DELETE_FRAGMENT";
+    private static final String ARG_TIT = "title";
+    private static final String ARG_URL = "url";
 
     @Inject
     ShelfContract.Presenter mPresenter;
 
-    private String mUrl;
     private String mTitle;
+    private String mUrl;
 
-    @Inject
     public DeleteFragment() {
         // Required empty public constructor
+    }
+
+    public static DeleteFragment newInstance(String title, String url) {
+        DeleteFragment fragment = new DeleteFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_TIT, title);
+        args.putString(ARG_URL, url);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mUrl = getArguments().getString(BOOK_URL);
-            mTitle = getArguments().getString(BOOK_TIT);
+            mTitle = getArguments().getString(ARG_TIT);
+            mUrl = getArguments().getString(ARG_URL);
         }
     }
 

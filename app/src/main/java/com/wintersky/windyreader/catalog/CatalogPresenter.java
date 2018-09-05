@@ -1,5 +1,7 @@
 package com.wintersky.windyreader.catalog;
 
+import android.support.annotation.NonNull;
+
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
@@ -40,14 +42,14 @@ public class CatalogPresenter implements CatalogContract.Presenter {
         }
         mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
-            public void onLoaded(final Book book) {
+            public void onLoaded(@NonNull final Book book) {
                 if (mView != null) {
                     mView.setBook(book);
                 }
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 LOG("Catalog - get book fail", e);
             }
         });

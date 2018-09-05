@@ -25,6 +25,7 @@ public class LuaUtil {
                 try {
                     InputStream is = context.getAssets().open(name + ".lua");
                     byte[] bytes = new byte[is.available()];
+                    //noinspection ResultOfMethodCallIgnored
                     is.read(bytes);
                     luaState.LloadBuffer(bytes, name);
                     return 1;

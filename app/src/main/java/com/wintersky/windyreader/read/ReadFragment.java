@@ -204,11 +204,6 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     }
 
     @Override
-    public void onBookCached() {
-        Toast.makeText(getContext(), "cache finished", Toast.LENGTH_SHORT).show();
-    }
-
-    @Override
     public void setContent(Chapter chapter, String content, float progress) {
         mContent.setText(content);
 

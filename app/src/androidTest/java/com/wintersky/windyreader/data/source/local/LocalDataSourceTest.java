@@ -105,7 +105,7 @@ public class LocalDataSourceTest {
     public void localGetShelf() {
         mSource.getShelf(new DataSource.GetShelfCallback() {
             @Override
-            public void onLoaded(RealmResults<Book> list) {
+            public void onLoaded(@NonNull RealmResults<Book> list) {
                 checkShelf(list);
             }
         });
@@ -115,12 +115,12 @@ public class LocalDataSourceTest {
     public void localGetBook() {
         mSource.getBook(mBook.getUrl(), new DataSource.GetBookCallback() {
             @Override
-            public void onLoaded(Book book) {
+            public void onLoaded(@NonNull Book book) {
                 checkBook(book);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -130,12 +130,12 @@ public class LocalDataSourceTest {
     public void localGetCatalog() {
         mSource.getCatalog(mBook.getUrl(), new DataSource.GetCatalogCallback() {
             @Override
-            public void onLoaded(List<Chapter> list) {
+            public void onLoaded(@NonNull List<Chapter> list) {
                 checkCatalog(list);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -145,12 +145,12 @@ public class LocalDataSourceTest {
     public void localGetContent() {
         mSource.getChapter(mChapter.getUrl(), new DataSource.GetChapterCallback() {
             @Override
-            public void onLoaded(Chapter chapter) {
+            public void onLoaded(@NonNull Chapter chapter) {
                 checkChapter(chapter);
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -160,12 +160,12 @@ public class LocalDataSourceTest {
     public void localSaveBook() {
         mSource.saveBook(mBook, new DataSource.SaveBookCallback() {
             @Override
-            public void onSaved() {
+            public void onSaved(@NonNull Book book) {
 
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 fail(e.getMessage());
             }
         });
@@ -174,11 +174,6 @@ public class LocalDataSourceTest {
     @Test
     public void localDeleteBook() {
         mSource.deleteBook(mBook.getUrl());
-    }
-
-    @Test
-    public void localCacheChapter() {
-        mSource.cacheChapter(mChapter, mContent);
     }
 
     @Test

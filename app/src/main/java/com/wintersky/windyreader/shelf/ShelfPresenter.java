@@ -1,12 +1,13 @@
 package com.wintersky.windyreader.shelf;
 
+import android.support.annotation.NonNull;
+
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
 
 import javax.inject.Inject;
 
-import io.realm.Realm;
 import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.LogUtil.LOG;
@@ -41,7 +42,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
         }
         mRepository.getShelf(new DataSource.GetShelfCallback() {
             @Override
-            public void onLoaded(RealmResults<Book> list) {
+            public void onLoaded(@NonNull RealmResults<Book> list) {
                 if (mView != null) {
                     mView.setShelf(list);
                 }
@@ -50,41 +51,29 @@ public class ShelfPresenter implements ShelfContract.Presenter {
     }
 
     @Override
-    public void saveBook(String url) {
-        Realm realm = Realm.getDefaultInstance();
-        if (realm.where(Book.class).equalTo("url", url).findFirst() != null) {
-            mView.onBookSaved(true);
-            realm.close();
-            return;
-        }
-        realm.close();
-        mRepository.getBook(url, new DataSource.GetBookCallback() {
+    public void saveBook(final String url) {
+        mRepository.saveBook(url, new DataSource.SaveBookCallback() {
             @Override
-            public void onLoaded(Book book) {
-                mRepository.saveBook(book, new DataSource.SaveBookCallback() {
-                    @Override
-                    public void onSaved() {
-                        if (mView != null) {
-                            mView.onBookSaved(true);
-                        }
-                    }
-
-                    @Override
-                    public void onFailed(Exception e) {
-                        LOG("Shelf - save book fail", e);
-                        if (mView != null) {
-                            mView.onBookSaved(true);
-                        }
-                    }
-                });
+            public void onSaved(@NonNull Book book) {
+                if (mView != null) {
+                    mView.onBookSaved(book);
+                }
             }
 
             @Override
-            public void onFailed(Exception e) {
-                LOG("Shelf - save book fail", e);
-                if (mView != null) {
-                    mView.onBookSaved(false);
+            public void onFailed(@NonNull Exception e) {
+                if (e.toString().contains("java.io.FileNotFoundException")) {
+                    if (url.matches("https?://m\\..*")) {
+                        String www = url.replaceFirst("m", "www");
+                        saveBook(www);
+                        LOG("try to connect to " + www, e);
+                        return;
+                    }
                 }
+                if (mView != null) {
+                    mView.onBookSaved(url, e);
+                }
+                LOG("Shelf - save book fail", e);
             }
         });
     }

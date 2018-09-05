@@ -9,22 +9,19 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.read.ReadActivity;
-import com.wintersky.windyreader.util.KeyboardUtil;
+import com.wintersky.windyreader.util.ErrorFragment;
 
 import javax.inject.Inject;
 
@@ -33,7 +30,6 @@ import io.realm.OrderedRealmCollection;
 import io.realm.RealmBaseAdapter;
 import io.realm.RealmResults;
 
-import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_TIT;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
 
 /**
@@ -44,8 +40,6 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     @Inject
     ShelfContract.Presenter mPresenter;
 
-    private EditText mLink;
-    private ImageButton mAdd;
     private GridView mGridView;
 
     @Inject
@@ -70,47 +64,24 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_shelf, container, false);
 
-        mLink = view.findViewById(R.id.link);
-        mAdd = view.findViewById(R.id.add);
         mGridView = view.findViewById(R.id.book_grid);
 
-        mLink.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (s.length() > 0) {
-                    mAdd.setEnabled(true);
-                } else {
-                    mAdd.setEnabled(false);
-                }
-            }
-        });
-
-        mAdd.setEnabled(false);
-        mAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String url = mLink.getText().toString();
-                if (!url.startsWith("http://") && !url.startsWith("https://")) {
-                    mLink.setError("URL should start with \"http(s)://\"");
-                    mAdd.setEnabled(false);
-                    return;
-                }
-                mPresenter.saveBook(url);
-                KeyboardUtil.hideKeyboard(mLink);
-            }
-        });
-
         return view;
+    }
+
+    public void onNewIntent(Intent intent) {
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (action != null && action.equals(Intent.ACTION_SEND)) {
+            if (type != null && type.equals("text/plain")) {
+                String url = intent.getStringExtra(Intent.EXTRA_TEXT);
+                if (url.matches("https?://.*")) {
+                    mPresenter.saveBook(url);
+                } else {
+                    Toast.makeText(getContext(), "Bad Share: " + url, Toast.LENGTH_LONG).show();
+                }
+            }
+        }
     }
 
     @Override
@@ -120,14 +91,14 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
     }
 
     @Override
-    public void onBookSaved(boolean ok) {
-        if (ok) {
-            mLink.getText().clear();
-        } else {
-            mLink.setError("Error");
-            KeyboardUtil.showKeyboard(mLink);
-        }
-        mAdd.setEnabled(false);
+    public void onBookSaved(Book book) {
+        Toast.makeText(getContext(), "New Book:\n" + book.title, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onBookSaved(String url, Exception e) {
+        ErrorFragment fragment = ErrorFragment.newInstance("Book Add Fail:", String.format("%s\n%s", url, e.toString()));
+        fragment.show(getChildFragmentManager(), "book_add_fail");
     }
 
     class GridAdapter extends RealmBaseAdapter<Book> {
@@ -196,12 +167,8 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View 
                 holder.cover.setOnLongClickListener(new View.OnLongClickListener() {
                     @Override
                     public boolean onLongClick(View v) {
-                        DeleteFragment fragment = new DeleteFragment();
-                        Bundle bundle = new Bundle();
-                        bundle.putString(BOOK_URL, book.url);
-                        bundle.putString(BOOK_TIT, book.title);
-                        fragment.setArguments(bundle);
-                        fragment.show(getChildFragmentManager(), DeleteFragment.TAG);
+                        DeleteFragment fragment = DeleteFragment.newInstance(book.title, book.url);
+                        fragment.show(getChildFragmentManager(), "book_delete");
                         return true;
                     }
                 });

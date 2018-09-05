@@ -1,6 +1,10 @@
 package com.wintersky.windyreader.di;
 
+import com.wintersky.windyreader.data.source.BookCache;
+import com.wintersky.windyreader.data.source.UpdateCheck;
 import com.wintersky.windyreader.data.source.local.Migration;
+
+import javax.inject.Inject;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
@@ -11,6 +15,11 @@ import static com.wintersky.windyreader.data.source.local.Migration.REALM_VERSIO
 
 public class MyDaggerApplication extends DaggerApplication {
 
+    @Inject
+    UpdateCheck mUpdateCheck;
+    @Inject
+    BookCache mBookCache;
+
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
         return DaggerAppComponent.builder().application(this).build();
@@ -18,7 +27,6 @@ public class MyDaggerApplication extends DaggerApplication {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         AppComponent appComponent = DaggerAppComponent.builder()
                 .application(this)
                 .build();
@@ -30,5 +38,14 @@ public class MyDaggerApplication extends DaggerApplication {
                 .migration(new Migration())
                 .build();
         Realm.setDefaultConfiguration(config);
+
+        super.onCreate();
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        mUpdateCheck.close();
+        mBookCache.close();
     }
 }

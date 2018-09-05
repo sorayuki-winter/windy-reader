@@ -1,5 +1,6 @@
 package com.wintersky.windyreader.shelf;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,7 +14,6 @@ import dagger.android.support.DaggerAppCompatActivity;
 public class ShelfActivity extends DaggerAppCompatActivity {
 
     public static final String BOOK_URL = "BOOK_URL";
-    public static final String BOOK_TIT = "BOOK_TIT";
 
     @Inject
     ShelfFragment shelfFragment;
@@ -29,6 +29,13 @@ public class ShelfActivity extends DaggerAppCompatActivity {
         if (fragment == null) {
             fragment = shelfFragment;
             fm.beginTransaction().replace(R.id.frame_shelf, fragment).commit();
+            shelfFragment.onNewIntent(getIntent());
         }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        shelfFragment.onNewIntent(intent);
     }
 }

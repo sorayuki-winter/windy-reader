@@ -12,7 +12,9 @@ public interface ShelfContract {
 
         void setShelf(RealmResults<Book> list);
 
-        void onBookSaved(boolean ok);
+        void onBookSaved(Book book);
+
+        void onBookSaved(String url, Exception e);
     }
 
     interface Presenter extends BasePresenter<View> {

@@ -11,8 +11,6 @@ public interface ReadContract {
 
         void setBook(Book book);
 
-        void onBookCached();
-
         void setContent(Chapter chapter, String content, float progress);
     }
 

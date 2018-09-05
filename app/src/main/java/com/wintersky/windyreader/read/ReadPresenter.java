@@ -50,7 +50,7 @@ public class ReadPresenter implements ReadContract.Presenter {
         }
         mRepository.getBook(mUrl, new DataSource.GetBookCallback() {
             @Override
-            public void onLoaded(final Book book) {
+            public void onLoaded(@NonNull final Book book) {
                 mBook = book;
                 Component.get().getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
@@ -59,21 +59,13 @@ public class ReadPresenter implements ReadContract.Presenter {
                         book.hasNew = false;
                     }
                 });
-                mRepository.cacheBook(mUrl, new DataSource.CacheBookCallback() {
-                    @Override
-                    public void onCached() {
-                        if (mView != null) {
-                            mView.onBookCached();
-                        }
-                    }
-                });
                 if (mView != null) {
                     mView.setBook(book);
                 }
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 LOG("Read - get book fail", e);
             }
         });
@@ -95,14 +87,14 @@ public class ReadPresenter implements ReadContract.Presenter {
     public void getContent(final Chapter chapter, final float progress) {
         mRepository.getContent(chapter.url, new DataSource.GetContentCallback() {
             @Override
-            public void onLoaded(String content) {
+            public void onLoaded(@NonNull String content) {
                 if (mView != null) {
                     mView.setContent(chapter, content.trim(), progress);
                 }
             }
 
             @Override
-            public void onFailed(Exception e) {
+            public void onFailed(@NonNull Exception e) {
                 LOG(e);
                 if (mView != null) {
                     mView.setContent(chapter, e.getMessage(), progress);
