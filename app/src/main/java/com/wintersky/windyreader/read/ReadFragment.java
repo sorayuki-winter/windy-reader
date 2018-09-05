@@ -212,18 +212,26 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     public void setContent(Chapter chapter, String content, float progress) {
         mContent.setText(content);
 
-        int count = mContent.getLineCount();
-        int h = mContent.getBottom() - mContent.getTop() - mContent.getPaddingTop() - mContent.getPaddingBottom();
-        int pCount = h / mContent.getLineHeight();
-        int pageNum = count / pCount;
-        int prev_end, end = 0;
         List<String> pageList = new ArrayList<>();
-        for (int i = 0; i < pageNum; i++) {
-            prev_end = end;
-            end = mContent.getLayout().getLineEnd((i + 1) * pCount - 1);
-            pageList.add(content.substring(prev_end, end));
+        if (content == null) {
+            pageList.add("(NULL)");
+        } else if (content.isEmpty()) {
+            pageList.add("(EMPTY)");
+        } else {
+            int count = mContent.getLineCount();
+            int h = mContent.getBottom() - mContent.getTop() - mContent.getPaddingTop() - mContent.getPaddingBottom();
+            int pCount = h / mContent.getLineHeight();
+            int pageNum = count / pCount;
+            int prev_end, end = 0;
+            for (int i = 0; i < pageNum; i++) {
+                prev_end = end;
+                end = mContent.getLayout().getLineEnd((i + 1) * pCount - 1);
+                pageList.add(content.substring(prev_end, end));
+            }
+            if (end < content.length()) {
+                pageList.add(content.substring(end));
+            }
         }
-        pageList.add(content.substring(end));
 
         if (progress > 1) {
             int index = mViewPager.getCurrentItem();
