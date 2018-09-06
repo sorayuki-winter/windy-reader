@@ -6,7 +6,6 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 import com.wintersky.windyreader.data.source.DataSource;
 import com.wintersky.windyreader.data.source.Repository;
-import com.wintersky.windyreader.di.Component;
 
 import java.util.Date;
 
@@ -52,7 +51,7 @@ public class ReadPresenter implements ReadContract.Presenter {
             @Override
             public void onLoaded(@NonNull final Book book) {
                 mBook = book;
-                Component.get().getRealm().executeTransaction(new Realm.Transaction() {
+                book.getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(@NonNull Realm realm) {
                         book.lastRead = new Date();
@@ -73,12 +72,19 @@ public class ReadPresenter implements ReadContract.Presenter {
 
     @Override
     public void saveReadIndex(final float index) {
-        Component.get().getRealm().executeTransaction(new Realm.Transaction() {
+        if (mBook == null) {
+            return;
+        }
+        mBook.getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
-                if (mBook != null) {
-                    mBook.index = index;
+                if ((int) mBook.index != (int) index) {
+                    Chapter chapter = mBook.catalog.get((int) index);
+                    if (chapter != null) {
+                        chapter.read = true;
+                    }
                 }
+                mBook.index = index;
             }
         });
     }

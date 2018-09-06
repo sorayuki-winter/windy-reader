@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
-import com.wintersky.windyreader.di.Component;
 
 import java.util.Date;
 import java.util.List;
@@ -95,7 +94,7 @@ public class Repository implements DataSource {
         mLocalDataSource.getBook(url, new GetBookCallback() {
             @Override
             public void onLoaded(@NonNull final Book book) {
-                Component.get().getRealm().executeTransaction(new Realm.Transaction() {
+                book.getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(@NonNull Realm realm) {
                         book.lastRead = new Date();

@@ -75,7 +75,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Page page = getPage(position);
-        String progress = String.format(Locale.CHINA, "%d/%d", page.pageIndex, page.pageCount);
+        String progress = String.format(Locale.CHINA, "%d/%d", page.pageIndex + 1, page.pageCount);
         return PageFragment.newInstance(page.title, page.content, progress);
     }
 
