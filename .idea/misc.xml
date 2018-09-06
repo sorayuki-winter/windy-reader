@@ -12,6 +12,7 @@
     <pattern value="com.wintersky.windyreader.util.KeyboardUtil" />
     <pattern value="com.wintersky.windyreader.util.LogUtil" method="LOG" />
     <pattern value="com.wintersky.windyreader.di.AppComponent" method="getRepository" />
+    <pattern value="com.wintersky.windyreader.di.AppComponent" method="getRealm" />
   </component>
   <component name="NullableNotNullManager">
     <option name="myDefaultNullable" value="android.support.annotation.Nullable" />

@@ -95,7 +95,12 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         mTitle.setText(book.getTitle());
         mAdapter = new CatalogAdapter(book.getCatalog());
         mListView.setAdapter(mAdapter);
-        mListView.setSelection(mIndex);
+        mListView.post(new Runnable() {
+            @Override
+            public void run() {
+                mListView.setSelectionFromTop(mIndex, mListView.getHeight() / 3);
+            }
+        });
     }
 
     class CatalogAdapter extends RealmBaseAdapter<Chapter> {
