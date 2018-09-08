@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import io.realm.RealmList;
+import lombok.Cleanup;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -157,7 +158,7 @@ public class RemoteDataSource implements DataSource {
     @NonNull
     public Book getBookFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        LuaState lua = getLua(mContext);
+        @Cleanup LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
@@ -183,7 +184,7 @@ public class RemoteDataSource implements DataSource {
     @NonNull
     public RealmList<Chapter> getCatalogFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        LuaState lua = getLua(mContext);
+        @Cleanup LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
@@ -209,7 +210,7 @@ public class RemoteDataSource implements DataSource {
     @NonNull
     public String getContentFrom(@NonNull String url) throws LuaException, IOException {
         String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        LuaState lua = getLua(mContext);
+        @Cleanup LuaState lua = getLua(mContext);
 
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
@@ -221,9 +222,8 @@ public class RemoteDataSource implements DataSource {
 
         luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
         lua.getField(-1, "getContent");
-        lua.pushString(url);
         lua.pushString(doc);
-        luaSafeRun(lua, 2, 1);
+        luaSafeRun(lua, 1, 1);
         return lua.toString(-1);
     }
 
