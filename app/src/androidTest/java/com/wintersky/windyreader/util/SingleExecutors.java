@@ -28,6 +28,7 @@ import java.util.concurrent.TimeUnit;
  * Allow instant execution of tasks.
  */
 public class SingleExecutors extends AppExecutors {
+
     private static final ExecutorService instant = new MyExecutor();
 
     public SingleExecutors() {

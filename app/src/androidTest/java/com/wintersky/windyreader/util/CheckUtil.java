@@ -28,8 +28,4 @@ public class CheckUtil {
         }
         LOG("catalog", sb.toString());
     }
-
-    public static void checkChapter(Chapter chapter) {
-        LOG("chapter: " + chapter.getUrl(), String.format("%d %s\ncatalogUrl: %s", chapter.getIndex(), chapter.getTitle(), chapter.getCatalogUrl()));
-    }
 }

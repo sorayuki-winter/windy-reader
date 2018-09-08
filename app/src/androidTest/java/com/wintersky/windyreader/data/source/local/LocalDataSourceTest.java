@@ -22,7 +22,6 @@ import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.CheckUtil.checkBook;
 import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
-import static com.wintersky.windyreader.util.CheckUtil.checkChapter;
 import static com.wintersky.windyreader.util.CheckUtil.checkShelf;
 import static com.wintersky.windyreader.util.LogUtil.LOG;
 import static com.wintersky.windyreader.util.LogUtil.LOGD;
@@ -130,23 +129,8 @@ public class LocalDataSourceTest {
     public void localGetCatalog() {
         mSource.getCatalog(mBook.getUrl(), new DataSource.GetCatalogCallback() {
             @Override
-            public void onLoaded(@NonNull List<Chapter> list) {
+            public void onLoaded(@NonNull RealmList<Chapter> list) {
                 checkCatalog(list);
-            }
-
-            @Override
-            public void onFailed(@NonNull Exception e) {
-                fail(e.getMessage());
-            }
-        });
-    }
-
-    @Test
-    public void localGetContent() {
-        mSource.getChapter(mChapter.getUrl(), new DataSource.GetChapterCallback() {
-            @Override
-            public void onLoaded(@NonNull Chapter chapter) {
-                checkChapter(chapter);
             }
 
             @Override
