@@ -12,8 +12,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 
 public class CatalogActivity extends DaggerAppCompatActivity {
 
-    @Inject
-    CatalogFragment catalogFragment;
+    @Inject CatalogFragment catalogFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +20,11 @@ public class CatalogActivity extends DaggerAppCompatActivity {
         setContentView(R.layout.activity_catalog);
 
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.frame_catalog);
+        Fragment fragment = fm.findFragmentById(R.id.content_frame);
 
         if (fragment == null) {
             fragment = catalogFragment;
-            fm.beginTransaction().replace(R.id.frame_catalog, fragment).commit();
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
     }
 }
