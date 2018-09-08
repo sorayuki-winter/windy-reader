@@ -78,11 +78,9 @@ public class ReadPresenter implements ReadContract.Presenter {
         mBook.getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
-                if ((int) mBook.index != (int) index) {
-                    Chapter chapter = mBook.catalog.get((int) index);
-                    if (chapter != null) {
-                        chapter.read = true;
-                    }
+                Chapter chapter = mBook.catalog.get((int) index);
+                if (chapter != null) {
+                    chapter.read = true;
                 }
                 mBook.index = index;
             }

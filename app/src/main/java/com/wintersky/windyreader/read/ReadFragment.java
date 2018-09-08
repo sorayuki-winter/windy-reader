@@ -1,12 +1,12 @@
 package com.wintersky.windyreader.read;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Point;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
@@ -27,24 +27,34 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnPageChange;
+import butterknife.OnTouch;
+import butterknife.Unbinder;
 import dagger.android.support.DaggerFragment;
 
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_IDX;
 import static com.wintersky.windyreader.shelf.ShelfActivity.BOOK_URL;
-import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class ReadFragment extends DaggerFragment implements ReadContract.View {
+public class ReadFragment extends DaggerFragment implements ReadContract.View,
+                                                            View.OnTouchListener,
+                                                            ViewPager.OnPageChangeListener {
 
     private static final int REQUEST_CATALOG = 1;
 
-    @Inject
-    ReadContract.Presenter mPresenter;
-    @Inject
-    String mBookUrl;
+    @Inject ReadContract.Presenter mPresenter;
+    @Inject ReadAdapter mAdapter;
+    Unbinder unbinder;
+    @BindView(R.id.view_pager) ViewPager mViewPager;
+    @BindView(R.id.bottom_bar) ConstraintLayout mBottomBar;
+    @BindView(R.id.content) TextView mContent;
+    @BindView(R.id.top_bar) ConstraintLayout mTopBar;
 
     private Book mBook;
     private boolean mVisible = true;
@@ -52,14 +62,16 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     private float downX, downY;
     private boolean loadingPrev, loadingNext;
 
-    private View mBottomBar;
-    private ViewPager mViewPager;
-    private PageAdapter mAdapter;
-    private TextView mContent;
-
     @Inject
     public ReadFragment() {
         // Required empty public constructor
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mPresenter.takeView(this);
+        hide();
     }
 
     @Override
@@ -80,118 +92,17 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        mPresenter.takeView(this);
-        hide();
-    }
-
-    @SuppressLint("ClickableViewAccessibility")
-    @Override
     public View onCreateView(@NonNull final LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         final View view = inflater.inflate(R.layout.fragment_read, container, false);
-
+        unbinder = ButterKnife.bind(this, view);
         if (getActivity() != null) {
             outSize = new Point();
             WindowManager wm = getActivity().getWindowManager();
             wm.getDefaultDisplay().getSize(outSize);
         }
-
-        mBottomBar = view.findViewById(R.id.bottom_bar);
-        mViewPager = view.findViewById(R.id.view_pager);
-        mContent = view.findViewById(R.id.content);
-
-        mAdapter = new PageAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mAdapter);
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                PageAdapter.Page page = mAdapter.getPage(position);
-                mPresenter.saveReadIndex(page.chapterIndex + (float) page.pageIndex / page.pageCount);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                if (state == ViewPager.SCROLL_STATE_IDLE) {
-                    turnCheck();
-                    preLoad();
-                }
-            }
-        });
-        mViewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        downX = event.getX();
-                        downY = event.getY();
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        float x = event.getX(), y = event.getY();
-                        float dx = x - downX, dy = y - downY;
-                        float xp = x / outSize.x, yp = y / outSize.y;
-                        if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
-                            if (mVisible) {
-                                hide();
-                            } else {
-                                if (xp < 0.3 || xp < 0.7 && yp < 0.3) {
-                                    turnCheck();
-                                    int index = mViewPager.getCurrentItem() - 1;
-                                    if (index >= 0) {
-                                        mViewPager.setCurrentItem(index);
-                                    }
-                                } else if (xp > 0.7 || xp > 0.3 && yp > 0.7) {
-                                    turnCheck();
-                                    int index = mViewPager.getCurrentItem() + 1;
-                                    if (index < mAdapter.getCount()) {
-                                        mViewPager.setCurrentItem(index);
-                                    }
-                                } else {
-                                    show();
-                                }
-                            }
-                        }
-                        break;
-                }
-                return mVisible;
-            }
-        });
-
-        view.findViewById(R.id.catalog).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Activity activity = getActivity();
-                if (activity != null) {
-                    Intent intent = new Intent();
-                    intent.setClass(activity, CatalogActivity.class);
-                    intent.putExtra(BOOK_URL, mBookUrl);
-                    startActivityForResult(intent, REQUEST_CATALOG);
-                } else {
-                    LOG("showCatalog onClick", "Activity null");
-                }
-            }
-        });
-
-        view.findViewById(R.id.browser).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int index = mAdapter.getPage(mViewPager.getCurrentItem()).chapterIndex;
-                Chapter chapter = mBook.catalog.get(index);
-                if (chapter != null) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(chapter.url));
-                    startActivity(intent);
-                }
-            }
-        });
-
         return view;
     }
 
@@ -279,12 +190,110 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View {
     }
 
     private void hide() {
+        mTopBar.setVisibility(View.GONE);
         mBottomBar.setVisibility(View.GONE);
         mVisible = false;
     }
 
     private void show() {
+        mTopBar.setVisibility(View.VISIBLE);
         mBottomBar.setVisibility(View.VISIBLE);
         mVisible = true;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @OnClick({R.id.catalog, R.id.browser})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.catalog:
+                if (getActivity() != null) {
+                    Intent intent = new Intent();
+                    intent.setClass(getActivity(), CatalogActivity.class);
+                    intent.putExtra(BOOK_URL, mBook.url);
+                    startActivityForResult(intent, REQUEST_CATALOG);
+                }
+                break;
+            case R.id.browser:
+                int index = mAdapter.getPage(mViewPager.getCurrentItem()).chapterIndex;
+                Chapter chapter = mBook.catalog.get(index);
+                if (chapter != null) {
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(chapter.url));
+                    startActivity(intent);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onPageScrolled(final int position, final float positionOffset, final int positionOffsetPixels) {
+
+    }
+
+    @OnPageChange(R.id.view_pager)
+    @Override
+    public void onPageSelected(int position) {
+        ReadAdapter.Page page = mAdapter.getPage(position);
+        mPresenter.saveReadIndex(page.chapterIndex + (float) page.index / page.count);
+    }
+
+    @OnPageChange(value = R.id.view_pager, callback = OnPageChange.Callback.PAGE_SCROLL_STATE_CHANGED)
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        if (state == ViewPager.SCROLL_STATE_IDLE) {
+            turnCheck();
+            preLoad();
+        }
+    }
+
+    @OnTouch(R.id.view_pager)
+    @SuppressLint("ClickableViewAccessibility")
+    @Override
+    public boolean onTouch(final View v, final MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downX = event.getX();
+                downY = event.getY();
+                break;
+
+            case MotionEvent.ACTION_UP:
+                float x = event.getX(), y = event.getY();
+                float dx = x - downX, dy = y - downY;
+                float xp = x / outSize.x, yp = y / outSize.y;
+                if (Math.abs(dx) < 20 && Math.abs(dy) < 20) {
+                    if (mVisible) {
+                        hide();
+                    } else {
+                        if (xp < 0.3 || xp < 0.7 && yp < 0.3) {
+                            turnCheck();
+                            int index = mViewPager.getCurrentItem() - 1;
+                            if (index >= 0) {
+                                mViewPager.setCurrentItem(index);
+                            }
+                        } else if (xp > 0.7 || xp > 0.3 && yp > 0.7) {
+                            turnCheck();
+                            int index = mViewPager.getCurrentItem() + 1;
+                            if (index < mAdapter.getCount()) {
+                                mViewPager.setCurrentItem(index);
+                            }
+                        } else {
+                            show();
+                        }
+                    }
+                }
+                break;
+        }
+        return mVisible;
+    }
+
+    @OnClick(R.id.back)
+    public void onViewClicked() {
+        if (getActivity() != null) {
+            getActivity().onBackPressed();
+        }
     }
 }

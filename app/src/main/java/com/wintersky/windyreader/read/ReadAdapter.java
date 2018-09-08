@@ -11,11 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class PageAdapter extends FragmentStatePagerAdapter {
+import javax.inject.Inject;
+
+public class ReadAdapter extends FragmentStatePagerAdapter {
 
     private List<Page> mList;
 
-    public PageAdapter(FragmentManager fm) {
+    @Inject
+    public ReadAdapter(FragmentManager fm) {
         super(fm);
     }
 
@@ -75,7 +78,7 @@ public class PageAdapter extends FragmentStatePagerAdapter {
     @Override
     public Fragment getItem(int position) {
         Page page = getPage(position);
-        String progress = String.format(Locale.CHINA, "%d/%d", page.pageIndex + 1, page.pageCount);
+        String progress = String.format(Locale.CHINA, "%d/%d", page.index + 1, page.count);
         return PageFragment.newInstance(page.title, page.content, progress);
     }
 
@@ -92,17 +95,17 @@ public class PageAdapter extends FragmentStatePagerAdapter {
         return POSITION_NONE;
     }
 
-    public static class Page {
+    public class Page {
         public final int chapterIndex;
-        public final int pageIndex;
-        public final int pageCount;
+        public final int index;
+        public final int count;
         public final String title;
         public final String content;
 
-        public Page(int chapterIndex, int pageIndex, int pageCount, String title, String content) {
+        public Page(int chapterIndex, int index, int count, String title, String content) {
             this.chapterIndex = chapterIndex;
-            this.pageIndex = pageIndex;
-            this.pageCount = pageCount;
+            this.index = index;
+            this.count = count;
             this.title = title;
             this.content = content;
         }

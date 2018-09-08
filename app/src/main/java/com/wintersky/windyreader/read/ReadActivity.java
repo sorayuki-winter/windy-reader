@@ -16,8 +16,7 @@ public class ReadActivity extends DaggerAppCompatActivity {
     public static final String CHAPTER_URL = "CHAPTER_URL";
     public static final String CHAPTER_IDX = "CHAPTER_IDX";
 
-    @Inject
-    ReadFragment readFragment;
+    @Inject ReadFragment readFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,11 +24,11 @@ public class ReadActivity extends DaggerAppCompatActivity {
         setContentView(R.layout.activity_read);
 
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.frame_read);
+        Fragment fragment = fm.findFragmentById(R.id.content_frame);
 
         if (fragment == null) {
             fragment = readFragment;
-            fm.beginTransaction().replace(R.id.frame_read, fragment).commit();
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
         }
     }
 

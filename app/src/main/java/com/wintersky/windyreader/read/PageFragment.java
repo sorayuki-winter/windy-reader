@@ -12,6 +12,10 @@ import android.widget.TextView;
 
 import com.wintersky.windyreader.R;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -20,10 +24,14 @@ public class PageFragment extends Fragment {
     private static final String ARG_TIT = "title";
     private static final String ARG_CON = "content";
     private static final String ARG_IDX = "index";
+    @BindView(R.id.title) TextView mTitle;
+    @BindView(R.id.content) TextView mContent;
+    @BindView(R.id.progress) TextView mProgress;
+    Unbinder unbinder;
 
-    private String mTitle;
-    private String mContent;
-    private String mIndex;
+    private String pgTitle;
+    private String pgContent;
+    private String pgProgress;
 
     public PageFragment() {
         // Required empty public constructor
@@ -43,9 +51,9 @@ public class PageFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTitle = getArguments().getString(ARG_TIT);
-            mContent = getArguments().getString(ARG_CON);
-            mIndex = getArguments().getString(ARG_IDX);
+            pgTitle = getArguments().getString(ARG_TIT);
+            pgContent = getArguments().getString(ARG_CON);
+            pgProgress = getArguments().getString(ARG_IDX);
         }
     }
 
@@ -54,15 +62,16 @@ public class PageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_page, container, false);
-
-        TextView title = view.findViewById(R.id.title);
-        TextView content = view.findViewById(R.id.content);
-        TextView index = view.findViewById(R.id.index);
-
-        title.setText(mTitle);
-        content.setText(mContent);
-        index.setText(mIndex);
-
+        unbinder = ButterKnife.bind(this, view);
+        mTitle.setText(pgTitle);
+        mContent.setText(pgContent);
+        mProgress.setText(pgProgress);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
     }
 }
