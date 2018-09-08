@@ -19,6 +19,10 @@ import com.wintersky.windyreader.R;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.Unbinder;
 import dagger.android.support.AndroidSupportInjection;
 
 /**
@@ -29,11 +33,12 @@ public class DeleteFragment extends DialogFragment {
     private static final String ARG_TIT = "title";
     private static final String ARG_URL = "url";
 
-    @Inject
-    ShelfContract.Presenter mPresenter;
+    @Inject ShelfContract.Presenter mPresenter;
+    @BindView(R.id.title) TextView mTitle;
+    Unbinder unbinder;
 
-    private String mTitle;
-    private String mUrl;
+    private String bkTitle;
+    private String bkUrl;
 
     public DeleteFragment() {
         // Required empty public constructor
@@ -52,15 +57,15 @@ public class DeleteFragment extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mTitle = getArguments().getString(ARG_TIT);
-            mUrl = getArguments().getString(ARG_URL);
+            bkTitle = getArguments().getString(ARG_TIT);
+            bkUrl = getArguments().getString(ARG_URL);
         }
     }
 
     @Override
     public void onAttach(Context context) {
-        super.onAttach(context);
         AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @Override
@@ -80,26 +85,25 @@ public class DeleteFragment extends DialogFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_delete, container, false);
-
-        TextView title = view.findViewById(R.id.title);
-
-        title.setText(mTitle);
-
-        view.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mPresenter.deleteBook(mUrl);
-                dismiss();
-            }
-        });
-
-        view.findViewById(R.id.cancel).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dismiss();
-            }
-        });
-
+        unbinder = ButterKnife.bind(this, view);
+        mTitle.setText(bkTitle);
         return view;
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        unbinder.unbind();
+    }
+
+    @OnClick({R.id.delete, R.id.cancel})
+    public void onViewClicked(View view) {
+        switch (view.getId()) {
+            case R.id.delete:
+                mPresenter.deleteBook(bkUrl);
+            case R.id.cancel:
+                dismiss();
+                break;
+        }
     }
 }

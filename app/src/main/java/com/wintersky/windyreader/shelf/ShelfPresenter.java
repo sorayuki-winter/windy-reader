@@ -52,7 +52,9 @@ public class ShelfPresenter implements ShelfContract.Presenter {
 
     @Override
     public void saveBook(final String url) {
-        mRepository.saveBook(url, new DataSource.SaveBookCallback() {
+        Book bkSave = new Book();
+        bkSave.url = url;
+        mRepository.saveBook(bkSave, new DataSource.SaveBookCallback() {
             @Override
             public void onSaved(@NonNull Book book) {
                 if (mView != null) {

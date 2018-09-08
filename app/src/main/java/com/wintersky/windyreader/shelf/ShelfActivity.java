@@ -15,8 +15,7 @@ public class ShelfActivity extends DaggerAppCompatActivity {
 
     public static final String BOOK_URL = "BOOK_URL";
 
-    @Inject
-    ShelfFragment shelfFragment;
+    @Inject ShelfFragment shelfFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,12 +23,19 @@ public class ShelfActivity extends DaggerAppCompatActivity {
         setContentView(R.layout.activity_shelf);
 
         FragmentManager fm = getSupportFragmentManager();
-        Fragment fragment = fm.findFragmentById(R.id.frame_shelf);
+        Fragment fragment = fm.findFragmentById(R.id.content_frame);
 
         if (fragment == null) {
             fragment = shelfFragment;
-            fm.beginTransaction().replace(R.id.frame_shelf, fragment).commit();
+            fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
             shelfFragment.onNewIntent(getIntent());
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!shelfFragment.onBackPressed()) {
+            super.onBackPressed();
         }
     }
 
