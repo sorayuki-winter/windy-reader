@@ -6,36 +6,72 @@
     android:layout_height="match_parent"
     tools:context=".catalog.CatalogFragment">
 
+    <FrameLayout
+        android:id="@+id/status"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/statusSize" />
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/top_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        app:layout_constraintTop_toBottomOf="@id/status">
+
+        <ImageButton
+            android:id="@+id/back"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/description"
+            android:padding="4dp"
+            android:scaleType="fitCenter"
+            android:src="@mipmap/ic_back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lines="1"
+            android:paddingEnd="44dp"
+            android:paddingStart="44dp"
+            android:textSize="18sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
     <ListView
         android:id="@+id/catalog"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:background="@color/readBack"
+        android:footerDividersEnabled="false"
         android:listSelector="?attr/selectableItemBackground"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/title" />
-
-    <FrameLayout
-        android:id="@+id/status"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/statusHigh"
-        android:background="@color/readBack" />
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        tools:listfooter="@layout/header_catalog"
+        tools:listheader="@layout/header_catalog"
+        tools:listitem="@layout/item_catalog" />
 
     <TextView
-        android:id="@+id/title"
+        android:id="@+id/is_loading"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/readBack"
         android:gravity="center"
-        android:paddingBottom="12dp"
-        android:paddingTop="12dp"
-        android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@id/status" />
+        android:text="@string/is_loading"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/top_bar" />
 
     <FrameLayout
+        android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="4dp"
         android:background="@drawable/divider_top"
-        app:layout_constraintTop_toBottomOf="@id/title" />
+        app:layout_constraintTop_toBottomOf="@id/top_bar" />
 
 </android.support.constraint.ConstraintLayout>

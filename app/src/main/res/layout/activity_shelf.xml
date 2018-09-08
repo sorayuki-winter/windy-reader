@@ -7,7 +7,7 @@
     tools:context=".shelf.ShelfActivity">
 
     <FrameLayout
-        android:id="@+id/frame_shelf"
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

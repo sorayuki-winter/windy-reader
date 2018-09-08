@@ -7,8 +7,9 @@
     tools:context=".read.ReadActivity">
 
     <FrameLayout
-        android:id="@+id/frame_read"
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/readBack" />
 
 </LinearLayout>

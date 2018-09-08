@@ -17,7 +17,7 @@
         <activity
             android:name=".shelf.ShelfActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateAlwaysHidden|adjustResize">
+            android:windowSoftInputMode="stateUnchanged">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
