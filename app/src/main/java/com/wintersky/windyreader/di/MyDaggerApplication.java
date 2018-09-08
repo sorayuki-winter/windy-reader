@@ -15,10 +15,8 @@ import static com.wintersky.windyreader.data.source.local.Migration.REALM_VERSIO
 
 public class MyDaggerApplication extends DaggerApplication {
 
-    @Inject
-    UpdateCheck mUpdateCheck;
-    @Inject
-    BookCache mBookCache;
+    @Inject UpdateCheck mUpdateCheck;
+    @Inject BookCache mBookCache;
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {

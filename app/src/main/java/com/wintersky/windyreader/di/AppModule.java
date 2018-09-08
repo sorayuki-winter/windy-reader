@@ -20,7 +20,7 @@ import io.realm.Realm;
  * AppComponent}.
  */
 @Module
-abstract class ApplicationModule {
+abstract class AppModule {
     @Provides
     @Singleton
     static Realm provideRealm() {

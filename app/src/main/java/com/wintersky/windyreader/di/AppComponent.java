@@ -27,7 +27,7 @@ import okhttp3.OkHttpClient;
  */
 @Singleton
 @Component(modules = {RepositoryModule.class,
-        ApplicationModule.class,
+        AppModule.class,
         ActivityBindingModule.class,
         AndroidSupportInjectionModule.class})
 public interface AppComponent extends AndroidInjector<MyDaggerApplication> {
