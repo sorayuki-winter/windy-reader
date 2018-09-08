@@ -6,7 +6,6 @@ import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 
 import java.util.Date;
-import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -47,8 +46,18 @@ public class Repository implements DataSource {
     }
 
     @Override
-    public void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback) {
-        mRemoteDataSource.getCatalog(url, callback);
+    public void getCatalog(@NonNull final String url, @NonNull final GetCatalogCallback callback) {
+        mLocalDataSource.getCatalog(url, new GetCatalogCallback() {
+            @Override
+            public void onLoaded(@NonNull final RealmList<Chapter> list) {
+                callback.onLoaded(list);
+            }
+
+            @Override
+            public void onFailed(@NonNull final Exception e) {
+                mRemoteDataSource.getCatalog(url, callback);
+            }
+        });
     }
 
     @Override
@@ -68,17 +77,37 @@ public class Repository implements DataSource {
 
     @Override
     public void saveBook(@NonNull final Book book, @NonNull final SaveBookCallback callback) {
-        mRemoteDataSource.getCatalog(book.getCatalogUrl(), new GetCatalogCallback() {
+        getBook(book.url, new GetBookCallback() {
             @Override
-            public void onLoaded(@NonNull List<Chapter> list) {
-                book.setCatalog(new RealmList<>(list.toArray(new Chapter[]{})));
-                book.setLastRead(new Date());
-                book.setHasNew(true);
-                mLocalDataSource.saveBook(book, callback);
+            public void onLoaded(@NonNull final Book book) {
+                if (book.isManaged()) {
+                    book.getRealm().executeTransaction(new Realm.Transaction() {
+                        @Override
+                        public void execute(@NonNull Realm realm) {
+                            book.lastRead = new Date();
+                        }
+                    });
+                    callback.onSaved(book);
+                } else {
+                    mRemoteDataSource.getCatalog(book.catalogUrl, new GetCatalogCallback() {
+                        @Override
+                        public void onLoaded(@NonNull RealmList<Chapter> list) {
+                            book.catalog = list;
+                            book.setLastRead(new Date());
+                            book.setHasNew(true);
+                            mLocalDataSource.saveBook(book, callback);
+                        }
+
+                        @Override
+                        public void onFailed(@NonNull Exception e) {
+                            callback.onFailed(e);
+                        }
+                    });
+                }
             }
 
             @Override
-            public void onFailed(@NonNull Exception e) {
+            public void onFailed(@NonNull final Exception e) {
                 callback.onFailed(e);
             }
         });
@@ -87,36 +116,5 @@ public class Repository implements DataSource {
     @Override
     public void deleteBook(@NonNull String url) {
         mLocalDataSource.deleteBook(url);
-    }
-
-    @Override
-    public void saveBook(@NonNull final String url, @NonNull final SaveBookCallback callback) {
-        mLocalDataSource.getBook(url, new GetBookCallback() {
-            @Override
-            public void onLoaded(@NonNull final Book book) {
-                book.getRealm().executeTransaction(new Realm.Transaction() {
-                    @Override
-                    public void execute(@NonNull Realm realm) {
-                        book.lastRead = new Date();
-                    }
-                });
-                callback.onSaved(book);
-            }
-
-            @Override
-            public void onFailed(@NonNull Exception e) {
-                mRemoteDataSource.getBook(url, new GetBookCallback() {
-                    @Override
-                    public void onLoaded(@NonNull Book book) {
-                        saveBook(book, callback);
-                    }
-
-                    @Override
-                    public void onFailed(@NonNull Exception e) {
-                        callback.onFailed(e);
-                    }
-                });
-            }
-        });
     }
 }

@@ -80,11 +80,11 @@ public class LocalDataSource implements DataSource {
 
     @Override
     public void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback) {
-        Book book = mRealm.where(Book.class).equalTo("url", url).findFirst();
+        Book book = mRealm.where(Book.class).equalTo("catalogUrl", url).findFirst();
         if (book != null) {
             callback.onLoaded(book.getCatalog());
         } else {
-            callback.onFailed(new Exception("Book not find: " + url));
+            callback.onFailed(new Exception("Catalog not find: " + url));
         }
     }
 
@@ -111,20 +111,6 @@ public class LocalDataSource implements DataSource {
                 }
             }
         });
-    }
-
-    @Override
-    public void saveBook(@NonNull String url, @NonNull SaveBookCallback callback) {
-
-    }
-
-    public void getChapter(@NonNull final String url, @NonNull final GetChapterCallback callback) {
-        final Chapter chapter = mRealm.where(Chapter.class).equalTo("url", url).findFirst();
-        if (chapter != null) {
-            callback.onLoaded(chapter);
-        } else {
-            callback.onFailed(new Exception("chapter not find: " + url));
-        }
     }
 
     @Override

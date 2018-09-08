@@ -5,8 +5,7 @@ import android.support.annotation.NonNull;
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
 
-import java.util.List;
-
+import io.realm.RealmList;
 import io.realm.RealmResults;
 
 public interface DataSource {
@@ -18,9 +17,6 @@ public interface DataSource {
     void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback);
 
     void getContent(@NonNull String url, @NonNull GetContentCallback callback);
-
-    @SuppressWarnings("unused")
-    void saveBook(@NonNull String url, @NonNull SaveBookCallback callback);
 
     void saveBook(@NonNull Book book, @NonNull SaveBookCallback callback);
 
@@ -40,14 +36,7 @@ public interface DataSource {
 
     interface GetCatalogCallback {
 
-        void onLoaded(@NonNull List<Chapter> list);
-
-        void onFailed(@NonNull Exception e);
-    }
-
-    interface GetChapterCallback {
-
-        void onLoaded(@NonNull Chapter chapter);
+        void onLoaded(@NonNull RealmList<Chapter> list);
 
         void onFailed(@NonNull Exception e);
     }

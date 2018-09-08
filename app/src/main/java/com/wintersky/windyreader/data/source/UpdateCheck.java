@@ -31,7 +31,7 @@ public class UpdateCheck {
     private final ScheduledExecutorService mService;
 
     @Inject
-    public UpdateCheck(Context context, RemoteDataSource remote) {
+    UpdateCheck(Context context, RemoteDataSource remote) {
         mContext = context;
         mRemote = remote;
 

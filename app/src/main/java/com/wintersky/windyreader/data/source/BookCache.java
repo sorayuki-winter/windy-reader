@@ -23,7 +23,7 @@ public class BookCache {
     private final Thread mThread;
 
     @Inject
-    public BookCache(LocalDataSource local, RemoteDataSource remote) {
+    BookCache(LocalDataSource local, RemoteDataSource remote) {
         mLocal = local;
         mRemote = remote;
 

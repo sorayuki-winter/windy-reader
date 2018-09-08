@@ -15,7 +15,6 @@ import org.keplerproject.luajava.LuaException;
 import org.keplerproject.luajava.LuaState;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
@@ -51,6 +50,7 @@ public class RemoteDataSource implements DataSource {
         mHttp = http;
     }
 
+    @Deprecated
     @Override
     public void getShelf(@NonNull GetShelfCallback callback) {
         throw new NoSuchMethodError();
@@ -90,7 +90,7 @@ public class RemoteDataSource implements DataSource {
             @Override
             public void run() {
                 try {
-                    final List<Chapter> list = getCatalogFrom(url);
+                    final RealmList<Chapter> list = getCatalogFrom(url);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -142,16 +142,13 @@ public class RemoteDataSource implements DataSource {
 
     }
 
-    @Override
-    public void saveBook(@NonNull String url, @NonNull SaveBookCallback callback) {
-        throw new NoSuchMethodError();
-    }
-
+    @Deprecated
     @Override
     public void saveBook(@NonNull Book book, @NonNull SaveBookCallback callback) {
         throw new NoSuchMethodError();
     }
 
+    @Deprecated
     @Override
     public void deleteBook(@NonNull String url) {
         throw new NoSuchMethodError();
