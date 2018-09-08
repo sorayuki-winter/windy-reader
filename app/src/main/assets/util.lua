@@ -2,6 +2,7 @@
 --- @param doc string
 --- @param tag string
 --- @param attr string
+---
 function matchTag(doc, tag, attr)
     local s = doc:find(("< *%s *%s"):format(tag, attr))
     assert(s ~= nil, ("< *%s *%s not find"):format(tag, attr))
@@ -17,6 +18,7 @@ end
 
 ---
 --- @param str string
+---
 function outStr(str)
     return str:gsub(" *\r?\n *", "")
               :gsub(" *<br */?> *", "\n")
@@ -29,9 +31,11 @@ function outStr(str)
               :gsub("&times;", "×")
 end
 
+---
 --- @param book string
 --- @param title string
 --- @param catalog string
+---
 function bookJson(book, title, catalog)
     return ([[{"url":"%s", "title":"%s", "catalogUrl":"%s"}]])
             :format(book, title, catalog)
@@ -42,6 +46,7 @@ end
 --- @param index number
 --- @param title string
 --- @param catalog string
+---
 function chapterJson(chapter, index, title, catalog)
     return ([[{"url":"%s", "index":%d, "title":"%s", "catalogUrl":"%s"}]])
             :format(chapter, index, title, catalog)

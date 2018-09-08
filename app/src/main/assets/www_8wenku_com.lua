@@ -1,13 +1,21 @@
--- www.8wenku.com
+--- www.8wenku.com
 require("util")
 
 local M = {}
 
+---
+--- @param url string
+--- @param doc string
+---
 function M.getBook(url, doc)
     local title = doc:match([[<h2 class="tit">《?(.-)》?</h2>]])
     return bookJson(url, title, url)
 end
 
+---
+--- @param url string
+--- @param doc string
+---
 function M.getCatalog(url, doc)
     local catalog = "["
     local i = 0
@@ -20,7 +28,10 @@ function M.getCatalog(url, doc)
     return catalog:sub(1, -2) .. "\n]"
 end
 
-function M.getContent(url, doc)
+---
+--- @param doc string
+---
+function M.getContent(doc)
     local content = matchTag(doc, "div", [[class="article%-body" role="article%-body"]])
     return outStr(content)
 end

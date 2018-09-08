@@ -1,13 +1,21 @@
--- zxzw.com
+--- zxzw.com
 require("util")
 
 local M = {}
 
+---
+--- @param url string
+--- @param doc string
+---
 function M.getBook(url, doc)
     local title = doc:match("<div class=\"text t_c\">.-</div>"):match("<a href=.->(.-)</a>")
     return bookJson(url, title, url)
 end
 
+---
+--- @param url string
+--- @param doc string
+---
 function M.getCatalog(url, doc)
     local catalog = "["
     local i = 0
@@ -20,7 +28,10 @@ function M.getCatalog(url, doc)
     return catalog:sub(1, -2) .. "\n]"
 end
 
-function M.getContent(url, doc)
+---
+--- @param doc string
+---
+function M.getContent(doc)
     local content = matchTag(doc, "div", "id=\"content\"")
     return outStr(content)
 end
