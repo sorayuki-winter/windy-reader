@@ -86,12 +86,13 @@ public class ShelfFragment extends DaggerFragment implements ShelfContract.View,
 
     @Override
     public void onBookSaved(Book book) {
-        Toast.makeText(getContext(), "New Book:\n" + book.title, Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "New Book:\n" + book.getTitle(), Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onBookSaved(String url, Exception e) {
-        ErrorFragment fragment = ErrorFragment.newInstance("Book Add Fail:", String.format("%s\n%s", url, e.toString()));
+    public void onBookSaved(String url, Throwable error) {
+        ErrorFragment fragment = ErrorFragment.newInstance("Book Add Fail:",
+                String.format("%s\n%s", url, error.toString()));
         fragment.show(getChildFragmentManager(), "book_add_fail");
     }
 

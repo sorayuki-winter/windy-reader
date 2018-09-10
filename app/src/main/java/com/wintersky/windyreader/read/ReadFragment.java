@@ -84,9 +84,9 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View,
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CATALOG && resultCode == RESULT_OK) {
             int index = data.getIntExtra(CHAPTER_IDX, 0);
-            if (index < mBook.catalog.size()) {
+            if (index < mBook.getCatalog().size()) {
                 mPresenter.saveReadIndex(index);
-                mPresenter.getContent(mBook.catalog.get(index), 0);
+                mPresenter.getContent(mBook.getCatalog().get(index), 0);
             }
         }
     }
@@ -109,8 +109,8 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View,
     @Override
     public void setBook(Book book) {
         mBook = book;
-        if (book.index < book.catalog.size()) {
-            mPresenter.getContent(book.catalog.get((int) book.index), book.index % 1);
+        if (book.getIndex() < book.getCatalog().size()) {
+            mPresenter.getContent(book.getCatalog().get((int) book.getIndex()), book.getIndex() % 1);
         }
     }
 
@@ -163,17 +163,17 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View,
     }
 
     private void preLoad() {
-        if (!loadingNext && mBook.index >= mAdapter.getNextIndex()) {
-            int index = (int) mBook.index + 1;
-            if (index < mBook.catalog.size()) {
-                mPresenter.getContent(mBook.catalog.get(index), -1);
+        if (!loadingNext && mBook.getIndex() >= mAdapter.getNextIndex()) {
+            int index = (int) mBook.getIndex() + 1;
+            if (index < mBook.getCatalog().size()) {
+                mPresenter.getContent(mBook.getCatalog().get(index), -1);
                 loadingNext = true;
             }
         }
-        if (!loadingPrev && mBook.index - 1 < mAdapter.getPrevIndex()) {
-            int index = (int) mBook.index - 1;
+        if (!loadingPrev && mBook.getIndex() - 1 < mAdapter.getPrevIndex()) {
+            int index = (int) mBook.getIndex() - 1;
             if (index >= 0) {
-                mPresenter.getContent(mBook.catalog.get(index), 2);
+                mPresenter.getContent(mBook.getCatalog().get(index), 2);
                 loadingPrev = true;
             }
         }
@@ -181,7 +181,7 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View,
 
     private void turnCheck() {
         if (mViewPager.getCurrentItem() == 0 || mViewPager.getCurrentItem() == mAdapter.getCount() - 1) {
-            if (mBook.index < 1 || mBook.index >= mBook.catalog.size() - 1) {
+            if (mBook.getIndex() < 1 || mBook.getIndex() >= mBook.getCatalog().size() - 1) {
                 Toast.makeText(getContext(), "No More Content", Toast.LENGTH_SHORT).show();
             } else if (loadingNext || loadingPrev) {
                 Toast.makeText(getContext(), "Wait Loading", Toast.LENGTH_SHORT).show();
@@ -214,15 +214,15 @@ public class ReadFragment extends DaggerFragment implements ReadContract.View,
                 if (getActivity() != null) {
                     Intent intent = new Intent();
                     intent.setClass(getActivity(), CatalogActivity.class);
-                    intent.putExtra(BOOK_URL, mBook.url);
+                    intent.putExtra(BOOK_URL, mBook.getUrl());
                     startActivityForResult(intent, REQUEST_CATALOG);
                 }
                 break;
             case R.id.browser:
                 int index = mAdapter.getPage(mViewPager.getCurrentItem()).chapterIndex;
-                Chapter chapter = mBook.catalog.get(index);
+                Chapter chapter = mBook.getCatalog().get(index);
                 if (chapter != null) {
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(chapter.url));
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(chapter.getUrl()));
                     startActivity(intent);
                 }
                 break;

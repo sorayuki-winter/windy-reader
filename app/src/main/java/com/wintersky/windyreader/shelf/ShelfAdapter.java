@@ -83,7 +83,7 @@ public class ShelfAdapter extends RealmBaseAdapter<Book> {
         public void onClick() {
             if (mActivity != null) {
                 Intent intent = new Intent(mActivity, ReadActivity.class);
-                intent.putExtra(BOOK_URL, mBook.url);
+                intent.putExtra(BOOK_URL, mBook.getUrl());
                 mActivity.startActivity(intent);
             }
         }
@@ -91,7 +91,7 @@ public class ShelfAdapter extends RealmBaseAdapter<Book> {
         @OnLongClick(R.id.cover)
         @Override
         public boolean onLongClick(final View v) {
-            DeleteFragment fragment = DeleteFragment.newInstance(mBook.title, mBook.url);
+            DeleteFragment fragment = DeleteFragment.newInstance(mBook.getTitle(), mBook.getUrl());
             fragment.show(mFragmentManager, "book_delete");
             return true;
         }

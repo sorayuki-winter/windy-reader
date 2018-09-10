@@ -14,7 +14,7 @@ public interface ShelfContract {
 
         void onBookSaved(Book book);
 
-        void onBookSaved(String url, Exception e);
+        void onBookSaved(String url, Throwable error);
     }
 
     interface Presenter extends BasePresenter<View> {

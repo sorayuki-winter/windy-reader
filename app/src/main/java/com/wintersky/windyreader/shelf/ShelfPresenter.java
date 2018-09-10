@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import io.realm.RealmResults;
 
 import static com.wintersky.windyreader.util.LogUtil.LOG;
+import static com.wintersky.windyreader.util.LogUtil.LOGD;
 
 public class ShelfPresenter implements ShelfContract.Presenter {
 
@@ -53,7 +54,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
     @Override
     public void saveBook(final String url) {
         Book bkSave = new Book();
-        bkSave.url = url;
+        bkSave.setUrl(url);
         mRepository.saveBook(bkSave, new DataSource.SaveBookCallback() {
             @Override
             public void onSaved(@NonNull Book book) {
@@ -63,25 +64,35 @@ public class ShelfPresenter implements ShelfContract.Presenter {
             }
 
             @Override
-            public void onFailed(@NonNull Exception e) {
-                if (e.toString().contains("java.io.FileNotFoundException")) {
+            public void onFailed(@NonNull Throwable error) {
+                if (error.toString().contains("java.io.FileNotFoundException")) {
                     if (url.matches("https?://m\\..*")) {
                         String www = url.replaceFirst("m", "www");
                         saveBook(www);
-                        LOG("try to connect to " + www, e);
+                        LOG("try to connect to " + www, error);
                         return;
                     }
                 }
                 if (mView != null) {
-                    mView.onBookSaved(url, e);
+                    mView.onBookSaved(url, error);
                 }
-                LOG("Shelf - save book fail", e);
+                LOG("Shelf - save book fail", error);
             }
         });
     }
 
     @Override
-    public void deleteBook(String url) {
-        mRepository.deleteBook(url);
+    public void deleteBook(final String url) {
+        mRepository.deleteBook(url, new DataSource.DeleteBookCallback() {
+            @Override
+            public void onDeleted() {
+                LOGD("book deleted: " + url);
+            }
+
+            @Override
+            public void onFailed(@NonNull final Throwable error) {
+                LOG("Delete book fail: " + url, error);
+            }
+        });
     }
 }

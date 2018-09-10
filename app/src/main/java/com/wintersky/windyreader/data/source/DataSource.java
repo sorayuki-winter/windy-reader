@@ -12,15 +12,15 @@ public interface DataSource {
 
     void getShelf(@NonNull GetShelfCallback callback);
 
-    void getBook(@NonNull String url, @NonNull GetBookCallback callback);
+    void getBook(@NonNull String bkUrl, @NonNull GetBookCallback callback);
 
-    void getCatalog(@NonNull String url, @NonNull GetCatalogCallback callback);
+    void getCatalog(@NonNull Book book, @NonNull GetCatalogCallback callback);
 
-    void getContent(@NonNull String url, @NonNull GetContentCallback callback);
+    void getContent(@NonNull Chapter chapter, @NonNull GetContentCallback callback);
 
     void saveBook(@NonNull Book book, @NonNull SaveBookCallback callback);
 
-    void deleteBook(@NonNull String url);
+    void deleteBook(@NonNull String bkUrl, @NonNull DeleteBookCallback callback);
 
     interface GetShelfCallback {
 
@@ -31,27 +31,34 @@ public interface DataSource {
 
         void onLoaded(@NonNull Book book);
 
-        void onFailed(@NonNull Exception e);
+        void onFailed(@NonNull Throwable error);
     }
 
     interface GetCatalogCallback {
 
         void onLoaded(@NonNull RealmList<Chapter> list);
 
-        void onFailed(@NonNull Exception e);
+        void onFailed(@NonNull Throwable error);
     }
 
     interface GetContentCallback {
 
         void onLoaded(@NonNull String content);
 
-        void onFailed(@NonNull Exception e);
+        void onFailed(@NonNull Throwable error);
     }
 
     interface SaveBookCallback {
 
         void onSaved(@NonNull Book book);
 
-        void onFailed(@NonNull Exception e);
+        void onFailed(@NonNull Throwable error);
+    }
+
+    interface DeleteBookCallback {
+
+        void onDeleted();
+
+        void onFailed(@NonNull Throwable error);
     }
 }

@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 
 import com.wintersky.windyreader.R;
+import com.wintersky.windyreader.data.source.BookCache;
+import com.wintersky.windyreader.data.source.UpdateCheck;
 
 import javax.inject.Inject;
 
@@ -15,6 +17,8 @@ public class ShelfActivity extends DaggerAppCompatActivity {
 
     public static final String BOOK_URL = "BOOK_URL";
 
+    @Inject BookCache mBookCache;
+    @Inject UpdateCheck mUpdateCheck;
     @Inject ShelfFragment shelfFragment;
 
     @Override
@@ -30,6 +34,9 @@ public class ShelfActivity extends DaggerAppCompatActivity {
             fm.beginTransaction().replace(R.id.content_frame, fragment).commit();
             shelfFragment.onNewIntent(getIntent());
         }
+
+        mBookCache.cache();
+        mUpdateCheck.check();
     }
 
     @Override
@@ -43,5 +50,12 @@ public class ShelfActivity extends DaggerAppCompatActivity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         shelfFragment.onNewIntent(intent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        mBookCache.close();
+        mUpdateCheck.close();
+        super.onDestroy();
     }
 }

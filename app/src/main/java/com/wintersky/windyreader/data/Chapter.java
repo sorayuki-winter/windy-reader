@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 public class Chapter extends RealmObject {
     @PrimaryKey
-    public String url;
-    public String catalogUrl;
-    public String title;
-    public int index;
-    public boolean read;
+    private String url;
+    private String catalogUrl;
+    private String title;
+    private int index;
+    private boolean read;
 }

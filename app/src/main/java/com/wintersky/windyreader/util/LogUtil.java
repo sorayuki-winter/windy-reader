@@ -9,17 +9,17 @@ import java.util.List;
 
 public class LogUtil {
 
-    public static void LOG(String hint, Exception e) {
+    public static void LOG(String hint, Throwable error) {
         if (hint != null) {
             LOGE(hint);
         }
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        e.printStackTrace(new PrintStream(bos));
+        error.printStackTrace(new PrintStream(bos));
         LOGD(null, bos.toString());
     }
 
-    public static void LOG(Exception e) {
-        LOG(e.getMessage(), e);
+    public static void LOG(Throwable error) {
+        LOG(error.getMessage(), error);
     }
 
     public static void LOG(String hint, String msg) {

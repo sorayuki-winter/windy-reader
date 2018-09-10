@@ -54,8 +54,8 @@ public class ReadPresenter implements ReadContract.Presenter {
                 book.getRealm().executeTransaction(new Realm.Transaction() {
                     @Override
                     public void execute(@NonNull Realm realm) {
-                        book.lastRead = new Date();
-                        book.hasNew = false;
+                        book.setLastRead(new Date());
+                        book.setHasNew(false);
                     }
                 });
                 if (mView != null) {
@@ -64,8 +64,8 @@ public class ReadPresenter implements ReadContract.Presenter {
             }
 
             @Override
-            public void onFailed(@NonNull Exception e) {
-                LOG("Read - get book fail", e);
+            public void onFailed(@NonNull Throwable error) {
+                LOG("Read - get book fail", error);
             }
         });
     }
@@ -78,18 +78,18 @@ public class ReadPresenter implements ReadContract.Presenter {
         mBook.getRealm().executeTransaction(new Realm.Transaction() {
             @Override
             public void execute(@NonNull Realm realm) {
-                Chapter chapter = mBook.catalog.get((int) index);
+                Chapter chapter = mBook.getCatalog().get((int) index);
                 if (chapter != null) {
-                    chapter.read = true;
+                    chapter.setRead(true);
                 }
-                mBook.index = index;
+                mBook.setIndex(index);
             }
         });
     }
 
     @Override
     public void getContent(final Chapter chapter, final float progress) {
-        mRepository.getContent(chapter.url, new DataSource.GetContentCallback() {
+        mRepository.getContent(chapter, new DataSource.GetContentCallback() {
             @Override
             public void onLoaded(@NonNull String content) {
                 if (mView != null) {
@@ -98,10 +98,10 @@ public class ReadPresenter implements ReadContract.Presenter {
             }
 
             @Override
-            public void onFailed(@NonNull Exception e) {
-                LOG(e);
+            public void onFailed(@NonNull Throwable error) {
+                LOG(error);
                 if (mView != null) {
-                    mView.setContent(chapter, e.getMessage(), progress);
+                    mView.setContent(chapter, error.getMessage(), progress);
                 }
             }
         });

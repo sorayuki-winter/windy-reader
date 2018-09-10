@@ -58,12 +58,12 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getBook(@NonNull final String url, @NonNull final GetBookCallback callback) {
+    public void getBook(@NonNull final String bkUrl, @NonNull final GetBookCallback callback) {
         mExecutors.networkIO().execute(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final Book book = getBookFrom(url);
+                    final Book book = getBookFrom(bkUrl);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -83,15 +83,16 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getCatalog(@NonNull final String url, @NonNull final GetCatalogCallback callback) {
+    public void getCatalog(@NonNull final Book book, @NonNull final GetCatalogCallback callback) {
         if (taskCatalog != null) {
             taskCatalog.cancel(true);
         }
+        final String ctUrl = book.getCatalogUrl();
         taskCatalog = mExecutors.networkIO().submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final RealmList<Chapter> list = getCatalogFrom(url);
+                    final RealmList<Chapter> list = getCatalogFrom(ctUrl);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -113,15 +114,16 @@ public class RemoteDataSource implements DataSource {
     }
 
     @Override
-    public void getContent(@NonNull final String url, @NonNull final GetContentCallback callback) {
+    public void getContent(@NonNull final Chapter chapter, @NonNull final GetContentCallback callback) {
         if (mContentFuture != null) {
             mContentFuture.cancel(true);
         }
+        final String chUrl = chapter.getUrl();
         mContentFuture = mExecutors.networkIO().submit(new Runnable() {
             @Override
             public void run() {
                 try {
-                    final String content = getContentFrom(url);
+                    final String content = getContentFrom(chUrl);
                     mExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
@@ -140,7 +142,6 @@ public class RemoteDataSource implements DataSource {
                 }
             }
         });
-
     }
 
     @Deprecated
@@ -151,7 +152,7 @@ public class RemoteDataSource implements DataSource {
 
     @Deprecated
     @Override
-    public void deleteBook(@NonNull String url) {
+    public void deleteBook(@NonNull String bkUrl, @NonNull DeleteBookCallback callback) {
         throw new NoSuchMethodError();
     }
 

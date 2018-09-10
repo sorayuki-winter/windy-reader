@@ -49,8 +49,8 @@ public class CatalogPresenter implements CatalogContract.Presenter {
             }
 
             @Override
-            public void onFailed(@NonNull Exception e) {
-                LOG("Catalog - get book fail", e);
+            public void onFailed(@NonNull Throwable error) {
+                LOG("Catalog - get book fail", error);
             }
         });
     }

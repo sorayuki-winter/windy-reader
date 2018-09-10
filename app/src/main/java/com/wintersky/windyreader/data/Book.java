@@ -12,15 +12,15 @@ import lombok.Setter;
 @Setter
 public class Book extends RealmObject {
     @PrimaryKey
-    public String url;
-    public String title;
-    public String catalogUrl;
-    public RealmList<Chapter> catalog;
-    public float index;
-    public Date lastRead;
-    public boolean hasNew;
+    private String url;
+    private String title;
+    private String catalogUrl;
+    private RealmList<Chapter> catalog;
+    private float index;
+    private Date lastRead;
+    private boolean hasNew;
 
-    public String author;
-    public String detail;
-    public String imgUrl;
+    private String author;
+    private String detail;
+    private String imgUrl;
 }

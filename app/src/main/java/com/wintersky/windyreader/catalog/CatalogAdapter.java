@@ -58,7 +58,7 @@ public class CatalogAdapter extends RealmBaseAdapter<Chapter> {
             if (chapter != null) {
                 title.setText(chapter.getTitle().trim());
                 title.setTextColor(chapter.isRead() ? colorRead : colorUnread);
-                mark.setVisibility(chapter.index == mIndex ? View.VISIBLE : View.INVISIBLE);
+                mark.setVisibility(chapter.getIndex() == mIndex ? View.VISIBLE : View.INVISIBLE);
             } else {
                 title.setText(null);
                 mark.setVisibility(View.INVISIBLE);

@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -24,48 +25,57 @@ import io.realm.Realm;
 import io.realm.RealmResults;
 
 @Singleton
-public class UpdateCheck {
+public class UpdateCheck implements Runnable {
 
     private final Context mContext;
     private final RemoteDataSource mRemote;
     private final ScheduledExecutorService mService;
+    private ScheduledFuture mFuture;
 
     @Inject
     UpdateCheck(Context context, RemoteDataSource remote) {
         mContext = context;
         mRemote = remote;
-
         mService = Executors.newSingleThreadScheduledExecutor();
-        mService.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                Realm realm = Realm.getDefaultInstance();
-                RealmResults<Book> results = realm.where(Book.class).findAll();
-                for (final Book book : results.createSnapshot()) {
-                    try {
-                        final List<Chapter> list = mRemote.getCatalogFrom(book.getCatalogUrl());
-                        final List<Chapter> catalog = book.getCatalog();
-                        realm.executeTransaction(new Realm.Transaction() {
-                            @Override
-                            public void execute(@NonNull Realm realm) {
-                                if (catalog.size() < list.size()) {
-                                    book.setHasNew(true);
-                                    book.setLastRead(new Date());
-                                    catalog.addAll(list.subList(catalog.size(), list.size()));
-                                    Toast.makeText(mContext, "New Chapter:\n" + book.title, Toast.LENGTH_LONG).show();
-                                }
-                            }
-                        });
-                    } catch (LuaException | IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-                realm.close();
+    }
+
+    public void check() {
+        if (mFuture != null && !mFuture.isCancelled()) {
+            return;
+        }
+        mFuture = mService.scheduleWithFixedDelay(this, 0, 10, TimeUnit.MINUTES);
+    }
+
+    @Override
+    public void run() {
+        Realm realm = Realm.getDefaultInstance();
+        RealmResults<Book> results = realm.where(Book.class).findAll();
+        for (final Book book : results.createSnapshot()) {
+            if (mFuture.isCancelled()) {
+                break;
             }
-        }, 0, 10, TimeUnit.MINUTES);
+            try {
+                final List<Chapter> list = mRemote.getCatalogFrom(book.getCatalogUrl());
+                final List<Chapter> catalog = book.getCatalog();
+                realm.executeTransaction(new Realm.Transaction() {
+                    @Override
+                    public void execute(@NonNull Realm realm) {
+                        if (catalog.size() < list.size()) {
+                            book.setHasNew(true);
+                            book.setLastRead(new Date());
+                            catalog.addAll(list.subList(catalog.size(), list.size()));
+                            Toast.makeText(mContext, "New Chapter:\n" + book.getTitle(), Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+            } catch (LuaException | IOException e) {
+                e.printStackTrace();
+            }
+        }
+        realm.close();
     }
 
     public void close() {
-        mService.shutdown();
+        mFuture.cancel(false);
     }
 }

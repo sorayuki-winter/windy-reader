@@ -25,18 +25,18 @@ public class ReadAdapter extends FragmentStatePagerAdapter {
     public void set(Chapter chapter, List<String> list) {
         mList = new ArrayList<>();
         for (int i = 0; i < list.size(); i++) {
-            Page page = new Page(chapter.index, i, list.size(), chapter.title, list.get(i));
+            Page page = new Page(chapter.getIndex(), i, list.size(), chapter.getTitle(), list.get(i));
             mList.add(page);
         }
         notifyDataSetChanged();
     }
 
     public int prev(Chapter chapter, List<String> list) {
-        if (chapter.index != getPrevIndex() - 1) {
+        if (chapter.getIndex() != getPrevIndex() - 1) {
             return 0;
         }
         for (int i = list.size() - 1; i >= 0; i--) {
-            Page page = new Page(chapter.index, i, list.size(), chapter.title, list.get(i));
+            Page page = new Page(chapter.getIndex(), i, list.size(), chapter.getTitle(), list.get(i));
             mList.add(0, page);
         }
         while (getNextIndex() - getPrevIndex() > 2) {
@@ -47,11 +47,11 @@ public class ReadAdapter extends FragmentStatePagerAdapter {
     }
 
     public int next(Chapter chapter, List<String> list) {
-        if (chapter.index != getNextIndex() + 1) {
+        if (chapter.getIndex() != getNextIndex() + 1) {
             return 0;
         }
         for (int i = 0; i < list.size(); i++) {
-            Page page = new Page(chapter.index, i, list.size(), chapter.title, list.get(i));
+            Page page = new Page(chapter.getIndex(), i, list.size(), chapter.getTitle(), list.get(i));
             mList.add(page);
         }
         int delCount = 0;

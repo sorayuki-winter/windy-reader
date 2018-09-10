@@ -97,7 +97,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
     @Override
     public void setBook(Book book) {
         mTitle.setText(book.getTitle());
-        final int index = (int) book.index;
+        final int index = (int) book.getIndex();
         mAdapter.updateData(index, book.getCatalog());
         mCatalog.post(new Runnable() {
             @Override
@@ -116,7 +116,7 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
         Chapter chapter = mAdapter.getItem(position - 1);
         if (activity != null && chapter != null) {
             Intent intent = new Intent();
-            intent.putExtra(CHAPTER_IDX, chapter.index);
+            intent.putExtra(CHAPTER_IDX, chapter.getIndex());
             activity.setResult(RESULT_OK, intent);
             activity.finish();
         } else {
