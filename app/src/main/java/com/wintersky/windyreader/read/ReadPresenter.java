@@ -65,7 +65,7 @@ public class ReadPresenter implements ReadContract.Presenter {
 
             @Override
             public void onFailed(@NonNull Throwable error) {
-                LOG("Read - get book fail", error);
+                LOG("Read - get book fail: " + mUrl, error);
             }
         });
     }

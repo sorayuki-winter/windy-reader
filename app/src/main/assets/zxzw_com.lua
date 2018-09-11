@@ -3,6 +3,8 @@ require("util")
 
 local M = {}
 
+M.charset = "GBK"
+
 ---
 --- @param url string
 --- @param doc string

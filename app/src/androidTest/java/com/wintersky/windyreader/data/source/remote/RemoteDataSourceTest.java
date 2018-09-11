@@ -2,6 +2,7 @@ package com.wintersky.windyreader.data.source.remote;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
+import android.webkit.WebSettings;
 
 import com.wintersky.windyreader.data.Book;
 import com.wintersky.windyreader.data.Chapter;
@@ -11,16 +12,25 @@ import com.wintersky.windyreader.util.SingleExecutors;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 import static com.wintersky.windyreader.util.CheckUtil.checkBook;
 import static com.wintersky.windyreader.util.CheckUtil.checkCatalog;
 import static com.wintersky.windyreader.util.LogUtil.LOG;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class RemoteDataSourceTest {
 
+    private Context mContext;
+    private OkHttpClient mHttp;
     private RemoteDataSource mSource;
     private List<String> bookList;
     private List<String> catalogList;
@@ -28,8 +38,9 @@ public class RemoteDataSourceTest {
 
     @Before
     public void setUp() {
-        Context context = InstrumentationRegistry.getTargetContext();
-        mSource = new RemoteDataSource(context, new SingleExecutors(), Component.get().getOkHttpClient());
+        mContext = InstrumentationRegistry.getTargetContext();
+        mHttp = Component.get().getOkHttpClient();
+        mSource = new RemoteDataSource(mContext, new SingleExecutors(), mHttp);
 
         bookList = new ArrayList<>();
         catalogList = new ArrayList<>();
@@ -49,6 +60,17 @@ public class RemoteDataSourceTest {
     }
 
     @Test
+    public void remoteTest() throws IOException {
+        Request get = new Request.Builder().url("http://www.8wenku.com")
+                .addHeader("User-Agent", WebSettings.getDefaultUserAgent(mContext))
+                .build();
+        Response response = mHttp.newCall(get).execute();
+        assertTrue(response.isSuccessful());
+        ResponseBody body = response.body();
+        assertNotNull(body);
+    }
+
+    @Test
     public void remoteGetBookFrom() throws Exception {
         for (String url : bookList) {
             Book book = mSource.getBookFrom(url);
@@ -65,7 +87,7 @@ public class RemoteDataSourceTest {
             long et = System.currentTimeMillis();
             assertNotNull("chapter list null: " + url, list);
             checkCatalog(list);
-            LOG(String.format("cast: %d ms", et - st));
+            LOG(String.format("Cast: %d ms", et - st));
         }
     }
 
@@ -74,7 +96,7 @@ public class RemoteDataSourceTest {
         for (String url : chapterList) {
             String content = mSource.getContentFrom(url);
             assertNotNull("content null: " + url, content);
-            LOG("content: " + url, content);
+            LOG("Content: " + url, content);
         }
     }
 }

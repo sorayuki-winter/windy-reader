@@ -15,7 +15,7 @@ import org.keplerproject.luajava.LuaException;
 import org.keplerproject.luajava.LuaState;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.nio.charset.Charset;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,9 +28,10 @@ import lombok.Cleanup;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
+import static com.wintersky.windyreader.util.FileUtil.is2String;
 import static com.wintersky.windyreader.util.LuaUtil.getLua;
-import static com.wintersky.windyreader.util.LuaUtil.is2String;
 import static com.wintersky.windyreader.util.LuaUtil.luaSafeDoString;
 import static com.wintersky.windyreader.util.LuaUtil.luaSafeRun;
 
@@ -158,20 +159,29 @@ public class RemoteDataSource implements DataSource {
 
     @NonNull
     public Book getBookFrom(@NonNull String url) throws LuaException, IOException {
-        String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        @Cleanup LuaState lua = getLua(mContext);
-
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-        String doc = new String(bytes, "UTF-8");
-        if (doc.contains("charset=gbk")) {
-            doc = new String(bytes, "GBK");
+
+        String doc;
+        @Cleanup LuaState lua = getLua(mContext);
+        String fileName = response.request().url().host().replace('.', '_') + ".lua";
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "charset");
+        String charset = lua.toString(-1);
+        lua.pop(1);
+
+        @Cleanup ResponseBody body = response.body();
+        if (body == null) {
+            throw new IOException("ResponseBody null");
+        }
+        if (charset == null) {
+            doc = body.string();
+        } else {
+            doc = body.source().readString(Charset.forName(charset));
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
         lua.getField(-1, "getBook");
-        lua.pushString(url);
+        lua.pushString(response.request().url().toString());
         lua.pushString(doc);
         luaSafeRun(lua, 2, 1);
         String json = lua.toString(-1);
@@ -184,18 +194,27 @@ public class RemoteDataSource implements DataSource {
 
     @NonNull
     public RealmList<Chapter> getCatalogFrom(@NonNull String url) throws LuaException, IOException {
-        String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        @Cleanup LuaState lua = getLua(mContext);
-
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-        String doc = new String(bytes, "UTF-8");
-        if (doc.contains("charset=gbk")) {
-            doc = new String(bytes, "GBK");
+
+        String doc;
+        @Cleanup LuaState lua = getLua(mContext);
+        String fileName = response.request().url().host().replace('.', '_') + ".lua";
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "charset");
+        String charset = lua.toString(-1);
+        lua.pop(1);
+
+        @Cleanup ResponseBody body = response.body();
+        if (body == null) {
+            throw new IOException("ResponseBody null");
+        }
+        if (charset == null) {
+            doc = body.string();
+        } else {
+            doc = body.source().readString(Charset.forName(charset));
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
         lua.getField(-1, "getCatalog");
         lua.pushString(url);
         lua.pushString(doc);
@@ -210,18 +229,27 @@ public class RemoteDataSource implements DataSource {
 
     @NonNull
     public String getContentFrom(@NonNull String url) throws LuaException, IOException {
-        String fileName = url.split("/")[2].replace('.', '_') + ".lua";
-        @Cleanup LuaState lua = getLua(mContext);
-
         Request request = new Request.Builder().url(url).build();
         Response response = mHttp.newCall(request).execute();
-        byte[] bytes = Objects.requireNonNull(response.body()).bytes();
-        String doc = new String(bytes, "UTF-8");
-        if (doc.contains("charset=gbk")) {
-            doc = new String(bytes, "GBK");
+
+        String doc;
+        @Cleanup LuaState lua = getLua(mContext);
+        String fileName = response.request().url().host().replace('.', '_') + ".lua";
+        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
+        lua.getField(-1, "charset");
+        String charset = lua.toString(-1);
+        lua.pop(1);
+
+        @Cleanup ResponseBody body = response.body();
+        if (body == null) {
+            throw new IOException("ResponseBody null");
+        }
+        if (charset == null) {
+            doc = body.string();
+        } else {
+            doc = body.source().readString(Charset.forName(charset));
         }
 
-        luaSafeDoString(lua, is2String(mContext.getAssets().open(fileName)), 1);
         lua.getField(-1, "getContent");
         lua.pushString(doc);
         luaSafeRun(lua, 1, 1);

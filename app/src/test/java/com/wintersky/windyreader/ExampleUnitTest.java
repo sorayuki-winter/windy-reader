@@ -18,7 +18,7 @@ public class ExampleUnitTest {
 
     @Test
     public void log() {
-        LOG("hint", "log");
-        LOG("log");
+        LOG("Hint", "Log");
+        LOG("Log");
     }
 }

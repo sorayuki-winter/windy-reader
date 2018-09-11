@@ -69,7 +69,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
                     if (url.matches("https?://m\\..*")) {
                         String www = url.replaceFirst("m", "www");
                         saveBook(www);
-                        LOG("try to connect to " + www, error);
+                        LOG("Try connect to " + www, error);
                         return;
                     }
                 }
@@ -86,7 +86,7 @@ public class ShelfPresenter implements ShelfContract.Presenter {
         mRepository.deleteBook(url, new DataSource.DeleteBookCallback() {
             @Override
             public void onDeleted() {
-                LOGD("book deleted: " + url);
+                LOGD("Book deleted: " + url);
             }
 
             @Override

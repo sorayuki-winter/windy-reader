@@ -28,7 +28,6 @@ import dagger.android.support.DaggerFragment;
 
 import static android.app.Activity.RESULT_OK;
 import static com.wintersky.windyreader.read.ReadActivity.CHAPTER_IDX;
-import static com.wintersky.windyreader.util.LogUtil.LOG;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -119,8 +118,6 @@ public class CatalogFragment extends DaggerFragment implements CatalogContract.V
             intent.putExtra(CHAPTER_IDX, chapter.getIndex());
             activity.setResult(RESULT_OK, intent);
             activity.finish();
-        } else {
-            LOG("CatalogFragment.mListView.onItemClick", "activity or chapter null");
         }
     }
 

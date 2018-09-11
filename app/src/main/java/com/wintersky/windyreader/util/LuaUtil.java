@@ -24,12 +24,15 @@ public class LuaUtil {
                 String name = luaState.toString(-1).replace(".", "/");
                 try {
                     InputStream is = context.getAssets().open(name + ".lua");
-                    byte[] bytes = new byte[is.available()];
-                    //noinspection ResultOfMethodCallIgnored
-                    is.read(bytes);
-                    luaState.LloadBuffer(bytes, name);
+                    int available = is.available();
+                    byte[] buff = new byte[available];
+                    int len = is.read(buff);
+                    if (len != available) {
+                        throw new IOException(String.format("file length available %d but read %d", available, len));
+                    }
+                    luaState.LloadBuffer(buff, name);
                     return 1;
-                } catch (Exception e) {
+                } catch (IOException e) {
                     ByteArrayOutputStream os = new ByteArrayOutputStream();
                     e.printStackTrace(new PrintStream(os));
                     luaState.pushString("Cannot load module " + name + ":\n" + os.toString());
@@ -59,23 +62,6 @@ public class LuaUtil {
         luaState.setTop(1);
 
         return luaState;
-    }
-
-    public static String is2String(InputStream is) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        int len;
-        try {
-            while ((len = is.read(buffer)) != -1) {
-                bos.write(buffer, 0, len);
-            }
-            is.close();
-            bos.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
-        }
-        return bos.toString();
     }
 
     private static String errorReason(int error) {

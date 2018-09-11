@@ -2,8 +2,10 @@ package com.wintersky.windyreader.shelf;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.widget.Toast;
 
 import com.wintersky.windyreader.R;
 import com.wintersky.windyreader.data.source.BookCache;
@@ -20,6 +22,9 @@ public class ShelfActivity extends DaggerAppCompatActivity {
     @Inject BookCache mBookCache;
     @Inject UpdateCheck mUpdateCheck;
     @Inject ShelfFragment shelfFragment;
+
+    private boolean exist = false;
+    private Toast mToast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,21 @@ public class ShelfActivity extends DaggerAppCompatActivity {
     @Override
     public void onBackPressed() {
         if (!shelfFragment.onBackPressed()) {
-            super.onBackPressed();
+            if (exist) {
+                mToast.cancel();
+                super.onBackPressed();
+            } else {
+                exist = true;
+                mToast = Toast.makeText(this, "Press to Exist", Toast.LENGTH_SHORT);
+                mToast.show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        exist = false;
+                        mToast = null;
+                    }
+                }, 2000);
+            }
         }
     }
 

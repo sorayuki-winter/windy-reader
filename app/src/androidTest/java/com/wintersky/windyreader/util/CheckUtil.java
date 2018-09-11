@@ -14,11 +14,11 @@ public class CheckUtil {
         for (Book book : list) {
             sb.append(book.getTitle()).append(" ").append(book.getUrl()).append("\n");
         }
-        LOG("shelf", sb.toString());
+        LOG("Shelf ----->>>>>", sb.toString());
     }
 
     public static void checkBook(Book book) {
-        LOG("book", book.getTitle() + " " + book.getUrl() + "\n" + book.getCatalogUrl());
+        LOG("Book ----->>>>>", book.getTitle() + " " + book.getUrl() + "\n" + book.getCatalogUrl());
     }
 
     public static void checkCatalog(List<Chapter> list) {
@@ -26,6 +26,6 @@ public class CheckUtil {
         for (Chapter c : list) {
             sb.append(c.getIndex()).append(" ").append(c.getTitle()).append(" ").append(c.getUrl()).append("\n");
         }
-        LOG("catalog", sb.toString());
+        LOG("Catalog ----->>>>>", sb.toString());
     }
 }
